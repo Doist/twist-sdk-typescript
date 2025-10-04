@@ -2,6 +2,61 @@ import { v4 as uuid } from 'uuid'
 import { isSuccess, request } from './rest-client'
 import { TwistRequestError } from './types/errors'
 
+/**
+ * OAuth permission scopes for the Twist API.
+ *
+ * @remarks
+ * Request only the permissions your application needs:
+ *
+ * **User Permissions:**
+ * - `user:read` - Access user's personal settings
+ * - `user:write` - Access and update user's personal settings
+ *
+ * **Workspace Permissions:**
+ * - `workspaces:read` - Access teams the user is part of
+ * - `workspaces:write` - Access and update teams the user is part of
+ *
+ * **Channel Permissions:**
+ * - `channels:read` - Access channels
+ * - `channels:write` - Access and update channels
+ * - `channels:remove` - Access, update, and delete channels
+ *
+ * **Thread Permissions:**
+ * - `threads:read` - Access threads
+ * - `threads:write` - Access and update threads
+ * - `threads:remove` - Access, update, and delete threads
+ *
+ * **Comment Permissions:**
+ * - `comments:read` - Access comments
+ * - `comments:write` - Access and update comments
+ * - `comments:remove` - Access, update, and delete comments
+ *
+ * **Group Permissions:**
+ * - `groups:read` - Access groups
+ * - `groups:write` - Access and update groups
+ * - `groups:remove` - Access, update, and delete groups
+ *
+ * **Message Permissions:**
+ * - `messages:read` - Access messages
+ * - `messages:write` - Access and update messages
+ * - `messages:remove` - Access, update, and delete messages
+ *
+ * **Reaction Permissions:**
+ * - `reactions:read` - Access reactions
+ * - `reactions:write` - Access and update reactions
+ * - `reactions:remove` - Access, update, and delete reactions
+ *
+ * **Search Permissions:**
+ * - `search:read` - Search
+ *
+ * **Attachment Permissions:**
+ * - `attachments:read` - Access attachments
+ * - `attachments:write` - Access and update attachments
+ *
+ * **Notification Permissions:**
+ * - `notifications:read` - Read user's notifications settings
+ * - `notifications:write` - Read and update user's notifications settings
+ */
 export type TwistPermission =
     | 'user:read'
     | 'user:write'
@@ -9,12 +64,27 @@ export type TwistPermission =
     | 'workspaces:write'
     | 'channels:read'
     | 'channels:write'
+    | 'channels:remove'
     | 'threads:read'
     | 'threads:write'
+    | 'threads:remove'
+    | 'comments:read'
+    | 'comments:write'
+    | 'comments:remove'
     | 'groups:read'
     | 'groups:write'
-    | 'conversations:read'
-    | 'conversations:write'
+    | 'groups:remove'
+    | 'messages:read'
+    | 'messages:write'
+    | 'messages:remove'
+    | 'reactions:read'
+    | 'reactions:write'
+    | 'reactions:remove'
+    | 'search:read'
+    | 'attachments:read'
+    | 'attachments:write'
+    | 'notifications:read'
+    | 'notifications:write'
 
 export type AuthTokenRequestArgs = {
     clientId: string
