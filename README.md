@@ -97,12 +97,19 @@ api.workspaces.getWorkspaces()
 
 This package follows semantic versioning. Currently in alpha release (0.1.0-alpha.x).
 
-To publish an alpha version:
+A new version is published to the NPM Registry whenever a new release on GitHub is created. The workflow automatically detects prerelease versions (alpha, beta, rc) and publishes them with the appropriate tag.
+
+To prepare a new release:
 
 ```bash
-npm version prerelease --preid=alpha
-npm publish --tag alpha
+# For alpha releases
+npm version prerelease --preid=alpha --no-git-tag-version
+
+# For stable releases
+npm version <major|minor|patch> --no-git-tag-version
 ```
+
+Once the version in `package.json` is updated, push the changes and create a GitHub release. The workflow will automatically publish to npm with the correct tag.
 
 ## Feedback
 
