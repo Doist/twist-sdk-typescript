@@ -7,6 +7,17 @@ import { UsersClient } from './clients/users-client'
 import { WorkspaceUsersClient } from './clients/workspace-users-client'
 import { WorkspacesClient } from './clients/workspaces-client'
 
+/**
+ * The main API client for interacting with the Twist REST API.
+ *
+ * @example
+ * ```typescript
+ * import { TwistApi } from '@doist/twist-sdk'
+ *
+ * const api = new TwistApi('your-api-token')
+ * const user = await api.users.getSessionUser()
+ * ```
+ */
 export class TwistApi {
     public users: UsersClient
     public workspaces: WorkspacesClient
@@ -17,6 +28,12 @@ export class TwistApi {
     public conversations: ConversationsClient
     public comments: CommentsClient
 
+    /**
+     * Creates a new Twist API client.
+     *
+     * @param authToken - Your Twist API token.
+     * @param baseUrl - Optional custom API base URL. If not provided, defaults to Twist's standard API endpoint.
+     */
     constructor(authToken: string, baseUrl?: string) {
         this.users = new UsersClient(authToken, baseUrl)
         this.workspaces = new WorkspacesClient(authToken, baseUrl)

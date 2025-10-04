@@ -2,6 +2,9 @@ import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
 import { Workspace, WorkspaceSchema } from '../types/entities'
 
+/**
+ * Client for interacting with Twist workspace endpoints.
+ */
 export class WorkspacesClient {
     constructor(
         private apiToken: string,
@@ -12,6 +15,17 @@ export class WorkspacesClient {
         return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
     }
 
+    /**
+     * Gets all the user's workspaces.
+     *
+     * @returns An array of all workspaces the user belongs to.
+     *
+     * @example
+     * ```typescript
+     * const workspaces = await api.workspaces.getWorkspaces()
+     * workspaces.forEach(ws => console.log(ws.name))
+     * ```
+     */
     async getWorkspaces(): Promise<Workspace[]> {
         const response = await request<Workspace[]>(
             'GET',
@@ -23,6 +37,18 @@ export class WorkspacesClient {
         return response.data.map((workspace) => WorkspaceSchema.parse(workspace))
     }
 
+    /**
+     * Gets a single workspace object by id.
+     *
+     * @param id - The workspace ID.
+     * @returns The workspace object.
+     *
+     * @example
+     * ```typescript
+     * const workspace = await api.workspaces.getWorkspace(123)
+     * console.log(workspace.name)
+     * ```
+     */
     async getWorkspace(id: number): Promise<Workspace> {
         const response = await request<Workspace>(
             'GET',

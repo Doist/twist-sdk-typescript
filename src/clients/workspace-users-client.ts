@@ -2,6 +2,9 @@ import { request } from '../rest-client'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
 
+/**
+ * Client for interacting with Twist workspace users endpoints (v4 API).
+ */
 export class WorkspaceUsersClient {
     constructor(
         private apiToken: string,
@@ -12,6 +15,19 @@ export class WorkspaceUsersClient {
         return this.baseUrl ? `${this.baseUrl}/api/v4` : 'https://api.twist.com/api/v4/'
     }
 
+    /**
+     * Returns a list of workspace user objects for the given workspace id.
+     *
+     * @param workspaceId - The workspace ID.
+     * @param archived - Optional flag to filter archived users.
+     * @returns An array of workspace user objects.
+     *
+     * @example
+     * ```typescript
+     * const users = await api.workspaceUsers.getWorkspaceUsers(123)
+     * users.forEach(u => console.log(u.name, u.userType))
+     * ```
+     */
     async getWorkspaceUsers(workspaceId: number, archived?: boolean): Promise<WorkspaceUser[]> {
         const response = await request<WorkspaceUser[]>(
             'GET',
@@ -24,6 +40,12 @@ export class WorkspaceUsersClient {
         return response.data.map((user) => WorkspaceUserSchema.parse(user))
     }
 
+    /**
+     * Returns a list of workspace user IDs for the given workspace id.
+     *
+     * @param workspaceId - The workspace ID.
+     * @returns An array of user IDs.
+     */
     async getWorkspaceUserIds(workspaceId: number): Promise<number[]> {
         const response = await request<number[]>(
             'GET',
@@ -36,6 +58,17 @@ export class WorkspaceUsersClient {
         return response.data
     }
 
+    /**
+     * Adds a person to a workspace.
+     *
+     * @param args - The arguments for adding a user.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.email - The user's email.
+     * @param args.name - Optional name for the user.
+     * @param args.userType - Optional user type (USER, GUEST, or ADMIN).
+     * @param args.channelIds - Optional array of channel IDs to add the user to.
+     * @returns The created workspace user object.
+     */
     async addUser(args: {
         workspaceId: number
         email: string
@@ -60,6 +93,16 @@ export class WorkspaceUsersClient {
         return WorkspaceUserSchema.parse(response.data)
     }
 
+    /**
+     * Updates a person in a workspace.
+     *
+     * @param args - The arguments for updating a user.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.userType - The user type (USER, GUEST, or ADMIN).
+     * @param args.email - Optional email of the user to update.
+     * @param args.userId - Optional user ID to update (use either email or userId).
+     * @returns The updated workspace user object.
+     */
     async updateUser(args: {
         workspaceId: number
         userType: UserType
@@ -82,6 +125,14 @@ export class WorkspaceUsersClient {
         return WorkspaceUserSchema.parse(response.data)
     }
 
+    /**
+     * Removes a person from a workspace.
+     *
+     * @param args - The arguments for removing a user.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.email - Optional email of the user to remove.
+     * @param args.userId - Optional user ID to remove (use either email or userId).
+     */
     async removeUser(args: {
         workspaceId: number
         email?: string
@@ -94,6 +145,14 @@ export class WorkspaceUsersClient {
         })
     }
 
+    /**
+     * Sends a new workspace invitation to the selected user.
+     *
+     * @param args - The arguments for resending an invite.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.email - The user's email.
+     * @param args.userId - Optional user ID.
+     */
     async resendInvite(args: {
         workspaceId: number
         email: string

@@ -2,6 +2,9 @@ import { ENDPOINT_USERS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
 import { User, UserSchema } from '../types/entities'
 
+/**
+ * Client for interacting with Twist user endpoints.
+ */
 export class UsersClient {
     constructor(
         private apiToken: string,
@@ -12,6 +15,17 @@ export class UsersClient {
         return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
     }
 
+    /**
+     * Gets the associated user for the access token used in the request.
+     *
+     * @returns The authenticated user's information.
+     *
+     * @example
+     * ```typescript
+     * const user = await api.users.getSessionUser()
+     * console.log(user.name, user.email)
+     * ```
+     */
     async getSessionUser(): Promise<User> {
         const response = await request<User>(
             'GET',
