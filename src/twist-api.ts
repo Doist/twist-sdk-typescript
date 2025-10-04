@@ -1,7 +1,11 @@
 import { ChannelsClient } from './clients/channels-client'
 import { CommentsClient } from './clients/comments-client'
+import { ConversationMessagesClient } from './clients/conversation-messages-client'
 import { ConversationsClient } from './clients/conversations-client'
 import { GroupsClient } from './clients/groups-client'
+import { InboxClient } from './clients/inbox-client'
+import { ReactionsClient } from './clients/reactions-client'
+import { SearchClient } from './clients/search-client'
 import { ThreadsClient } from './clients/threads-client'
 import { UsersClient } from './clients/users-client'
 import { WorkspaceUsersClient } from './clients/workspace-users-client'
@@ -27,6 +31,10 @@ export class TwistApi {
     public groups: GroupsClient
     public conversations: ConversationsClient
     public comments: CommentsClient
+    public conversationMessages: ConversationMessagesClient
+    public inbox: InboxClient
+    public reactions: ReactionsClient
+    public search: SearchClient
 
     /**
      * Creates a new Twist API client.
@@ -43,5 +51,9 @@ export class TwistApi {
         this.groups = new GroupsClient(authToken, baseUrl)
         this.conversations = new ConversationsClient(authToken, baseUrl)
         this.comments = new CommentsClient(authToken, baseUrl)
+        this.conversationMessages = new ConversationMessagesClient(authToken, baseUrl)
+        this.inbox = new InboxClient(authToken, baseUrl)
+        this.reactions = new ReactionsClient(authToken, baseUrl)
+        this.search = new SearchClient(authToken, baseUrl)
     }
 }

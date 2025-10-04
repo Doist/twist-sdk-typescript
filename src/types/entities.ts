@@ -183,3 +183,62 @@ export const WorkspaceUserSchema = z.object({
 })
 
 export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
+
+// ConversationMessage entity from API
+export const ConversationMessageSchema = z.object({
+    id: z.number(),
+    content: z.string(),
+    creatorId: z.number(),
+    conversationId: z.number(),
+    createdTs: z.number(),
+    systemMessage: z.string().nullable().optional(),
+    attachments: z.array(z.unknown()).optional(),
+    reactions: z.record(z.string(), z.array(z.number())).optional(),
+    actions: z.array(z.unknown()).optional(),
+    objIndex: z.number().optional(),
+    lastEditedTs: z.number().nullable().optional(),
+})
+
+export type ConversationMessage = z.infer<typeof ConversationMessageSchema>
+
+// InboxThread entity from API
+export const InboxThreadSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    channelId: z.number(),
+    workspaceId: z.number(),
+    creatorId: z.number(),
+    isUnread: z.boolean(),
+    isStarred: z.boolean(),
+    newestObjIndex: z.number(),
+    oldestObjIndex: z.number(),
+    unreadCount: z.number(),
+})
+
+export type InboxThread = z.infer<typeof InboxThreadSchema>
+
+// InboxConversation entity from API
+export const InboxConversationSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    workspaceId: z.number(),
+    isUnread: z.boolean(),
+    unreadCount: z.number(),
+})
+
+export type InboxConversation = z.infer<typeof InboxConversationSchema>
+
+// SearchResult entity from API
+export const SearchResultSchema = z.object({
+    id: z.number(),
+    type: z.enum(['thread', 'comment', 'message']),
+    content: z.string(),
+    creatorId: z.number(),
+    createdTs: z.number(),
+    threadId: z.number().optional(),
+    conversationId: z.number().optional(),
+    channelId: z.number().optional(),
+    workspaceId: z.number(),
+})
+
+export type SearchResult = z.infer<typeof SearchResultSchema>

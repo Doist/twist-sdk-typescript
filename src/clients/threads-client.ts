@@ -172,4 +172,63 @@ export class ThreadsClient {
             id,
         })
     }
+
+    /**
+     * Marks a thread as read.
+     *
+     * @param id - The thread ID.
+     */
+    async markRead(id: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_read`, this.apiToken, {
+            id,
+        })
+    }
+
+    /**
+     * Marks all threads in a workspace as read.
+     *
+     * @param workspaceId - The workspace ID.
+     */
+    async markAllRead(workspaceId: number): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/mark_all_read`,
+            this.apiToken,
+            { workspace_id: workspaceId },
+        )
+    }
+
+    /**
+     * Clears unread status for a thread (marks as read without marking all comments as seen).
+     *
+     * @param id - The thread ID.
+     */
+    async clearUnread(id: number): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/clear_unread`,
+            this.apiToken,
+            { id },
+        )
+    }
+
+    /**
+     * Gets unread threads for a workspace.
+     *
+     * @param workspaceId - The workspace ID.
+     * @returns Array of unread thread IDs.
+     */
+    async getUnread(workspaceId: number): Promise<number[]> {
+        const response = await request<number[]>(
+            'GET',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/get_unread`,
+            this.apiToken,
+            { workspace_id: workspaceId },
+        )
+
+        return response.data
+    }
 }

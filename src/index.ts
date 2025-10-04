@@ -1,3 +1,7 @@
 export * from './authentication'
+export { ConversationMessagesClient } from './clients/conversation-messages-client'
+export { InboxClient } from './clients/inbox-client'
+export { ReactionsClient } from './clients/reactions-client'
+export { SearchClient } from './clients/search-client'
 export { TwistApi } from './twist-api'
 export * from './types'

@@ -21,24 +21,33 @@ export class CommentsClient {
      *
      * @param args - The arguments for getting comments.
      * @param args.threadId - The thread ID.
-     * @param args.newerThanTs - Optional timestamp to get comments newer than.
-     * @param args.olderThanTs - Optional timestamp to get comments older than.
+     * @param args.from - Optional date to get comments from.
      * @param args.limit - Optional limit on number of comments returned.
      * @returns An array of comment objects.
      *
      * @example
      * ```typescript
-     * const comments = await api.comments.getComments({ threadId: 789 })
+     * const comments = await api.comments.getComments({
+     *   threadId: 789,
+     *   from: new Date('2024-01-01')
+     * })
      * comments.forEach(c => console.log(c.content))
      * ```
      */
     async getComments(args: GetCommentsArgs): Promise<Comment[]> {
+        const params: Record<string, unknown> = {
+            thread_id: args.threadId,
+        }
+
+        if (args.from) params.from = Math.floor(args.from.getTime() / 1000)
+        if (args.limit) params.limit = args.limit
+
         const response = await request<Comment[]>(
             'GET',
             this.getBaseUri(),
             `${ENDPOINT_COMMENTS}/get`,
             this.apiToken,
-            args,
+            params,
         )
 
         return response.data.map((comment) => CommentSchema.parse(comment))

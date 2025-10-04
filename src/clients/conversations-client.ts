@@ -149,4 +149,52 @@ export class ConversationsClient {
             { id, userId },
         )
     }
+
+    /**
+     * Marks a conversation as read.
+     *
+     * @param id - The conversation ID.
+     */
+    async markRead(id: number): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/mark_read`,
+            this.apiToken,
+            { id },
+        )
+    }
+
+    /**
+     * Marks a conversation as unread.
+     *
+     * @param id - The conversation ID.
+     */
+    async markUnread(id: number): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/mark_unread`,
+            this.apiToken,
+            { id },
+        )
+    }
+
+    /**
+     * Gets unread conversations for a workspace.
+     *
+     * @param workspaceId - The workspace ID.
+     * @returns Array of unread conversation IDs.
+     */
+    async getUnread(workspaceId: number): Promise<number[]> {
+        const response = await request<number[]>(
+            'GET',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/get_unread`,
+            this.apiToken,
+            { workspace_id: workspaceId },
+        )
+
+        return response.data
+    }
 }

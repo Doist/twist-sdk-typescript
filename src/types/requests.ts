@@ -112,7 +112,7 @@ export type GetThreadsArgs = z.infer<typeof GetThreadsArgsSchema>
 
 export const GetCommentsArgsSchema = z.object({
     threadId: z.number(),
-    from: z.number().optional(),
+    from: z.date().optional(),
     limit: z.number().optional(),
 })
 
