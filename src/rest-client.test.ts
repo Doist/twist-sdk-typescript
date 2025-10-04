@@ -1,9 +1,10 @@
+import { vi } from 'vitest'
 import { isSuccess, paramsSerializer, request } from './rest-client'
 import { TwistRequestError } from './types/errors'
 
 // Mock fetch globally
-const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
-global.fetch = mockFetch
+const mockFetch = vi.fn()
+global.fetch = mockFetch as unknown as typeof fetch
 
 describe('restClient', () => {
     beforeEach(() => {

@@ -1,10 +1,11 @@
+import { vi } from 'vitest'
 import { setupRestClientMock } from '../testUtils/mocks'
 import { mockUser, TEST_API_TOKEN } from '../testUtils/test-defaults'
 import { UsersClient } from './users-client'
 
 describe('UsersClient', () => {
     let client: UsersClient
-    let mockRequest: jest.SpyInstance
+    let mockRequest: ReturnType<typeof setupRestClientMock>
 
     beforeEach(() => {
         client = new UsersClient(TEST_API_TOKEN)
@@ -12,7 +13,7 @@ describe('UsersClient', () => {
     })
 
     afterEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     describe('getSessionUser', () => {

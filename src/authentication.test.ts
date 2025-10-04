@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
     getAuthorizationUrl,
     getAuthStateParameter,
@@ -69,7 +70,7 @@ describe('authentication', () => {
     })
 
     describe('getAuthToken', () => {
-        let mockRequest: jest.SpyInstance
+        let mockRequest: ReturnType<typeof setupRestClientMock>
 
         beforeEach(() => {
             const mockResponse = {
@@ -82,7 +83,7 @@ describe('authentication', () => {
         })
 
         afterEach(() => {
-            jest.clearAllMocks()
+            vi.clearAllMocks()
         })
 
         it('should exchange auth code for access token', async () => {
@@ -132,14 +133,14 @@ describe('authentication', () => {
     })
 
     describe('revokeAuthToken', () => {
-        let mockRequest: jest.SpyInstance
+        let mockRequest: ReturnType<typeof setupRestClientMock>
 
         beforeEach(() => {
             mockRequest = setupRestClientMock({}, 200)
         })
 
         afterEach(() => {
-            jest.clearAllMocks()
+            vi.clearAllMocks()
         })
 
         it('should revoke access token', async () => {
