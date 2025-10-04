@@ -15,6 +15,9 @@ function toSnakeCase(str: string): string {
         .replace(/^_/, '')
 }
 
+/**
+ * @internal
+ */
 export function camelCaseKeys(obj: unknown): unknown {
     if (isArray(obj)) {
         return obj.map(camelCaseKeys)
@@ -32,6 +35,9 @@ export function camelCaseKeys(obj: unknown): unknown {
     return obj
 }
 
+/**
+ * @internal
+ */
 export function snakeCaseKeys(obj: unknown): unknown {
     if (isArray(obj)) {
         return obj.map(snakeCaseKeys)

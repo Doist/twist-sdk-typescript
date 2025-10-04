@@ -121,6 +121,7 @@ const config: Config = {
                 expandParameters: true,
                 excludeNotDocumented: true,
                 excludeNotDocumentedKinds: ['Variable'],
+                excludeInternal: true,
                 pageTitleTemplates: { member: '{name}' },
 
                 /**
