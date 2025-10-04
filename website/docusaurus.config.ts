@@ -47,14 +47,13 @@ const config: Config = {
             title: 'Twist SDK TypeScript',
             logo: {
                 alt: 'Twist Logo',
-                src: 'img/twist-logo.svg',
-                href: '/about',
+                src: 'img/twist-logo.png',
             },
             items: [
                 {
                     position: 'left',
                     label: 'Docs',
-                    to: '/about',
+                    to: '/',
                 },
                 {
                     href: 'https://github.com/Doist/twist-sdk-typescript',
@@ -71,7 +70,7 @@ const config: Config = {
                     items: [
                         {
                             label: 'Getting Started',
-                            to: '/about',
+                            to: '/',
                         },
                         {
                             label: 'API Reference',

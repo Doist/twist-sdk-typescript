@@ -1,5 +1,5 @@
 ---
-id: about
+slug: /
 title: Getting Started
 sidebar_position: 1
 ---
