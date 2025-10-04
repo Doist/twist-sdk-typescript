@@ -1,6 +1,6 @@
 import {
-    getAuthStateParameter,
     getAuthorizationUrl,
+    getAuthStateParameter,
     getAuthToken,
     revokeAuthToken,
     TwistPermission,

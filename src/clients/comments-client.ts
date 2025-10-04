@@ -1,7 +1,7 @@
+import { ENDPOINT_COMMENTS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { Comment, CommentSchema } from '../types/entities'
-import { CreateCommentArgs, UpdateCommentArgs, GetCommentsArgs } from '../types/requests'
+import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
 
 export class CommentsClient {
     constructor(

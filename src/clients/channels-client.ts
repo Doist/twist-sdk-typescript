@@ -1,7 +1,7 @@
+import { ENDPOINT_CHANNELS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_CHANNELS } from '../consts/endpoints'
 import { Channel, ChannelSchema } from '../types/entities'
-import { CreateChannelArgs, UpdateChannelArgs, GetChannelsArgs } from '../types/requests'
+import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
 
 export class ChannelsClient {
     constructor(

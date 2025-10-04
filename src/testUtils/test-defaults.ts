@@ -1,4 +1,4 @@
-import { User, Workspace, Channel, Thread, Group, Conversation, Comment } from '../types/entities'
+import { Channel, Comment, Conversation, Group, Thread, User, Workspace } from '../types/entities'
 
 export const TEST_API_TOKEN = 'test-api-token'
 

@@ -1,5 +1,5 @@
+import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_WORKSPACES } from '../consts/endpoints'
 import { Workspace, WorkspaceSchema } from '../types/entities'
 
 export class WorkspacesClient {

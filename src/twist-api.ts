@@ -1,11 +1,11 @@
-import { UsersClient } from './clients/users-client'
-import { WorkspacesClient } from './clients/workspaces-client'
-import { WorkspaceUsersClient } from './clients/workspace-users-client'
 import { ChannelsClient } from './clients/channels-client'
-import { ThreadsClient } from './clients/threads-client'
-import { GroupsClient } from './clients/groups-client'
-import { ConversationsClient } from './clients/conversations-client'
 import { CommentsClient } from './clients/comments-client'
+import { ConversationsClient } from './clients/conversations-client'
+import { GroupsClient } from './clients/groups-client'
+import { ThreadsClient } from './clients/threads-client'
+import { UsersClient } from './clients/users-client'
+import { WorkspaceUsersClient } from './clients/workspace-users-client'
+import { WorkspacesClient } from './clients/workspaces-client'
 
 export class TwistApi {
     public users: UsersClient

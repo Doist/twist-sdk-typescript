@@ -1,5 +1,5 @@
-import { TwistApi } from './twist-api'
 import { TEST_API_TOKEN } from './testUtils/test-defaults'
+import { TwistApi } from './twist-api'
 
 describe('TwistApi', () => {
     it('should initialize all client instances', () => {

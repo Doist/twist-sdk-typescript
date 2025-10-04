@@ -1,5 +1,5 @@
-import { request, isSuccess } from './rest-client'
 import { v4 as uuid } from 'uuid'
+import { isSuccess, request } from './rest-client'
 import { TwistRequestError } from './types/errors'
 
 export type TwistPermission =

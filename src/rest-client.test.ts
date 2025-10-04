@@ -1,4 +1,4 @@
-import { request, paramsSerializer, isSuccess } from './rest-client'
+import { isSuccess, paramsSerializer, request } from './rest-client'
 import { TwistRequestError } from './types/errors'
 
 // Mock fetch globally

@@ -1,5 +1,5 @@
+import { ENDPOINT_GROUPS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_GROUPS } from '../consts/endpoints'
 import { Group, GroupSchema } from '../types/entities'
 
 export class GroupsClient {

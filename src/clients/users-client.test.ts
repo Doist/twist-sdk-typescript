@@ -1,6 +1,6 @@
-import { UsersClient } from './users-client'
 import { setupRestClientMock } from '../testUtils/mocks'
 import { mockUser, TEST_API_TOKEN } from '../testUtils/test-defaults'
+import { UsersClient } from './users-client'
 
 describe('UsersClient', () => {
     let client: UsersClient

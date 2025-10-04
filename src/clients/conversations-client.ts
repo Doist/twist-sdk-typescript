@@ -1,5 +1,5 @@
+import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_CONVERSATIONS } from '../consts/endpoints'
 import { Conversation, ConversationSchema } from '../types/entities'
 import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
 

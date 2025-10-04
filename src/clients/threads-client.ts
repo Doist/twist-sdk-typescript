@@ -1,7 +1,7 @@
+import { ENDPOINT_THREADS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_THREADS } from '../consts/endpoints'
 import { Thread, ThreadSchema } from '../types/entities'
-import { CreateThreadArgs, UpdateThreadArgs, GetThreadsArgs } from '../types/requests'
+import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
 
 export class ThreadsClient {
     constructor(

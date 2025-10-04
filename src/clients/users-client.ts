@@ -1,5 +1,5 @@
+import { ENDPOINT_USERS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { getTwistBaseUri, ENDPOINT_USERS } from '../consts/endpoints'
 import { User, UserSchema } from '../types/entities'
 
 export class UsersClient {
