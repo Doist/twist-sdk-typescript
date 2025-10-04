@@ -43,9 +43,9 @@ req.session.oauthState = state
 Create the URL to redirect users to for authorization:
 
 ```typescript
-import { getAuthorizationUrl, TwistPermission } from '@doist/twist-sdk'
+import { getAuthorizationUrl, TwistScope } from '@doist/twist-sdk'
 
-const permissions: TwistPermission[] = [
+const scopes: TwistScope[] = [
     'user:read',
     'workspaces:read',
     'channels:read',
@@ -54,7 +54,7 @@ const permissions: TwistPermission[] = [
 
 const authUrl = getAuthorizationUrl(
     'your-client-id',           // Your OAuth client ID
-    permissions,                 // Array of permission scopes
+    scopes,                      // Array of OAuth scopes
     state,                       // State parameter from step 1
     'https://yourapp.com/callback', // Optional redirect URI
 )
@@ -67,7 +67,7 @@ res.redirect(authUrl)
 ```typescript
 getAuthorizationUrl(
     clientId: string,
-    permissions: TwistPermission[],
+    scopes: TwistScope[],
     state: string,
     redirectUri?: string,
     baseUrl?: string,
@@ -159,60 +159,60 @@ revokeAuthToken(
 ): Promise<boolean>
 ```
 
-## Available Permission Scopes
+## Available Scopes
 
-The SDK includes a `TwistPermission` type that defines all available OAuth scopes:
+The SDK includes a `TwistScope` type that defines all available OAuth scopes:
 
-### User Permissions
+### User Scopes
 - `user:read` - Access user's personal settings
 - `user:write` - Access and update user's personal settings
 
-### Workspace Permissions
+### Workspace Scopes
 - `workspaces:read` - Access teams the user is part of
 - `workspaces:write` - Access and update teams the user is part of
 
-### Channel Permissions
+### Channel Scopes
 - `channels:read` - Access channels
 - `channels:write` - Access and update channels
 - `channels:remove` - Access, update, and delete channels
 
-### Thread Permissions
+### Thread Scopes
 - `threads:read` - Access threads
 - `threads:write` - Access and update threads
 - `threads:remove` - Access, update, and delete threads
 
-### Comment Permissions
+### Comment Scopes
 - `comments:read` - Access comments
 - `comments:write` - Access and update comments
 - `comments:remove` - Access, update, and delete comments
 
-### Group Permissions
+### Group Scopes
 - `groups:read` - Access groups
 - `groups:write` - Access and update groups
 - `groups:remove` - Access, update, and delete groups
 
-### Message Permissions
+### Message Scopes
 - `messages:read` - Access messages
 - `messages:write` - Access and update messages
 - `messages:remove` - Access, update, and delete messages
 
-### Reaction Permissions
+### Reaction Scopes
 - `reactions:read` - Access reactions
 - `reactions:write` - Access and update reactions
 - `reactions:remove` - Access, update, and delete reactions
 
-### Search Permissions
+### Search Scopes
 - `search:read` - Search
 
-### Attachment Permissions
+### Attachment Scopes
 - `attachments:read` - Access attachments
 - `attachments:write` - Access and update attachments
 
-### Notification Permissions
+### Notification Scopes
 - `notifications:read` - Read user's notifications settings
 - `notifications:write` - Read and update user's notifications settings
 
-**Best Practice:** Only request the permissions your application actually needs.
+**Best Practice:** Only request the scopes your application actually needs.
 
 ## Complete Example
 
@@ -226,7 +226,7 @@ import {
     getAuthorizationUrl,
     getAuthToken,
     TwistApi,
-    TwistPermission
+    TwistScope
 } from '@doist/twist-sdk'
 
 const app = express()
@@ -242,7 +242,7 @@ app.get('/auth/twist', (req, res) => {
     const state = getAuthStateParameter()
     req.session.oauthState = state
 
-    const permissions: TwistPermission[] = [
+    const scopes: TwistScope[] = [
         'user:read',
         'workspaces:read',
         'channels:read',
@@ -251,7 +251,7 @@ app.get('/auth/twist', (req, res) => {
 
     const authUrl = getAuthorizationUrl(
         process.env.TWIST_CLIENT_ID!,
-        permissions,
+        scopes,
         state,
         'http://localhost:3000/auth/callback',
     )
@@ -304,7 +304,7 @@ The SDK exports these types for OAuth operations:
 
 ```typescript
 import type {
-    TwistPermission,
+    TwistScope,
     AuthTokenRequestArgs,
     AuthTokenResponse,
     RevokeAuthTokenRequestArgs

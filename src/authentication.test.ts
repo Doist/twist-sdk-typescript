@@ -3,7 +3,7 @@ import {
     getAuthStateParameter,
     getAuthToken,
     revokeAuthToken,
-    TwistPermission,
+    TwistScope,
 } from './authentication'
 import { setupRestClientMock } from './testUtils/mocks'
 
@@ -29,10 +29,10 @@ describe('authentication', () => {
     describe('getAuthorizationUrl', () => {
         it('should generate correct authorization URL', () => {
             const clientId = 'test-client-id'
-            const permissions: TwistPermission[] = ['user:read', 'channels:write']
+            const scopes: TwistScope[] = ['user:read', 'channels:write']
             const state = 'test-state'
 
-            const url = getAuthorizationUrl(clientId, permissions, state)
+            const url = getAuthorizationUrl(clientId, scopes, state)
 
             expect(url).toBe(
                 'https://twist.com/oauth/authorize?client_id=test-client-id&response_type=code&scope=user%3Aread+channels%3Awrite&state=test-state',
@@ -41,30 +41,30 @@ describe('authentication', () => {
 
         it('should include redirect URI if provided', () => {
             const clientId = 'test-client-id'
-            const permissions: TwistPermission[] = ['user:read']
+            const scopes: TwistScope[] = ['user:read']
             const state = 'test-state'
             const redirectUri = 'https://myapp.com/callback'
 
-            const url = getAuthorizationUrl(clientId, permissions, state, redirectUri)
+            const url = getAuthorizationUrl(clientId, scopes, state, redirectUri)
 
             expect(url).toContain('redirect_uri=https%3A%2F%2Fmyapp.com%2Fcallback')
         })
 
         it('should use custom base URL if provided', () => {
             const clientId = 'test-client-id'
-            const permissions: TwistPermission[] = ['user:read']
+            const scopes: TwistScope[] = ['user:read']
             const state = 'test-state'
             const baseUrl = 'https://custom.twist.com'
 
-            const url = getAuthorizationUrl(clientId, permissions, state, undefined, baseUrl)
+            const url = getAuthorizationUrl(clientId, scopes, state, undefined, baseUrl)
 
             expect(url).toContain('https://custom.twist.com/oauth/authorize')
         })
 
-        it('should throw error if no permissions provided', () => {
+        it('should throw error if no scopes provided', () => {
             expect(() => {
                 getAuthorizationUrl('client-id', [], 'state')
-            }).toThrow('At least one scope value should be passed for permissions.')
+            }).toThrow('At least one scope value is required.')
         })
     })
 
