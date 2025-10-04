@@ -5,13 +5,29 @@
     "author": "Doist developers",
     "repository": "git@github.com:doist/twist-sdk-typescript.git",
     "license": "MIT",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/cjs/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/esm/index.d.ts",
+                "default": "./dist/esm/index.js"
+            },
+            "require": {
+                "types": "./dist/cjs/index.d.ts",
+                "default": "./dist/cjs/index.js"
+            }
+        }
+    },
     "sideEffects": false,
     "scripts": {
         "clean": "rimraf dist",
         "test": "jest",
-        "build": "rimraf dist && npx tsc -p tsconfig.json",
+        "build": "rimraf dist && npm run build:cjs && npm run build:esm && npm run build:esm-package",
+        "build:cjs": "tsc -p tsconfig.cjs.json",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "build:esm-package": "echo '{\"type\":\"module\"}' > dist/esm/package.json",
         "type-check": "npx tsc --noEmit",
         "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",
         "lint:check": "biome lint",
@@ -59,8 +75,10 @@
         ]
     },
     "files": [
-        "dist/**/*",
+        "dist/cjs/**/*",
+        "dist/esm/**/*",
         "!dist/**/*.test.js",
-        "!dist/**/*.test.d.ts"
+        "!dist/**/*.test.d.ts",
+        "!dist/**/*.test.d.ts.map"
     ]
 }
