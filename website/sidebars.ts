@@ -20,6 +20,11 @@ const sidebars: SidebarsConfig = {
             label: 'Getting Started',
         },
         {
+            type: 'doc',
+            id: 'authorization',
+            label: 'Authorization',
+        },
+        {
             type: 'category',
             label: 'API Reference',
             collapsible: false,

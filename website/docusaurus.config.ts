@@ -73,6 +73,10 @@ const config: Config = {
                             to: '/',
                         },
                         {
+                            label: 'Authorization',
+                            to: '/authorization',
+                        },
+                        {
                             label: 'API Reference',
                             to: '/api/classes/TwistApi',
                         },
