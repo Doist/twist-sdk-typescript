@@ -1,0 +1,185 @@
+import { z } from 'zod'
+import { USER_TYPES, WORKSPACE_PLANS } from './enums'
+
+// User entity from API
+export const UserSchema = z.object({
+    id: z.number(),
+    email: z.string().email(),
+    name: z.string(),
+    shortName: z.string(),
+    firstName: z.string().optional(),
+    contactInfo: z.string().optional(),
+    bot: z.boolean(),
+    profession: z.string().optional(),
+    snoozeDndStart: z.string().nullable().optional(),
+    clientId: z.string().optional(),
+    timezone: z.string(),
+    removed: z.boolean(),
+    avatarId: z.string().optional(),
+    avatarUrls: z
+        .object({
+            s35: z.string(),
+            s60: z.string(),
+            s195: z.string(),
+            s640: z.string(),
+        })
+        .optional(),
+    cometChannel: z.string().optional(),
+    lang: z.string(),
+    awayMode: z
+        .object({
+            dateFrom: z.string(),
+            type: z.string(),
+            dateTo: z.string(),
+        })
+        .nullable()
+        .optional(),
+    cometServer: z.string().optional(),
+    offDays: z.array(z.number()).optional(),
+    restricted: z.boolean().optional(),
+    defaultWorkspace: z.number().nullable().optional(),
+    token: z.string().optional(),
+    snoozeDndEnd: z.string().nullable().optional(),
+    snoozed: z.boolean().optional(),
+    setupPending: z.union([z.boolean(), z.number()]).optional(),
+    snoozeUntil: z.number().optional(),
+    scheduledBanners: z.array(z.string()).optional(),
+})
+
+export type User = z.infer<typeof UserSchema>
+
+// Workspace entity from API
+export const WorkspaceSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    defaultChannel: z.number().optional(),
+    defaultConversation: z.number().optional(),
+    creator: z.number(),
+    createdTs: z.number(),
+    avatarId: z.string().optional(),
+    avatarUrls: z
+        .object({
+            s35: z.string(),
+            s60: z.string(),
+            s195: z.string(),
+            s640: z.string(),
+        })
+        .optional(),
+    plan: z.enum(WORKSPACE_PLANS).optional(),
+})
+
+export type Workspace = z.infer<typeof WorkspaceSchema>
+
+// Channel entity from API
+export const ChannelSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string().optional(),
+    creator: z.number(),
+    userIds: z.array(z.number()).optional(),
+    color: z.number().optional(),
+    public: z.boolean(),
+    workspaceId: z.number(),
+    archived: z.boolean(),
+    createdTs: z.number(),
+    useDefaultRecipients: z.boolean().optional(),
+    defaultGroups: z.array(z.number()).optional(),
+    defaultRecipients: z.array(z.number()).optional(),
+    isFavorited: z.boolean().optional(),
+    icon: z.number().optional(),
+})
+
+export type Channel = z.infer<typeof ChannelSchema>
+
+// Thread entity from API
+export const ThreadSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    content: z.string(),
+    creator: z.number(),
+    channelId: z.number(),
+    workspaceId: z.number(),
+    actions: z.array(z.unknown()).optional(),
+    attachments: z.array(z.unknown()).optional(),
+    commentCount: z.number(),
+    directGroupMentions: z.array(z.number()).optional(),
+    directMentions: z.array(z.number()).optional(),
+    groups: z.array(z.number()).optional(),
+    lastEditedTs: z.number().nullable().optional(),
+    lastObjIndex: z.number().optional(),
+    lastUpdatedTs: z.number(),
+    mutedUntilTs: z.number().nullable().optional(),
+    participants: z.array(z.number()).optional(),
+    pinned: z.boolean(),
+    pinnedTs: z.number().nullable().optional(),
+    postedTs: z.number(),
+    reactions: z.record(z.string(), z.unknown()).optional(),
+    recipients: z.array(z.number()).optional(),
+    snippet: z.string(),
+    snippetCreator: z.number(),
+    starred: z.boolean(),
+    systemMessage: z.string().nullable().optional(),
+    isArchived: z.boolean(),
+    inInbox: z.boolean().optional(),
+})
+
+export type Thread = z.infer<typeof ThreadSchema>
+
+// Group entity from API
+export const GroupSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    workspaceId: z.number(),
+    userIds: z.array(z.number()),
+})
+
+export type Group = z.infer<typeof GroupSchema>
+
+// Conversation entity from API
+export const ConversationSchema = z.object({
+    id: z.number(),
+    workspaceId: z.number(),
+    userIds: z.array(z.number()),
+    messageCount: z.number(),
+    lastObjIndex: z.number(),
+    snippet: z.string(),
+    snippetCreators: z.array(z.number()),
+    lastActiveTs: z.number(),
+    mutedUntilTs: z.number().nullable().optional(),
+    archived: z.boolean(),
+    createdTs: z.number(),
+})
+
+export type Conversation = z.infer<typeof ConversationSchema>
+
+// Comment entity from API
+export const CommentSchema = z.object({
+    id: z.number(),
+    content: z.string(),
+    creator: z.number(),
+    threadId: z.number(),
+    workspaceId: z.number().optional(),
+    conversationId: z.number().optional(),
+    postedTs: z.number(),
+    lastEditedTs: z.number().nullable().optional(),
+    directMentions: z.array(z.number()).optional(),
+    directGroupMentions: z.array(z.number()).optional(),
+    systemMessage: z.string().nullable().optional(),
+    attachments: z.array(z.unknown()).optional(),
+    reactions: z.record(z.string(), z.unknown()).optional(),
+    objIndex: z.number().optional(),
+})
+
+export type Comment = z.infer<typeof CommentSchema>
+
+// WorkspaceUser entity from v4 API
+export const WorkspaceUserSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string(),
+    userType: z.enum(USER_TYPES),
+    workspaceId: z.number(),
+})
+
+export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
