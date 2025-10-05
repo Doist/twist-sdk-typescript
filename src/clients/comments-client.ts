@@ -1,7 +1,7 @@
-import { ENDPOINT_COMMENTS, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { Comment, CommentSchema } from '../types/entities.js'
-import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests.js'
+import { ENDPOINT_COMMENTS, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { Comment, CommentSchema } from '../types/entities'
+import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
 
 /**
  * Client for interacting with Twist comment endpoints.

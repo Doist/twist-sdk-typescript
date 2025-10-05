@@ -1,6 +1,6 @@
-import { ENDPOINT_SEARCH, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { SearchResult, SearchResultSchema } from '../types/entities.js'
+import { ENDPOINT_SEARCH, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { SearchResult, SearchResultSchema } from '../types/entities'
 
 type SearchArgs = {
     query: string

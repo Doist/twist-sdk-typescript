@@ -1,7 +1,7 @@
-import { ENDPOINT_CHANNELS, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { Channel, ChannelSchema } from '../types/entities.js'
-import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests.js'
+import { ENDPOINT_CHANNELS, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { Channel, ChannelSchema } from '../types/entities'
+import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
 
 /**
  * Client for interacting with Twist channel endpoints.

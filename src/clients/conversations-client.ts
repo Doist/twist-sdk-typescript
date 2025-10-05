@@ -1,7 +1,7 @@
-import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { Conversation, ConversationSchema } from '../types/entities.js'
-import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests.js'
+import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { Conversation, ConversationSchema } from '../types/entities'
+import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
 
 /**
  * Client for interacting with Twist conversation endpoints.

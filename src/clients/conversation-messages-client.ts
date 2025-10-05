@@ -1,6 +1,6 @@
-import { ENDPOINT_CONVERSATION_MESSAGES, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { ConversationMessage, ConversationMessageSchema } from '../types/entities.js'
+import { ENDPOINT_CONVERSATION_MESSAGES, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { ConversationMessage, ConversationMessageSchema } from '../types/entities'
 
 type GetConversationMessagesArgs = {
     conversationId: number

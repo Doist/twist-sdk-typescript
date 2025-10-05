@@ -1,6 +1,6 @@
-import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints.js'
-import { request } from '../rest-client.js'
-import { Workspace, WorkspaceSchema } from '../types/entities.js'
+import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints'
+import { request } from '../rest-client'
+import { Workspace, WorkspaceSchema } from '../types/entities'
 
 /**
  * Client for interacting with Twist workspace endpoints.

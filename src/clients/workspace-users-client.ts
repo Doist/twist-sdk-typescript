@@ -1,6 +1,6 @@
-import { request } from '../rest-client.js'
-import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities.js'
-import { UserType } from '../types/enums.js'
+import { request } from '../rest-client'
+import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
+import { UserType } from '../types/enums'
 
 /**
  * Client for interacting with Twist workspace users endpoints (v4 API).

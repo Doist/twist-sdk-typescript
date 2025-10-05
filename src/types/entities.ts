@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { USER_TYPES, WORKSPACE_PLANS } from './enums.js'
+import { USER_TYPES, WORKSPACE_PLANS } from './enums'
 
 // User entity from API
 export const UserSchema = z.object({

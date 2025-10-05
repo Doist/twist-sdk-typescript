@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
-import { isSuccess, request } from './rest-client.js'
-import { TwistRequestError } from './types/errors.js'
+import { isSuccess, request } from './rest-client'
+import { TwistRequestError } from './types/errors'
 
 /**
  * OAuth scopes for the Twist API.
