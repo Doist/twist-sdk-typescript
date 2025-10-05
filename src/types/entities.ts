@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { USER_TYPES, WORKSPACE_PLANS } from './enums'
+import { USER_TYPES, WORKSPACE_PLANS } from './enums.js'
 
 // User entity from API
 export const UserSchema = z.object({
@@ -7,15 +7,15 @@ export const UserSchema = z.object({
     email: z.string().email(),
     name: z.string(),
     shortName: z.string(),
-    firstName: z.string().optional(),
-    contactInfo: z.string().optional(),
+    firstName: z.string().nullable().optional(),
+    contactInfo: z.string().nullable().optional(),
     bot: z.boolean(),
-    profession: z.string().optional(),
+    profession: z.string().nullable().optional(),
     snoozeDndStart: z.string().nullable().optional(),
-    clientId: z.string().optional(),
+    clientId: z.string().nullable().optional(),
     timezone: z.string(),
     removed: z.boolean(),
-    avatarId: z.string().optional(),
+    avatarId: z.string().nullable().optional(),
     avatarUrls: z
         .object({
             s35: z.string(),
@@ -23,8 +23,9 @@ export const UserSchema = z.object({
             s195: z.string(),
             s640: z.string(),
         })
+        .nullable()
         .optional(),
-    cometChannel: z.string().optional(),
+    cometChannel: z.string().nullable().optional(),
     lang: z.string(),
     awayMode: z
         .object({
@@ -34,16 +35,16 @@ export const UserSchema = z.object({
         })
         .nullable()
         .optional(),
-    cometServer: z.string().optional(),
-    offDays: z.array(z.number()).optional(),
-    restricted: z.boolean().optional(),
+    cometServer: z.string().nullable().optional(),
+    offDays: z.array(z.number()).nullable().optional(),
+    restricted: z.boolean().nullable().optional(),
     defaultWorkspace: z.number().nullable().optional(),
-    token: z.string().optional(),
+    token: z.string().nullable().optional(),
     snoozeDndEnd: z.string().nullable().optional(),
-    snoozed: z.boolean().optional(),
-    setupPending: z.union([z.boolean(), z.number()]).optional(),
-    snoozeUntil: z.number().optional(),
-    scheduledBanners: z.array(z.string()).optional(),
+    snoozed: z.boolean().nullable().optional(),
+    setupPending: z.union([z.boolean(), z.number()]).nullable().optional(),
+    snoozeUntil: z.number().nullable().optional(),
+    scheduledBanners: z.array(z.string()).nullable().optional(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -52,11 +53,11 @@ export type User = z.infer<typeof UserSchema>
 export const WorkspaceSchema = z.object({
     id: z.number(),
     name: z.string(),
-    defaultChannel: z.number().optional(),
-    defaultConversation: z.number().optional(),
+    defaultChannel: z.number().nullable().optional(),
+    defaultConversation: z.number().nullable().optional(),
     creator: z.number(),
     createdTs: z.number(),
-    avatarId: z.string().optional(),
+    avatarId: z.string().nullable().optional(),
     avatarUrls: z
         .object({
             s35: z.string(),
@@ -64,8 +65,9 @@ export const WorkspaceSchema = z.object({
             s195: z.string(),
             s640: z.string(),
         })
+        .nullable()
         .optional(),
-    plan: z.enum(WORKSPACE_PLANS).optional(),
+    plan: z.enum(WORKSPACE_PLANS).nullable().optional(),
 })
 
 export type Workspace = z.infer<typeof WorkspaceSchema>
@@ -74,19 +76,19 @@ export type Workspace = z.infer<typeof WorkspaceSchema>
 export const ChannelSchema = z.object({
     id: z.number(),
     name: z.string(),
-    description: z.string().optional(),
+    description: z.string().nullable().optional(),
     creator: z.number(),
-    userIds: z.array(z.number()).optional(),
-    color: z.number().optional(),
+    userIds: z.array(z.number()).nullable().optional(),
+    color: z.number().nullable().optional(),
     public: z.boolean(),
     workspaceId: z.number(),
     archived: z.boolean(),
     createdTs: z.number(),
-    useDefaultRecipients: z.boolean().optional(),
-    defaultGroups: z.array(z.number()).optional(),
-    defaultRecipients: z.array(z.number()).optional(),
-    isFavorited: z.boolean().optional(),
-    icon: z.number().optional(),
+    useDefaultRecipients: z.boolean().nullable().optional(),
+    defaultGroups: z.array(z.number()).nullable().optional(),
+    defaultRecipients: z.array(z.number()).nullable().optional(),
+    isFavorited: z.boolean().nullable().optional(),
+    icon: z.number().nullable().optional(),
 })
 
 export type Channel = z.infer<typeof ChannelSchema>
@@ -99,28 +101,28 @@ export const ThreadSchema = z.object({
     creator: z.number(),
     channelId: z.number(),
     workspaceId: z.number(),
-    actions: z.array(z.unknown()).optional(),
-    attachments: z.array(z.unknown()).optional(),
+    actions: z.array(z.unknown()).nullable().optional(),
+    attachments: z.array(z.unknown()).nullable().optional(),
     commentCount: z.number(),
-    directGroupMentions: z.array(z.number()).optional(),
-    directMentions: z.array(z.number()).optional(),
-    groups: z.array(z.number()).optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
     lastEditedTs: z.number().nullable().optional(),
-    lastObjIndex: z.number().optional(),
+    lastObjIndex: z.number().nullable().optional(),
     lastUpdatedTs: z.number(),
     mutedUntilTs: z.number().nullable().optional(),
-    participants: z.array(z.number()).optional(),
+    participants: z.array(z.number()).nullable().optional(),
     pinned: z.boolean(),
     pinnedTs: z.number().nullable().optional(),
     postedTs: z.number(),
-    reactions: z.record(z.string(), z.unknown()).optional(),
-    recipients: z.array(z.number()).optional(),
+    reactions: z.record(z.string(), z.unknown()).nullable().optional(),
+    recipients: z.array(z.number()).nullable().optional(),
     snippet: z.string(),
     snippetCreator: z.number(),
     starred: z.boolean(),
     systemMessage: z.string().nullable().optional(),
     isArchived: z.boolean(),
-    inInbox: z.boolean().optional(),
+    inInbox: z.boolean().nullable().optional(),
 })
 
 export type Thread = z.infer<typeof ThreadSchema>
@@ -159,16 +161,16 @@ export const CommentSchema = z.object({
     content: z.string(),
     creator: z.number(),
     threadId: z.number(),
-    workspaceId: z.number().optional(),
-    conversationId: z.number().optional(),
+    workspaceId: z.number().nullable().optional(),
+    conversationId: z.number().nullable().optional(),
     postedTs: z.number(),
     lastEditedTs: z.number().nullable().optional(),
-    directMentions: z.array(z.number()).optional(),
-    directGroupMentions: z.array(z.number()).optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
     systemMessage: z.string().nullable().optional(),
-    attachments: z.array(z.unknown()).optional(),
-    reactions: z.record(z.string(), z.unknown()).optional(),
-    objIndex: z.number().optional(),
+    attachments: z.array(z.unknown()).nullable().optional(),
+    reactions: z.record(z.string(), z.unknown()).nullable().optional(),
+    objIndex: z.number().nullable().optional(),
 })
 
 export type Comment = z.infer<typeof CommentSchema>
@@ -192,10 +194,10 @@ export const ConversationMessageSchema = z.object({
     conversationId: z.number(),
     createdTs: z.number(),
     systemMessage: z.string().nullable().optional(),
-    attachments: z.array(z.unknown()).optional(),
-    reactions: z.record(z.string(), z.array(z.number())).optional(),
-    actions: z.array(z.unknown()).optional(),
-    objIndex: z.number().optional(),
+    attachments: z.array(z.unknown()).nullable().optional(),
+    reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+    actions: z.array(z.unknown()).nullable().optional(),
+    objIndex: z.number().nullable().optional(),
     lastEditedTs: z.number().nullable().optional(),
 })
 
@@ -235,9 +237,9 @@ export const SearchResultSchema = z.object({
     content: z.string(),
     creatorId: z.number(),
     createdTs: z.number(),
-    threadId: z.number().optional(),
-    conversationId: z.number().optional(),
-    channelId: z.number().optional(),
+    threadId: z.number().nullable().optional(),
+    conversationId: z.number().nullable().optional(),
+    channelId: z.number().nullable().optional(),
     workspaceId: z.number(),
 })
 

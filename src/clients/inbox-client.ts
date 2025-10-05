@@ -1,11 +1,11 @@
-import { ENDPOINT_INBOX, getTwistBaseUri } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { ENDPOINT_INBOX, getTwistBaseUri } from '../consts/endpoints.js'
+import { request } from '../rest-client.js'
 import {
     InboxConversation,
     InboxConversationSchema,
     InboxThread,
     InboxThreadSchema,
-} from '../types/entities'
+} from '../types/entities.js'
 
 type GetInboxArgs = {
     workspaceId: number

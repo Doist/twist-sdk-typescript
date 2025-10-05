@@ -1,7 +1,7 @@
-import { ENDPOINT_THREADS, getTwistBaseUri } from '../consts/endpoints'
-import { request } from '../rest-client'
-import { Thread, ThreadSchema } from '../types/entities'
-import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
+import { ENDPOINT_THREADS, getTwistBaseUri } from '../consts/endpoints.js'
+import { request } from '../rest-client.js'
+import { Thread, ThreadSchema } from '../types/entities.js'
+import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests.js'
 
 /**
  * Client for interacting with Twist thread endpoints.

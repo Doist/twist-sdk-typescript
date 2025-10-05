@@ -1,6 +1,6 @@
-import { TwistRequestError } from './types/errors'
-import { HttpMethod, HttpResponse, RequestConfig } from './types/http'
-import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
+import { TwistRequestError } from './types/errors.js'
+import { HttpMethod, HttpResponse, RequestConfig } from './types/http.js'
+import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion.js'
 
 export function paramsSerializer(params: Record<string, unknown>): string {
     const qs = new URLSearchParams()

@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
-import { setupRestClientMock } from '../testUtils/mocks'
-import { mockUser, TEST_API_TOKEN } from '../testUtils/test-defaults'
-import { UsersClient } from './users-client'
+import { setupRestClientMock } from '../testUtils/mocks.js'
+import { mockUser, TEST_API_TOKEN } from '../testUtils/test-defaults.js'
+import { UsersClient } from './users-client.js'
 
 describe('UsersClient', () => {
     let client: UsersClient

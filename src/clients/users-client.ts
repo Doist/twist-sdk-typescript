@@ -1,6 +1,6 @@
-import { ENDPOINT_USERS, getTwistBaseUri } from '../consts/endpoints'
-import { request } from '../rest-client'
-import { User, UserSchema } from '../types/entities'
+import { ENDPOINT_USERS, getTwistBaseUri } from '../consts/endpoints.js'
+import { request } from '../rest-client.js'
+import { User, UserSchema } from '../types/entities.js'
 
 /**
  * Client for interacting with Twist user endpoints.

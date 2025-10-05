@@ -1,5 +1,5 @@
-import { ENDPOINT_REACTIONS, getTwistBaseUri } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { ENDPOINT_REACTIONS, getTwistBaseUri } from '../consts/endpoints.js'
+import { request } from '../rest-client.js'
 
 type AddReactionArgs = {
     threadId?: number

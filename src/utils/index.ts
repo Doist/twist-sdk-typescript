@@ -1,1 +1,1 @@
-export * from './case-conversion'
+export * from './case-conversion.js'

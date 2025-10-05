@@ -1,6 +1,6 @@
-import { ENDPOINT_GROUPS, getTwistBaseUri } from '../consts/endpoints'
-import { request } from '../rest-client'
-import { Group, GroupSchema } from '../types/entities'
+import { ENDPOINT_GROUPS, getTwistBaseUri } from '../consts/endpoints.js'
+import { request } from '../rest-client.js'
+import { Group, GroupSchema } from '../types/entities.js'
 
 /**
  * Client for interacting with Twist group endpoints.
