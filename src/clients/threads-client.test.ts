@@ -1,138 +1,160 @@
-import { vi } from 'vitest'
-import { setupRestClientMock } from '../testUtils/mocks'
-import { mockThread, TEST_API_TOKEN } from '../testUtils/test-defaults'
+import { HttpResponse, http } from 'msw'
+import { apiUrl } from '../testUtils/msw-handlers'
+import { server } from '../testUtils/msw-setup'
+import { TEST_API_TOKEN } from '../testUtils/test-defaults'
 import { ThreadsClient } from './threads-client'
 
 describe('ThreadsClient', () => {
     let client: ThreadsClient
-    let mockRequest: ReturnType<typeof setupRestClientMock>
+
+    // API format response (snake_case with timestamps)
+    const mockThreadApiResponse = {
+        id: 123,
+        title: 'Test Thread',
+        content: 'This is a test thread',
+        creator: 1,
+        channel_id: 1,
+        workspace_id: 1,
+        comment_count: 0,
+        last_updated_ts: 1609459200,
+        pinned: false,
+        posted_ts: 1609459200,
+        snippet: 'This is a test thread',
+        snippet_creator: 1,
+        starred: false,
+        is_archived: false,
+    }
 
     beforeEach(() => {
         client = new ThreadsClient(TEST_API_TOKEN)
-        mockRequest = setupRestClientMock(mockThread)
-    })
-
-    afterEach(() => {
-        vi.clearAllMocks()
     })
 
     describe('pinThread', () => {
         it('should pin a thread', async () => {
-            await client.pinThread(123)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/pin',
-                TEST_API_TOKEN,
-                { id: 123 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/pin'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.pinThread(123)
         })
     })
 
     describe('unpinThread', () => {
         it('should unpin a thread', async () => {
-            await client.unpinThread(123)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/unpin',
-                TEST_API_TOKEN,
-                { id: 123 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/unpin'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.unpinThread(123)
         })
     })
 
     describe('moveToChannel', () => {
         it('should move thread to another channel', async () => {
-            await client.moveToChannel(123, 456)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/move_to_channel',
-                TEST_API_TOKEN,
-                { id: 123, toChannel: 456 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/move_to_channel'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, to_channel: 456 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.moveToChannel(123, 456)
         })
     })
 
     describe('markUnread', () => {
         it('should mark thread as unread with objIndex', async () => {
-            await client.markUnread(123, 5)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_unread',
-                TEST_API_TOKEN,
-                { id: 123, obj_index: 5 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_unread'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, obj_index: 5 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markUnread(123, 5)
         })
 
         it('should mark entire thread as unread with -1', async () => {
-            await client.markUnread(123, -1)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_unread',
-                TEST_API_TOKEN,
-                { id: 123, obj_index: -1 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_unread'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, obj_index: -1 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markUnread(123, -1)
         })
     })
 
     describe('markUnreadForOthers', () => {
         it('should mark thread as unread for others', async () => {
-            await client.markUnreadForOthers(123, 5)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_unread_for_others',
-                TEST_API_TOKEN,
-                { id: 123, obj_index: 5 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_unread_for_others'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, obj_index: 5 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markUnreadForOthers(123, 5)
         })
 
         it('should mark entire thread as unread for others with -1', async () => {
-            await client.markUnreadForOthers(123, -1)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_unread_for_others',
-                TEST_API_TOKEN,
-                { id: 123, obj_index: -1 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_unread_for_others'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, obj_index: -1 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markUnreadForOthers(123, -1)
         })
     })
 
     describe('markAllRead', () => {
         it('should mark all threads as read in workspace', async () => {
-            await client.markAllRead({ workspaceId: 123 })
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_all_read',
-                TEST_API_TOKEN,
-                { workspace_id: 123 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_all_read'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ workspace_id: 123 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markAllRead({ workspaceId: 123 })
         })
 
         it('should mark all threads as read in channel', async () => {
-            await client.markAllRead({ channelId: 456 })
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mark_all_read',
-                TEST_API_TOKEN,
-                { channel_id: 456 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mark_all_read'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ channel_id: 456 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(null)
+                }),
             )
+
+            await client.markAllRead({ channelId: 456 })
         })
 
         it('should throw error if neither workspaceId nor channelId provided', async () => {
@@ -144,31 +166,37 @@ describe('ThreadsClient', () => {
 
     describe('muteThread', () => {
         it('should mute thread for specified minutes', async () => {
-            const result = await client.muteThread(123, 30)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/mute',
-                TEST_API_TOKEN,
-                { id: 123, minutes: 30 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/mute'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123, minutes: 30 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockThreadApiResponse)
+                }),
             )
-            expect(result).toEqual(mockThread)
+
+            const result = await client.muteThread(123, 30)
+            expect(result.id).toBe(123)
+            expect(result.lastUpdated).toBeInstanceOf(Date)
+            expect(result.posted).toBeInstanceOf(Date)
         })
     })
 
     describe('unmuteThread', () => {
         it('should unmute thread', async () => {
-            const result = await client.unmuteThread(123)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://api.twist.com/api/v3/',
-                'threads/unmute',
-                TEST_API_TOKEN,
-                { id: 123 },
+            server.use(
+                http.post(apiUrl('api/v3/threads/unmute'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({ id: 123 })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockThreadApiResponse)
+                }),
             )
-            expect(result).toEqual(mockThread)
+
+            const result = await client.unmuteThread(123)
+            expect(result.id).toBe(123)
+            expect(result.lastUpdated).toBeInstanceOf(Date)
+            expect(result.posted).toBeInstanceOf(Date)
         })
     })
 })

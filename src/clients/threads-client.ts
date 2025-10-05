@@ -276,7 +276,13 @@ export class ThreadsClient {
         if (args.workspaceId) params.workspace_id = args.workspaceId
         if (args.channelId) params.channel_id = args.channelId
 
-        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_all_read`, this.apiToken, params)
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/mark_all_read`,
+            this.apiToken,
+            params,
+        )
     }
 
     /**

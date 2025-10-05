@@ -233,7 +233,13 @@ export class ConversationsClient {
         if (args.objIndex !== undefined) params.obj_index = args.objIndex
         if (args.messageId !== undefined) params.message_id = args.messageId
 
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CONVERSATIONS}/mark_read`, this.apiToken, params)
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/mark_read`,
+            this.apiToken,
+            params,
+        )
     }
 
     /**
@@ -249,7 +255,13 @@ export class ConversationsClient {
         if (args.objIndex !== undefined) params.obj_index = args.objIndex
         if (args.messageId !== undefined) params.message_id = args.messageId
 
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CONVERSATIONS}/mark_unread`, this.apiToken, params)
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/mark_unread`,
+            this.apiToken,
+            params,
+        )
     }
 
     /**

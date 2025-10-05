@@ -1,51 +1,46 @@
-import { vi } from 'vitest'
-import { setupRestClientMock } from '../testUtils/mocks'
+import { HttpResponse, http } from 'msw'
+import { apiUrl } from '../testUtils/msw-handlers'
+import { server } from '../testUtils/msw-setup'
 import { mockWorkspaceUser, TEST_API_TOKEN } from '../testUtils/test-defaults'
 import { WorkspaceUsersClient } from './workspace-users-client'
 
 describe('WorkspaceUsersClient', () => {
     let client: WorkspaceUsersClient
-    let mockRequest: ReturnType<typeof setupRestClientMock>
 
     beforeEach(() => {
         client = new WorkspaceUsersClient(TEST_API_TOKEN)
-        mockRequest = setupRestClientMock(mockWorkspaceUser)
-    })
-
-    afterEach(() => {
-        vi.clearAllMocks()
     })
 
     describe('getUserById', () => {
         it('should get user by id', async () => {
-            mockRequest = setupRestClientMock(mockWorkspaceUser)
+            server.use(
+                http.get(apiUrl('api/v4/workspace_users/getone'), async ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('id')).toBe('123')
+                    expect(url.searchParams.get('user_id')).toBe('456')
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockWorkspaceUser)
+                }),
+            )
 
             const result = await client.getUserById(123, 456)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'GET',
-                'https://api.twist.com/api/v4/',
-                'workspace_users/getone',
-                TEST_API_TOKEN,
-                { id: 123, user_id: 456 },
-            )
             expect(result).toEqual(mockWorkspaceUser)
         })
     })
 
     describe('getUserByEmail', () => {
         it('should get user by email', async () => {
-            mockRequest = setupRestClientMock(mockWorkspaceUser)
+            server.use(
+                http.get(apiUrl('api/v4/workspace_users/get_by_email'), async ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('id')).toBe('123')
+                    expect(url.searchParams.get('email')).toBe('user@example.com')
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockWorkspaceUser)
+                }),
+            )
 
             const result = await client.getUserByEmail(123, 'user@example.com')
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'GET',
-                'https://api.twist.com/api/v4/',
-                'workspace_users/get_by_email',
-                TEST_API_TOKEN,
-                { id: 123, email: 'user@example.com' },
-            )
             expect(result).toEqual(mockWorkspaceUser)
         })
     })
@@ -58,17 +53,18 @@ describe('WorkspaceUsersClient', () => {
                 role: 'admin',
                 joinedDate: '2021-01-01',
             }
-            mockRequest = setupRestClientMock(mockUserInfo)
+
+            server.use(
+                http.get(apiUrl('api/v4/workspace_users/get_info'), async ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('id')).toBe('123')
+                    expect(url.searchParams.get('user_id')).toBe('456')
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockUserInfo)
+                }),
+            )
 
             const result = await client.getUserInfo(123, 456)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'GET',
-                'https://api.twist.com/api/v4/',
-                'workspace_users/get_info',
-                TEST_API_TOKEN,
-                { id: 123, user_id: 456 },
-            )
             expect(result).toEqual(mockUserInfo)
         })
     })
@@ -76,17 +72,18 @@ describe('WorkspaceUsersClient', () => {
     describe('getUserLocalTime', () => {
         it('should get user local time', async () => {
             const mockLocalTime = '2017-05-10 07:55:40'
-            mockRequest = setupRestClientMock(mockLocalTime)
+
+            server.use(
+                http.get(apiUrl('api/v4/workspace_users/get_local_time'), async ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('id')).toBe('123')
+                    expect(url.searchParams.get('user_id')).toBe('456')
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockLocalTime)
+                }),
+            )
 
             const result = await client.getUserLocalTime(123, 456)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'GET',
-                'https://api.twist.com/api/v4/',
-                'workspace_users/get_local_time',
-                TEST_API_TOKEN,
-                { id: 123, user_id: 456 },
-            )
             expect(result).toBe(mockLocalTime)
         })
     })

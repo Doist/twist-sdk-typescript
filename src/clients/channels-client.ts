@@ -214,10 +214,16 @@ export class ChannelsClient {
      * @param userId - The user ID to remove.
      */
     async removeUser(id: number, userId: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/remove_user`, this.apiToken, {
-            id,
-            userId,
-        })
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CHANNELS}/remove_user`,
+            this.apiToken,
+            {
+                id,
+                userId,
+            },
+        )
     }
 
     /**
@@ -227,9 +233,15 @@ export class ChannelsClient {
      * @param userIds - Array of user IDs to remove.
      */
     async removeUsers(id: number, userIds: number[]): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/remove_users`, this.apiToken, {
-            id,
-            userIds,
-        })
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CHANNELS}/remove_users`,
+            this.apiToken,
+            {
+                id,
+                userIds,
+            },
+        )
     }
 }

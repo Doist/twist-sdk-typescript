@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { HttpResponse, http } from 'msw'
 import {
     getAuthorizationUrl,
     getAuthStateParameter,
@@ -6,7 +6,7 @@ import {
     revokeAuthToken,
     TwistScope,
 } from './authentication'
-import { setupRestClientMock } from './testUtils/mocks'
+import { server } from './testUtils/msw-setup'
 
 describe('authentication', () => {
     describe('getAuthStateParameter', () => {
@@ -70,23 +70,27 @@ describe('authentication', () => {
     })
 
     describe('getAuthToken', () => {
-        let mockRequest: ReturnType<typeof setupRestClientMock>
-
-        beforeEach(() => {
-            const mockResponse = {
-                accessToken: 'access-token-123',
-                tokenType: 'Bearer',
-                refreshToken: 'refresh-token-456',
-                expiresIn: 3600,
-            }
-            mockRequest = setupRestClientMock(mockResponse, 200)
-        })
-
-        afterEach(() => {
-            vi.clearAllMocks()
-        })
-
         it('should exchange auth code for access token', async () => {
+            const mockResponse = {
+                access_token: 'access-token-123',
+                token_type: 'Bearer',
+                refresh_token: 'refresh-token-456',
+                expires_in: 3600,
+            }
+
+            server.use(
+                http.post('https://twist.com/oauth/token', async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({
+                        client_id: 'client-id',
+                        client_secret: 'client-secret',
+                        code: 'auth-code',
+                        grant_type: 'authorization_code',
+                    })
+                    return HttpResponse.json(mockResponse)
+                }),
+            )
+
             const args = {
                 clientId: 'client-id',
                 clientSecret: 'client-secret',
@@ -94,23 +98,34 @@ describe('authentication', () => {
             }
 
             const result = await getAuthToken(args)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://twist.com/oauth/token',
-                '',
-                undefined,
-                {
-                    clientId: 'client-id',
-                    clientSecret: 'client-secret',
-                    code: 'auth-code',
-                    grantType: 'authorization_code',
-                },
-            )
             expect(result.accessToken).toBe('access-token-123')
+            expect(result.tokenType).toBe('Bearer')
+            expect(result.refreshToken).toBe('refresh-token-456')
+            expect(result.expiresIn).toBe(3600)
         })
 
         it('should include redirect URI in token request if provided', async () => {
+            const mockResponse = {
+                access_token: 'access-token-123',
+                token_type: 'Bearer',
+                refresh_token: 'refresh-token-456',
+                expires_in: 3600,
+            }
+
+            server.use(
+                http.post('https://twist.com/oauth/token', async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({
+                        client_id: 'client-id',
+                        client_secret: 'client-secret',
+                        code: 'auth-code',
+                        grant_type: 'authorization_code',
+                        redirect_uri: 'https://myapp.com/callback',
+                    })
+                    return HttpResponse.json(mockResponse)
+                }),
+            )
+
             const args = {
                 clientId: 'client-id',
                 clientSecret: 'client-secret',
@@ -119,31 +134,23 @@ describe('authentication', () => {
             }
 
             await getAuthToken(args)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://twist.com/oauth/token',
-                '',
-                undefined,
-                expect.objectContaining({
-                    redirectUri: 'https://myapp.com/callback',
-                }),
-            )
         })
     })
 
     describe('revokeAuthToken', () => {
-        let mockRequest: ReturnType<typeof setupRestClientMock>
-
-        beforeEach(() => {
-            mockRequest = setupRestClientMock({}, 200)
-        })
-
-        afterEach(() => {
-            vi.clearAllMocks()
-        })
-
         it('should revoke access token', async () => {
+            server.use(
+                http.post('https://twist.com/oauth/revoke', async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({
+                        client_id: 'client-id',
+                        client_secret: 'client-secret',
+                        token: 'access-token',
+                    })
+                    return HttpResponse.json({})
+                }),
+            )
+
             const args = {
                 clientId: 'client-id',
                 clientSecret: 'client-secret',
@@ -151,18 +158,6 @@ describe('authentication', () => {
             }
 
             const result = await revokeAuthToken(args)
-
-            expect(mockRequest).toHaveBeenCalledWith(
-                'POST',
-                'https://twist.com/oauth/revoke',
-                '',
-                undefined,
-                {
-                    clientId: 'client-id',
-                    clientSecret: 'client-secret',
-                    token: 'access-token',
-                },
-            )
             expect(result).toBe(true)
         })
     })

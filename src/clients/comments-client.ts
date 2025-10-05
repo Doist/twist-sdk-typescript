@@ -148,9 +148,15 @@ export class CommentsClient {
      * ```
      */
     async markPosition(threadId: number, commentId: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_COMMENTS}/mark_position`, this.apiToken, {
-            thread_id: threadId,
-            comment_id: commentId,
-        })
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_COMMENTS}/mark_position`,
+            this.apiToken,
+            {
+                thread_id: threadId,
+                comment_id: commentId,
+            },
+        )
     }
 }

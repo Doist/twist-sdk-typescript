@@ -1,5 +1,6 @@
 import { vi } from 'vitest'
 import { isSuccess, paramsSerializer, request } from './rest-client'
+import { server } from './testUtils/msw-setup'
 import { TwistRequestError } from './types/errors'
 
 // Mock fetch globally
@@ -7,6 +8,11 @@ const mockFetch = vi.fn()
 global.fetch = mockFetch as unknown as typeof fetch
 
 describe('restClient', () => {
+    // Disable MSW for this test file since we're testing the low-level fetch behavior
+    beforeAll(() => {
+        server.close()
+    })
+
     beforeEach(() => {
         mockFetch.mockClear()
     })

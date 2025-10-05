@@ -147,13 +147,10 @@ export class WorkspacesClient {
      * ```
      */
     async removeWorkspace(id: number, currentPassword: string): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/remove`,
-            this.apiToken,
-            { id, currentPassword },
-        )
+        await request('POST', this.getBaseUri(), `${ENDPOINT_WORKSPACES}/remove`, this.apiToken, {
+            id,
+            currentPassword,
+        })
     }
 
     /**
