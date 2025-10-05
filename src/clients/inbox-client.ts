@@ -1,11 +1,6 @@
 import { ENDPOINT_INBOX, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import {
-    InboxConversation,
-    InboxConversationSchema,
-    InboxThread,
-    InboxThreadSchema,
-} from '../types/entities'
+import { InboxThread, InboxThreadSchema } from '../types/entities'
 
 type GetInboxArgs = {
     workspaceId: number
@@ -16,7 +11,8 @@ type GetInboxArgs = {
 }
 
 type InboxCountResponse = {
-    count: number
+    data: number
+    version: number
 }
 
 type ArchiveAllArgs = {
@@ -40,7 +36,7 @@ export class InboxClient {
     }
 
     /**
-     * Gets inbox items (threads and conversations).
+     * Gets inbox items (threads).
      *
      * @param args - The arguments for getting inbox.
      * @param args.workspaceId - The workspace ID.
@@ -48,7 +44,7 @@ export class InboxClient {
      * @param args.until - Optional date to get items until.
      * @param args.limit - Optional limit on number of items returned.
      * @param args.cursor - Optional cursor for pagination.
-     * @returns Inbox threads and conversations.
+     * @returns Inbox threads.
      *
      * @example
      * ```typescript
@@ -58,10 +54,7 @@ export class InboxClient {
      * })
      * ```
      */
-    async getInbox(args: GetInboxArgs): Promise<{
-        threads: InboxThread[]
-        conversations: InboxConversation[]
-    }> {
+    async getInbox(args: GetInboxArgs): Promise<InboxThread[]> {
         const params: Record<string, unknown> = {
             workspace_id: args.workspaceId,
         }
@@ -71,17 +64,15 @@ export class InboxClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<{
-            threads: InboxThread[]
-            conversations: InboxConversation[]
-        }>('GET', this.getBaseUri(), `${ENDPOINT_INBOX}/get`, this.apiToken, params)
+        const response = await request<InboxThread[]>(
+            'GET',
+            this.getBaseUri(),
+            `${ENDPOINT_INBOX}/get`,
+            this.apiToken,
+            params,
+        )
 
-        return {
-            threads: response.data.threads.map((thread) => InboxThreadSchema.parse(thread)),
-            conversations: response.data.conversations.map((conversation) =>
-                InboxConversationSchema.parse(conversation),
-            ),
-        }
+        return response.data.map((thread) => InboxThreadSchema.parse(thread))
     }
 
     /**
@@ -105,7 +96,7 @@ export class InboxClient {
             { workspace_id: workspaceId },
         )
 
-        return response.data.count
+        return response.data.data
     }
 
     /**

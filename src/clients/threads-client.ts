@@ -1,6 +1,6 @@
 import { ENDPOINT_THREADS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { Thread, ThreadSchema } from '../types/entities'
+import { Thread, ThreadSchema, UnreadThread, UnreadThreadSchema } from '../types/entities'
 import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
 
 /**
@@ -218,10 +218,10 @@ export class ThreadsClient {
      * Gets unread threads for a workspace.
      *
      * @param workspaceId - The workspace ID.
-     * @returns Array of unread thread IDs.
+     * @returns Array of unread thread references.
      */
-    async getUnread(workspaceId: number): Promise<number[]> {
-        const response = await request<number[]>(
+    async getUnread(workspaceId: number): Promise<UnreadThread[]> {
+        const response = await request<UnreadThread[]>(
             'GET',
             this.getBaseUri(),
             `${ENDPOINT_THREADS}/get_unread`,
@@ -229,6 +229,6 @@ export class ThreadsClient {
             { workspace_id: workspaceId },
         )
 
-        return response.data
+        return response.data.map((thread) => UnreadThreadSchema.parse(thread))
     }
 }

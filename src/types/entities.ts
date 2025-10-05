@@ -167,10 +167,20 @@ export const CommentSchema = z.object({
     lastEditedTs: z.number().nullable().optional(),
     directMentions: z.array(z.number()).nullable().optional(),
     directGroupMentions: z.array(z.number()).nullable().optional(),
-    systemMessage: z.string().nullable().optional(),
+    systemMessage: z.union([z.string(), z.unknown()]).nullable().optional(),
     attachments: z.array(z.unknown()).nullable().optional(),
     reactions: z.record(z.string(), z.unknown()).nullable().optional(),
     objIndex: z.number().nullable().optional(),
+    // Extended fields that may appear in some API responses (like inbox)
+    creatorName: z.string().nullable().optional(),
+    channelId: z.number().nullable().optional(),
+    recipients: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    toEmails: z.array(z.string()).nullable().optional(),
+    deleted: z.boolean().nullable().optional(),
+    deletedBy: z.number().nullable().optional(),
+    version: z.number().nullable().optional(),
+    actions: z.array(z.unknown()).nullable().optional(),
 })
 
 export type Comment = z.infer<typeof CommentSchema>
@@ -203,32 +213,67 @@ export const ConversationMessageSchema = z.object({
 
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>
 
-// InboxThread entity from API
+// InboxThread entity from API - returns full Thread objects with additional inbox metadata
 export const InboxThreadSchema = z.object({
     id: z.number(),
     title: z.string(),
+    content: z.string(),
+    creator: z.number(),
+    creatorName: z.string().nullable().optional(),
     channelId: z.number(),
     workspaceId: z.number(),
-    creatorId: z.number(),
-    isUnread: z.boolean(),
-    isStarred: z.boolean(),
-    newestObjIndex: z.number(),
-    oldestObjIndex: z.number(),
-    unreadCount: z.number(),
+    actions: z.array(z.unknown()).nullable().optional(),
+    attachments: z.array(z.unknown()).nullable().optional(),
+    commentCount: z.number(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    lastEditedTs: z.number().nullable().optional(),
+    lastObjIndex: z.number().nullable().optional(),
+    lastUpdatedTs: z.number(),
+    mutedUntilTs: z.number().nullable().optional(),
+    participants: z.array(z.number()).nullable().optional(),
+    pinned: z.boolean(),
+    pinnedTs: z.number().nullable().optional(),
+    postedTs: z.number(),
+    reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+    recipients: z.array(z.number()).nullable().optional(),
+    snippet: z.string(),
+    snippetCreator: z.number(),
+    snippetMaskAvatarUrl: z.string().nullable().optional(),
+    snippetMaskPoster: z.number().nullable().optional(),
+    starred: z.boolean(),
+    systemMessage: z.string().nullable().optional(),
+    isArchived: z.boolean(),
+    inInbox: z.boolean(),
+    isSaved: z.boolean().nullable().optional(),
+    closed: z.boolean(),
+    responders: z.array(z.number()).nullable().optional(),
+    lastComment: CommentSchema.nullable().optional(),
+    toEmails: z.array(z.string()).nullable().optional(),
+    version: z.number().nullable().optional(),
 })
 
 export type InboxThread = z.infer<typeof InboxThreadSchema>
 
-// InboxConversation entity from API
-export const InboxConversationSchema = z.object({
-    id: z.number(),
-    title: z.string(),
-    workspaceId: z.number(),
-    isUnread: z.boolean(),
-    unreadCount: z.number(),
+// UnreadThread entity from API - simplified thread reference for unread threads
+export const UnreadThreadSchema = z.object({
+    threadId: z.number(),
+    channelId: z.number(),
+    objIndex: z.number(),
+    directMention: z.boolean(),
 })
 
-export type InboxConversation = z.infer<typeof InboxConversationSchema>
+export type UnreadThread = z.infer<typeof UnreadThreadSchema>
+
+// UnreadConversation entity from API - simplified conversation reference for unread conversations
+export const UnreadConversationSchema = z.object({
+    conversationId: z.number(),
+    objIndex: z.number(),
+    directMention: z.boolean(),
+})
+
+export type UnreadConversation = z.infer<typeof UnreadConversationSchema>
 
 // SearchResult entity from API
 export const SearchResultSchema = z.object({

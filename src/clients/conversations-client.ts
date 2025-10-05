@@ -1,6 +1,11 @@
 import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
-import { Conversation, ConversationSchema } from '../types/entities'
+import {
+    Conversation,
+    ConversationSchema,
+    UnreadConversation,
+    UnreadConversationSchema,
+} from '../types/entities'
 import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
 
 /**
@@ -184,10 +189,10 @@ export class ConversationsClient {
      * Gets unread conversations for a workspace.
      *
      * @param workspaceId - The workspace ID.
-     * @returns Array of unread conversation IDs.
+     * @returns Array of unread conversation references.
      */
-    async getUnread(workspaceId: number): Promise<number[]> {
-        const response = await request<number[]>(
+    async getUnread(workspaceId: number): Promise<UnreadConversation[]> {
+        const response = await request<UnreadConversation[]>(
             'GET',
             this.getBaseUri(),
             `${ENDPOINT_CONVERSATIONS}/get_unread`,
@@ -195,6 +200,6 @@ export class ConversationsClient {
             { workspace_id: workspaceId },
         )
 
-        return response.data
+        return response.data.map((conversation) => UnreadConversationSchema.parse(conversation))
     }
 }
