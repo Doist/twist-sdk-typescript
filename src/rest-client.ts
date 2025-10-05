@@ -1,6 +1,7 @@
 import { TwistRequestError } from './types/errors'
 import { HttpMethod, HttpResponse, RequestConfig } from './types/http'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
+import { transformTimestamps } from './utils/timestamp-conversion'
 
 export function paramsSerializer(params: Record<string, unknown>): string {
     const qs = new URLSearchParams()
@@ -84,8 +85,12 @@ async function fetchWithRetry<T>(
                 headers[key] = value
             })
 
+            // Convert snake_case keys to camelCase, then transform timestamps to Dates
+            const camelCased = camelCaseKeys(responseData)
+            const transformed = transformTimestamps(camelCased)
+
             return {
-                data: camelCaseKeys(responseData) as T,
+                data: transformed as T,
                 status: response.status,
                 headers,
             }
