@@ -17,7 +17,7 @@ export const mockWorkspace: Workspace = {
     id: 1,
     name: 'Test Workspace',
     creator: 1,
-    createdTs: 1609459200,
+    created: new Date('2021-01-01T00:00:00Z'),
 }
 
 export const mockChannel: Channel = {
@@ -27,7 +27,8 @@ export const mockChannel: Channel = {
     public: true,
     workspaceId: 1,
     archived: false,
-    createdTs: 1609459200,
+    created: new Date('2021-01-01T00:00:00Z'),
+    version: 0,
 }
 
 export const mockThread: Thread = {
@@ -38,9 +39,9 @@ export const mockThread: Thread = {
     channelId: 1,
     workspaceId: 1,
     commentCount: 0,
-    lastUpdatedTs: 1609459200,
+    lastUpdated: new Date('2021-01-01T00:00:00Z'),
     pinned: false,
-    postedTs: 1609459200,
+    posted: new Date('2021-01-01T00:00:00Z'),
     snippet: 'This is a test thread',
     snippetCreator: 1,
     starred: false,
@@ -52,6 +53,7 @@ export const mockGroup: Group = {
     name: 'Test Group',
     workspaceId: 1,
     userIds: [1, 2, 3],
+    version: 0,
 }
 
 export const mockConversation: Conversation = {
@@ -62,9 +64,10 @@ export const mockConversation: Conversation = {
     lastObjIndex: 0,
     snippet: 'Hello there',
     snippetCreators: [1],
-    lastActiveTs: 1609459200,
+    lastActive: new Date('2021-01-01T00:00:00Z'),
     archived: false,
-    createdTs: 1609459200,
+    created: new Date('2021-01-01T00:00:00Z'),
+    creator: 1,
 }
 
 export const mockComment: Comment = {
@@ -72,5 +75,5 @@ export const mockComment: Comment = {
     content: 'This is a comment',
     creator: 1,
     threadId: 1,
-    postedTs: 1609459200,
+    posted: new Date('2021-01-01T00:00:00Z'),
 }
