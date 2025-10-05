@@ -29,9 +29,18 @@ type SearchConversationArgs = {
 }
 
 type SearchResponse = {
-    results: SearchResult[]
-    cursor?: string
+    items: SearchResult[]
+    nextCursorMark?: string
     hasMore: boolean
+    isPlanRestricted: boolean
+}
+
+type SearchThreadResponse = {
+    commentIds: number[]
+}
+
+type SearchConversationResponse = {
+    messageIds: number[]
 }
 
 /**
@@ -94,7 +103,7 @@ export class SearchClient {
 
         return {
             ...response.data,
-            results: response.data.results.map((result) => SearchResultSchema.parse(result)),
+            items: response.data.items.map((result) => SearchResultSchema.parse(result)),
         }
     }
 
@@ -106,7 +115,7 @@ export class SearchClient {
      * @param args.threadId - The thread ID to search in.
      * @param args.limit - Optional limit on number of results returned.
      * @param args.cursor - Optional cursor for pagination.
-     * @returns Search results with pagination.
+     * @returns Comment IDs that match the search query.
      *
      * @example
      * ```typescript
@@ -116,7 +125,7 @@ export class SearchClient {
      * })
      * ```
      */
-    async searchComments(args: SearchThreadArgs): Promise<SearchResponse> {
+    async searchThread(args: SearchThreadArgs): Promise<SearchThreadResponse> {
         const params: Record<string, unknown> = {
             query: args.query,
             thread_id: args.threadId,
@@ -125,18 +134,15 @@ export class SearchClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<SearchResponse>(
+        const response = await request<SearchThreadResponse>(
             'GET',
             this.getBaseUri(),
-            `${ENDPOINT_SEARCH}/comments`,
+            `${ENDPOINT_SEARCH}/thread`,
             this.apiToken,
             params,
         )
 
-        return {
-            ...response.data,
-            results: response.data.results.map((result) => SearchResultSchema.parse(result)),
-        }
+        return response.data
     }
 
     /**
@@ -147,7 +153,7 @@ export class SearchClient {
      * @param args.conversationId - The conversation ID to search in.
      * @param args.limit - Optional limit on number of results returned.
      * @param args.cursor - Optional cursor for pagination.
-     * @returns Search results with pagination.
+     * @returns Message IDs that match the search query.
      *
      * @example
      * ```typescript
@@ -157,7 +163,7 @@ export class SearchClient {
      * })
      * ```
      */
-    async searchMessages(args: SearchConversationArgs): Promise<SearchResponse> {
+    async searchConversation(args: SearchConversationArgs): Promise<SearchConversationResponse> {
         const params: Record<string, unknown> = {
             query: args.query,
             conversation_id: args.conversationId,
@@ -166,17 +172,14 @@ export class SearchClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<SearchResponse>(
+        const response = await request<SearchConversationResponse>(
             'GET',
             this.getBaseUri(),
-            `${ENDPOINT_SEARCH}/messages`,
+            `${ENDPOINT_SEARCH}/conversation`,
             this.apiToken,
             params,
         )
 
-        return {
-            ...response.data,
-            results: response.data.results.map((result) => SearchResultSchema.parse(result)),
-        }
+        return response.data
     }
 }

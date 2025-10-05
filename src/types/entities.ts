@@ -383,15 +383,19 @@ export type UnreadConversation = z.infer<typeof UnreadConversationSchema>
 
 // SearchResult entity from API
 export const SearchResultSchema = z.object({
-    id: z.number(),
+    id: z.string(),
     type: z.enum(['thread', 'comment', 'message']),
-    content: z.string(),
-    creatorId: z.number(),
-    created: z.date(),
+    snippet: z.string(),
+    snippetCreatorId: z.number(),
+    snippetLastUpdated: z.date(),
     threadId: z.number().nullable().optional(),
     conversationId: z.number().nullable().optional(),
+    commentId: z.number().nullable().optional(),
     channelId: z.number().nullable().optional(),
-    workspaceId: z.number(),
+    channelName: z.string().nullable().optional(),
+    channelColor: z.number().nullable().optional(),
+    title: z.string().nullable().optional(),
+    closed: z.boolean().nullable().optional(),
 })
 
 export type SearchResult = z.infer<typeof SearchResultSchema>
