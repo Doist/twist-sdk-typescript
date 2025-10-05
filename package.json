@@ -34,7 +34,7 @@
         "zod": "4.1.11"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.2.4",
+        "@biomejs/biome": "2.2.5",
         "@types/uuid": "9.0.8",
         "husky": "8.0.3",
         "lint-staged": "13.1.4",
