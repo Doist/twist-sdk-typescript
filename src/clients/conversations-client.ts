@@ -94,6 +94,34 @@ export class ConversationsClient {
     }
 
     /**
+     * Updates a conversation.
+     *
+     * @param id - The conversation ID.
+     * @param title - The new title for the conversation.
+     * @param archived - Optional flag to archive/unarchive the conversation.
+     * @returns The updated conversation object.
+     *
+     * @example
+     * ```typescript
+     * const conversation = await api.conversations.updateConversation(123, 'New Title')
+     * ```
+     */
+    async updateConversation(id: number, title: string, archived?: boolean): Promise<Conversation> {
+        const params: Record<string, unknown> = { id, title }
+        if (archived !== undefined) params.archived = archived
+
+        const response = await request<Conversation>(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/update`,
+            this.apiToken,
+            params,
+        )
+
+        return ConversationSchema.parse(response.data)
+    }
+
+    /**
      * Archives a conversation.
      *
      * @param id - The conversation ID.
@@ -140,6 +168,27 @@ export class ConversationsClient {
     }
 
     /**
+     * Adds multiple users to a conversation.
+     *
+     * @param id - The conversation ID.
+     * @param userIds - Array of user IDs to add.
+     *
+     * @example
+     * ```typescript
+     * await api.conversations.addUsers(123, [456, 789, 101])
+     * ```
+     */
+    async addUsers(id: number, userIds: number[]): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/add_users`,
+            this.apiToken,
+            { id, userIds },
+        )
+    }
+
+    /**
      * Removes a user from a conversation.
      *
      * @param id - The conversation ID.
@@ -156,33 +205,51 @@ export class ConversationsClient {
     }
 
     /**
-     * Marks a conversation as read.
+     * Removes multiple users from a conversation.
      *
      * @param id - The conversation ID.
+     * @param userIds - Array of user IDs to remove.
      */
-    async markRead(id: number): Promise<void> {
+    async removeUsers(id: number, userIds: number[]): Promise<void> {
         await request(
             'POST',
             this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/mark_read`,
+            `${ENDPOINT_CONVERSATIONS}/remove_users`,
             this.apiToken,
-            { id },
+            { id, userIds },
         )
+    }
+
+    /**
+     * Marks a conversation as read.
+     *
+     * @param args - The arguments for marking as read.
+     * @param args.id - The conversation ID.
+     * @param args.objIndex - Optional index of the message to mark as last read.
+     * @param args.messageId - Optional message ID to mark as last read.
+     */
+    async markRead(args: { id: number; objIndex?: number; messageId?: number }): Promise<void> {
+        const params: Record<string, unknown> = { id: args.id }
+        if (args.objIndex !== undefined) params.obj_index = args.objIndex
+        if (args.messageId !== undefined) params.message_id = args.messageId
+
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CONVERSATIONS}/mark_read`, this.apiToken, params)
     }
 
     /**
      * Marks a conversation as unread.
      *
-     * @param id - The conversation ID.
+     * @param args - The arguments for marking as unread.
+     * @param args.id - The conversation ID.
+     * @param args.objIndex - Optional index of the message to mark as last unread.
+     * @param args.messageId - Optional message ID to mark as last unread.
      */
-    async markUnread(id: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/mark_unread`,
-            this.apiToken,
-            { id },
-        )
+    async markUnread(args: { id: number; objIndex?: number; messageId?: number }): Promise<void> {
+        const params: Record<string, unknown> = { id: args.id }
+        if (args.objIndex !== undefined) params.obj_index = args.objIndex
+        if (args.messageId !== undefined) params.message_id = args.messageId
+
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CONVERSATIONS}/mark_unread`, this.apiToken, params)
     }
 
     /**
@@ -201,5 +268,48 @@ export class ConversationsClient {
         )
 
         return response.data.map((conversation) => UnreadConversationSchema.parse(conversation))
+    }
+
+    /**
+     * Mutes a conversation for a specified number of minutes.
+     * The user will receive no notifications from this conversation during that period.
+     *
+     * @param id - The conversation ID.
+     * @param minutes - Number of minutes to mute the conversation.
+     * @returns The updated conversation object.
+     *
+     * @example
+     * ```typescript
+     * const conversation = await api.conversations.muteConversation(123, 30)
+     * ```
+     */
+    async muteConversation(id: number, minutes: number): Promise<Conversation> {
+        const response = await request<Conversation>(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/mute`,
+            this.apiToken,
+            { id, minutes },
+        )
+
+        return ConversationSchema.parse(response.data)
+    }
+
+    /**
+     * Unmutes a conversation.
+     *
+     * @param id - The conversation ID.
+     * @returns The updated conversation object.
+     */
+    async unmuteConversation(id: number): Promise<Conversation> {
+        const response = await request<Conversation>(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATIONS}/unmute`,
+            this.apiToken,
+            { id },
+        )
+
+        return ConversationSchema.parse(response.data)
     }
 }

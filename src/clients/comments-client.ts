@@ -134,4 +134,23 @@ export class CommentsClient {
             id,
         })
     }
+
+    /**
+     * Marks the user's read position in a thread. Used to track where the user has read up to,
+     * so clients can scroll to this position and show a visual indicator (blue line).
+     *
+     * @param threadId - The thread ID.
+     * @param commentId - The comment ID to mark as the last read position.
+     *
+     * @example
+     * ```typescript
+     * await api.comments.markPosition(789, 206113)
+     * ```
+     */
+    async markPosition(threadId: number, commentId: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_COMMENTS}/mark_position`, this.apiToken, {
+            thread_id: threadId,
+            comment_id: commentId,
+        })
+    }
 }

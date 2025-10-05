@@ -1,4 +1,4 @@
-import { Channel, Comment, Conversation, Group, Thread, User, Workspace } from '../types/entities'
+import { Channel, Comment, Conversation, Group, Thread, User, Workspace, WorkspaceUser } from '../types/entities'
 
 export const TEST_API_TOKEN = 'test-api-token'
 
@@ -76,4 +76,28 @@ export const mockComment: Comment = {
     creator: 1,
     threadId: 1,
     posted: new Date('2021-01-01T00:00:00Z'),
+}
+
+export const mockWorkspaceUser: WorkspaceUser = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    userType: 'USER',
+    shortName: 'TU',
+    firstName: 'Test',
+    avatarId: null,
+    avatarUrls: null,
+    awayMode: null,
+    bot: false,
+    contactInfo: null,
+    dateFormat: null,
+    featureFlags: null,
+    profession: null,
+    removed: false,
+    restricted: null,
+    setupPending: null,
+    theme: null,
+    timeFormat: null,
+    timezone: 'America/New_York',
+    version: 1,
 }

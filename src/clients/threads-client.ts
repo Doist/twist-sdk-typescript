@@ -174,43 +174,123 @@ export class ThreadsClient {
     }
 
     /**
-     * Marks a thread as read.
+     * Pins a thread.
      *
      * @param id - The thread ID.
      */
-    async markRead(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_read`, this.apiToken, {
+    async pinThread(id: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/pin`, this.apiToken, { id })
+    }
+
+    /**
+     * Unpins a thread.
+     *
+     * @param id - The thread ID.
+     */
+    async unpinThread(id: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/unpin`, this.apiToken, {
             id,
         })
     }
 
     /**
-     * Marks all threads in a workspace as read.
+     * Moves a thread to a different channel.
      *
-     * @param workspaceId - The workspace ID.
+     * @param id - The thread ID.
+     * @param toChannel - The target channel ID.
      */
-    async markAllRead(workspaceId: number): Promise<void> {
+    async moveToChannel(id: number, toChannel: number): Promise<void> {
         await request(
             'POST',
             this.getBaseUri(),
-            `${ENDPOINT_THREADS}/mark_all_read`,
+            `${ENDPOINT_THREADS}/move_to_channel`,
             this.apiToken,
-            { workspace_id: workspaceId },
+            { id, toChannel },
         )
     }
 
     /**
-     * Clears unread status for a thread (marks as read without marking all comments as seen).
+     * Marks a thread as read.
      *
      * @param id - The thread ID.
+     * @param objIndex - The index of the last known read message.
      */
-    async clearUnread(id: number): Promise<void> {
+    async markRead(id: number, objIndex: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_read`, this.apiToken, {
+            id,
+            obj_index: objIndex,
+        })
+    }
+
+    /**
+     * Marks a thread as unread.
+     *
+     * @param id - The thread ID.
+     * @param objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
+     */
+    async markUnread(id: number, objIndex: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_unread`, this.apiToken, {
+            id,
+            obj_index: objIndex,
+        })
+    }
+
+    /**
+     * Marks a thread as unread for others. Useful to notify others about thread changes.
+     *
+     * @param id - The thread ID.
+     * @param objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
+     */
+    async markUnreadForOthers(id: number, objIndex: number): Promise<void> {
+        await request(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/mark_unread_for_others`,
+            this.apiToken,
+            { id, obj_index: objIndex },
+        )
+    }
+
+    /**
+     * Marks all threads as read in a workspace or channel.
+     *
+     * @param args - Either workspaceId or channelId (one is required).
+     * @param args.workspaceId - The workspace ID.
+     * @param args.channelId - The channel ID.
+     *
+     * @example
+     * ```typescript
+     * // Mark all in workspace
+     * await api.threads.markAllRead({ workspaceId: 123 })
+     *
+     * // Mark all in channel
+     * await api.threads.markAllRead({ channelId: 456 })
+     * ```
+     */
+    async markAllRead(args: { workspaceId?: number; channelId?: number }): Promise<void> {
+        if (!args.workspaceId && !args.channelId) {
+            throw new Error('Either workspaceId or channelId is required')
+        }
+
+        const params: Record<string, number> = {}
+        if (args.workspaceId) params.workspace_id = args.workspaceId
+        if (args.channelId) params.channel_id = args.channelId
+
+        await request('POST', this.getBaseUri(), `${ENDPOINT_THREADS}/mark_all_read`, this.apiToken, params)
+    }
+
+    /**
+     * Clears unread threads in a workspace.
+     *
+     * @param workspaceId - The workspace ID.
+     */
+    async clearUnread(workspaceId: number): Promise<void> {
         await request(
             'POST',
             this.getBaseUri(),
             `${ENDPOINT_THREADS}/clear_unread`,
             this.apiToken,
-            { id },
+            { workspace_id: workspaceId },
         )
     }
 
@@ -230,5 +310,49 @@ export class ThreadsClient {
         )
 
         return response.data.map((thread) => UnreadThreadSchema.parse(thread))
+    }
+
+    /**
+     * Mutes a thread for a specified number of minutes.
+     * When muted, you will not get notified in your inbox about new comments.
+     *
+     * @param id - The thread ID.
+     * @param minutes - Number of minutes to mute the thread.
+     * @returns The updated thread object.
+     *
+     * @example
+     * ```typescript
+     * const thread = await api.threads.muteThread(789, 30)
+     * ```
+     */
+    async muteThread(id: number, minutes: number): Promise<Thread> {
+        const response = await request<Thread>(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/mute`,
+            this.apiToken,
+            { id, minutes },
+        )
+
+        return ThreadSchema.parse(response.data)
+    }
+
+    /**
+     * Unmutes a thread.
+     * You will start to see notifications in your inbox again when new comments are added.
+     *
+     * @param id - The thread ID.
+     * @returns The updated thread object.
+     */
+    async unmuteThread(id: number): Promise<Thread> {
+        const response = await request<Thread>(
+            'POST',
+            this.getBaseUri(),
+            `${ENDPOINT_THREADS}/unmute`,
+            this.apiToken,
+            { id },
+        )
+
+        return ThreadSchema.parse(response.data)
     }
 }

@@ -59,6 +59,99 @@ export class WorkspaceUsersClient {
     }
 
     /**
+     * Gets a user by id.
+     *
+     * @param workspaceId - The workspace ID.
+     * @param userId - The user's ID.
+     * @returns The workspace user object.
+     *
+     * @example
+     * ```typescript
+     * const user = await api.workspaceUsers.getUserById(123, 456)
+     * console.log(user.name, user.email)
+     * ```
+     */
+    async getUserById(workspaceId: number, userId: number): Promise<WorkspaceUser> {
+        const response = await request<WorkspaceUser>(
+            'GET',
+            this.getBaseUri(),
+            'workspace_users/getone',
+            this.apiToken,
+            { id: workspaceId, user_id: userId },
+        )
+
+        return WorkspaceUserSchema.parse(response.data)
+    }
+
+    /**
+     * Gets a user by email.
+     *
+     * @param workspaceId - The workspace ID.
+     * @param email - The user's email.
+     * @returns The workspace user object.
+     *
+     * @example
+     * ```typescript
+     * const user = await api.workspaceUsers.getUserByEmail(123, 'user@example.com')
+     * ```
+     */
+    async getUserByEmail(workspaceId: number, email: string): Promise<WorkspaceUser> {
+        const response = await request<WorkspaceUser>(
+            'GET',
+            this.getBaseUri(),
+            'workspace_users/get_by_email',
+            this.apiToken,
+            { id: workspaceId, email },
+        )
+
+        return WorkspaceUserSchema.parse(response.data)
+    }
+
+    /**
+     * Gets the user's info in the context of the workspace.
+     *
+     * @param workspaceId - The workspace ID.
+     * @param userId - The user's ID.
+     * @returns Information about the user in the workspace context.
+     */
+    async getUserInfo(workspaceId: number, userId: number): Promise<Record<string, unknown>> {
+        const response = await request<Record<string, unknown>>(
+            'GET',
+            this.getBaseUri(),
+            'workspace_users/get_info',
+            this.apiToken,
+            { id: workspaceId, user_id: userId },
+        )
+
+        return response.data
+    }
+
+    /**
+     * Gets the user's local time.
+     *
+     * @param workspaceId - The workspace ID.
+     * @param userId - The user's ID.
+     * @returns The user's local time as a string (e.g., "2017-05-10 07:55:40").
+     *
+     * @example
+     * ```typescript
+     * const localTime = await api.workspaceUsers.getUserLocalTime(123, 456)
+     * console.log('User local time:', localTime)
+     * ```
+     */
+    async getUserLocalTime(workspaceId: number, userId: number): Promise<string> {
+        const response = await request<string>(
+            'GET',
+            this.getBaseUri(),
+            'workspace_users/get_local_time',
+            this.apiToken,
+            { id: workspaceId, user_id: userId },
+        )
+
+        return response.data
+    }
+
+    /**
      * Adds a person to a workspace.
      *
      * @param args - The arguments for adding a user.

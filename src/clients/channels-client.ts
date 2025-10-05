@@ -148,4 +148,88 @@ export class ChannelsClient {
             id,
         })
     }
+
+    /**
+     * Favorites a channel.
+     *
+     * @param id - The channel ID.
+     */
+    async favoriteChannel(id: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/favorite`, this.apiToken, {
+            id,
+        })
+    }
+
+    /**
+     * Unfavorites a channel.
+     *
+     * @param id - The channel ID.
+     */
+    async unfavoriteChannel(id: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/unfavorite`, this.apiToken, {
+            id,
+        })
+    }
+
+    /**
+     * Adds a user to a channel.
+     *
+     * @param id - The channel ID.
+     * @param userId - The user ID to add.
+     *
+     * @example
+     * ```typescript
+     * await api.channels.addUser(456, 789)
+     * ```
+     */
+    async addUser(id: number, userId: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/add_user`, this.apiToken, {
+            id,
+            userId,
+        })
+    }
+
+    /**
+     * Adds multiple users to a channel.
+     *
+     * @param id - The channel ID.
+     * @param userIds - Array of user IDs to add.
+     *
+     * @example
+     * ```typescript
+     * await api.channels.addUsers(456, [789, 790, 791])
+     * ```
+     */
+    async addUsers(id: number, userIds: number[]): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/add_users`, this.apiToken, {
+            id,
+            userIds,
+        })
+    }
+
+    /**
+     * Removes a user from a channel.
+     *
+     * @param id - The channel ID.
+     * @param userId - The user ID to remove.
+     */
+    async removeUser(id: number, userId: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/remove_user`, this.apiToken, {
+            id,
+            userId,
+        })
+    }
+
+    /**
+     * Removes multiple users from a channel.
+     *
+     * @param id - The channel ID.
+     * @param userIds - Array of user IDs to remove.
+     */
+    async removeUsers(id: number, userIds: number[]): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/remove_users`, this.apiToken, {
+            id,
+            userIds,
+        })
+    }
 }

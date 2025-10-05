@@ -143,4 +143,48 @@ export class GroupsClient {
             userId,
         })
     }
+
+    /**
+     * Adds multiple users to a group.
+     *
+     * @param id - The group ID.
+     * @param userIds - Array of user IDs to add.
+     *
+     * @example
+     * ```typescript
+     * await api.groups.addUsers(123, [456, 789, 101])
+     * ```
+     */
+    async addUsers(id: number, userIds: number[]): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/add_users`, this.apiToken, {
+            id,
+            userIds,
+        })
+    }
+
+    /**
+     * Removes a user from a group.
+     *
+     * @param id - The group ID.
+     * @param userId - The user ID to remove.
+     */
+    async removeUser(id: number, userId: number): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/remove_user`, this.apiToken, {
+            id,
+            userId,
+        })
+    }
+
+    /**
+     * Removes multiple users from a group.
+     *
+     * @param id - The group ID.
+     * @param userIds - Array of user IDs to remove.
+     */
+    async removeUsers(id: number, userIds: number[]): Promise<void> {
+        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/remove_users`, this.apiToken, {
+            id,
+            userIds,
+        })
+    }
 }

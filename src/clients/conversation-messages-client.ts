@@ -77,6 +77,29 @@ export class ConversationMessagesClient {
     }
 
     /**
+     * Gets a single conversation message by id.
+     *
+     * @param id - The message ID.
+     * @returns The conversation message object.
+     *
+     * @example
+     * ```typescript
+     * const message = await api.conversationMessages.getMessage(514069)
+     * ```
+     */
+    async getMessage(id: number): Promise<ConversationMessage> {
+        const response = await request<ConversationMessage>(
+            'GET',
+            this.getBaseUri(),
+            `${ENDPOINT_CONVERSATION_MESSAGES}/getone`,
+            this.apiToken,
+            { id },
+        )
+
+        return ConversationMessageSchema.parse(response.data)
+    }
+
+    /**
      * Creates a new message in a conversation.
      *
      * @param args - The arguments for creating a message.
