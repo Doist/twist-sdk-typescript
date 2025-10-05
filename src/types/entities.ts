@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { USER_TYPES, WORKSPACE_PLANS } from './enums'
 
+// Reusable schema for system messages that can be either a string or an object
+export const SystemMessageSchema = z.union([z.string(), z.unknown()]).nullable().optional()
+
 // User entity from API
 export const UserSchema = z.object({
     id: z.number(),
@@ -89,6 +92,8 @@ export const ChannelSchema = z.object({
     defaultRecipients: z.array(z.number()).nullable().optional(),
     isFavorited: z.boolean().nullable().optional(),
     icon: z.number().nullable().optional(),
+    version: z.number(),
+    filters: z.record(z.string(), z.string()).nullable().optional(),
 })
 
 export type Channel = z.infer<typeof ChannelSchema>
@@ -99,11 +104,13 @@ export const ThreadSchema = z.object({
     title: z.string(),
     content: z.string(),
     creator: z.number(),
+    creatorName: z.string().nullable().optional(),
     channelId: z.number(),
     workspaceId: z.number(),
     actions: z.array(z.unknown()).nullable().optional(),
     attachments: z.array(z.unknown()).nullable().optional(),
     commentCount: z.number(),
+    closed: z.boolean().nullable().optional(),
     directGroupMentions: z.array(z.number()).nullable().optional(),
     directMentions: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
@@ -117,12 +124,44 @@ export const ThreadSchema = z.object({
     postedTs: z.number(),
     reactions: z.record(z.string(), z.unknown()).nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
+    responders: z.array(z.number()).nullable().optional(),
     snippet: z.string(),
     snippetCreator: z.number(),
+    snippetMaskAvatarUrl: z.string().nullable().optional(),
+    snippetMaskPoster: z.union([z.number(), z.string()]).nullable().optional(),
     starred: z.boolean(),
-    systemMessage: z.string().nullable().optional(),
+    systemMessage: SystemMessageSchema,
+    toEmails: z.array(z.string()).nullable().optional(),
     isArchived: z.boolean(),
+    isSaved: z.boolean().nullable().optional(),
     inInbox: z.boolean().nullable().optional(),
+    lastComment: z
+        .object({
+            id: z.number(),
+            content: z.string(),
+            creator: z.number(),
+            creatorName: z.string(),
+            threadId: z.number(),
+            channelId: z.number(),
+            postedTs: z.number(),
+            systemMessage: SystemMessageSchema,
+            attachments: z.array(z.unknown()).nullable().optional(),
+            reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+            actions: z.array(z.unknown()).nullable().optional(),
+            objIndex: z.number(),
+            lastEditedTs: z.number().nullable().optional(),
+            deleted: z.boolean(),
+            deletedBy: z.number().nullable().optional(),
+            directGroupMentions: z.array(z.number()).nullable().optional(),
+            directMentions: z.array(z.number()).nullable().optional(),
+            groups: z.array(z.number()).nullable().optional(),
+            recipients: z.array(z.number()).nullable().optional(),
+            toEmails: z.array(z.string()).nullable().optional(),
+            version: z.number(),
+            workspaceId: z.number(),
+        })
+        .nullable()
+        .optional(),
 })
 
 export type Thread = z.infer<typeof ThreadSchema>
@@ -134,6 +173,7 @@ export const GroupSchema = z.object({
     description: z.string().nullable().optional(),
     workspaceId: z.number(),
     userIds: z.array(z.number()),
+    version: z.number(),
 })
 
 export type Group = z.infer<typeof GroupSchema>
@@ -143,7 +183,7 @@ export const ConversationSchema = z.object({
     id: z.number(),
     workspaceId: z.number(),
     userIds: z.array(z.number()),
-    messageCount: z.number(),
+    messageCount: z.number().nullable().optional(),
     lastObjIndex: z.number(),
     snippet: z.string(),
     snippetCreators: z.array(z.number()),
@@ -151,6 +191,33 @@ export const ConversationSchema = z.object({
     mutedUntilTs: z.number().nullable().optional(),
     archived: z.boolean(),
     createdTs: z.number(),
+    creator: z.number(),
+    title: z.string().nullable().optional(),
+    private: z.boolean().nullable().optional(),
+    lastMessage: z
+        .object({
+            id: z.number(),
+            content: z.string(),
+            creator: z.number().nullable().optional(),
+            creatorId: z.number().nullable().optional(),
+            creatorName: z.string().nullable().optional(),
+            conversationId: z.number(),
+            createdTs: z.number().nullable().optional(),
+            postedTs: z.number().nullable().optional(),
+            systemMessage: SystemMessageSchema,
+            attachments: z.array(z.unknown()).nullable().optional(),
+            reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+            actions: z.array(z.unknown()).nullable().optional(),
+            objIndex: z.number().nullable().optional(),
+            lastEditedTs: z.number().nullable().optional(),
+            deleted: z.boolean().nullable().optional(),
+            directGroupMentions: z.array(z.number()).nullable().optional(),
+            directMentions: z.array(z.number()).nullable().optional(),
+            version: z.number().nullable().optional(),
+            workspaceId: z.number().nullable().optional(),
+        })
+        .nullable()
+        .optional(),
 })
 
 export type Conversation = z.infer<typeof ConversationSchema>
@@ -167,7 +234,7 @@ export const CommentSchema = z.object({
     lastEditedTs: z.number().nullable().optional(),
     directMentions: z.array(z.number()).nullable().optional(),
     directGroupMentions: z.array(z.number()).nullable().optional(),
-    systemMessage: z.union([z.string(), z.unknown()]).nullable().optional(),
+    systemMessage: SystemMessageSchema,
     attachments: z.array(z.unknown()).nullable().optional(),
     reactions: z.record(z.string(), z.unknown()).nullable().optional(),
     objIndex: z.number().nullable().optional(),
@@ -189,9 +256,40 @@ export type Comment = z.infer<typeof CommentSchema>
 export const WorkspaceUserSchema = z.object({
     id: z.number(),
     name: z.string(),
-    email: z.string(),
+    email: z.string().nullable().optional(),
     userType: z.enum(USER_TYPES),
-    workspaceId: z.number(),
+    shortName: z.string(),
+    firstName: z.string().nullable().optional(),
+    avatarId: z.string().nullable().optional(),
+    avatarUrls: z
+        .object({
+            s35: z.string(),
+            s60: z.string(),
+            s195: z.string(),
+            s640: z.string(),
+        })
+        .nullable()
+        .optional(),
+    awayMode: z
+        .object({
+            dateFrom: z.string(),
+            type: z.string(),
+            dateTo: z.string(),
+        })
+        .nullable()
+        .optional(),
+    bot: z.boolean(),
+    contactInfo: z.string().nullable().optional(),
+    dateFormat: z.string().nullable().optional(),
+    featureFlags: z.array(z.string()).nullable().optional(),
+    profession: z.string().nullable().optional(),
+    removed: z.boolean(),
+    restricted: z.boolean().nullable().optional(),
+    setupPending: z.union([z.boolean(), z.number()]).nullable().optional(),
+    theme: z.string().nullable().optional(),
+    timeFormat: z.string().nullable().optional(),
+    timezone: z.string(),
+    version: z.number(),
 })
 
 export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
@@ -200,15 +298,23 @@ export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
 export const ConversationMessageSchema = z.object({
     id: z.number(),
     content: z.string(),
-    creatorId: z.number(),
+    creator: z.number().nullable().optional(),
+    creatorId: z.number().nullable().optional(),
+    creatorName: z.string().nullable().optional(),
     conversationId: z.number(),
-    createdTs: z.number(),
-    systemMessage: z.string().nullable().optional(),
+    createdTs: z.number().nullable().optional(),
+    postedTs: z.number().nullable().optional(),
+    systemMessage: SystemMessageSchema,
     attachments: z.array(z.unknown()).nullable().optional(),
     reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
     actions: z.array(z.unknown()).nullable().optional(),
     objIndex: z.number().nullable().optional(),
     lastEditedTs: z.number().nullable().optional(),
+    deleted: z.boolean().nullable().optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    version: z.number().nullable().optional(),
+    workspaceId: z.number().nullable().optional(),
 })
 
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>
@@ -243,7 +349,7 @@ export const InboxThreadSchema = z.object({
     snippetMaskAvatarUrl: z.string().nullable().optional(),
     snippetMaskPoster: z.number().nullable().optional(),
     starred: z.boolean(),
-    systemMessage: z.string().nullable().optional(),
+    systemMessage: SystemMessageSchema,
     isArchived: z.boolean(),
     inInbox: z.boolean(),
     isSaved: z.boolean().nullable().optional(),
