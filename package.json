@@ -38,7 +38,7 @@
         "@types/uuid": "9.0.8",
         "husky": "8.0.3",
         "lint-staged": "13.1.4",
-        "npm-run-all2": "5.0.0",
+        "npm-run-all2": "5.0.2",
         "rimraf": "3.0.2",
         "ts-node": "10.9.1",
         "type-fest": "^4.12.0",
