@@ -233,10 +233,7 @@ export function getSearchQueryURL(params: { workspaceId: number; query: string }
  * @param params - Object containing workspaceId and optional initialLocation
  * @returns A relative URL path
  */
-export function getSettingsURL(params: {
-    workspaceId: number
-    initialLocation?: string
-}): string {
+export function getSettingsURL(params: { workspaceId: number; initialLocation?: string }): string {
     return params.initialLocation
         ? `/a/${params.workspaceId}/settings/${params.initialLocation}`
         : `/a/${params.workspaceId}/settings`

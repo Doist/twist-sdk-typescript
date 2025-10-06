@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/complexity/noExcessiveNestedTestSuites: <explanation> */
+/** biome-ignore-all lint/complexity/noExcessiveNestedTestSuites: In this instance, not excessive */
 import {
     getChannelURL,
     getCommentURL,
@@ -162,9 +162,9 @@ describe('URL Helpers', () => {
 
     describe('getMessageURL', () => {
         test('returns message URL', () => {
-            expect(
-                getMessageURL({ workspaceId: 1, conversationId: 1337, messageId: 9000 }),
-            ).toBe('/a/1/msg/1337/m/9000')
+            expect(getMessageURL({ workspaceId: 1, conversationId: 1337, messageId: 9000 })).toBe(
+                '/a/1/msg/1337/m/9000',
+            )
         })
     })
 
@@ -204,9 +204,7 @@ describe('URL Helpers', () => {
 
     describe('getUserProfileURL', () => {
         test('returns user profile URL', () => {
-            expect(getUserProfileURL({ workspaceId: 1, userId: 1001 })).toBe(
-                '/a/1/people/u/1001',
-            )
+            expect(getUserProfileURL({ workspaceId: 1, userId: 1001 })).toBe('/a/1/people/u/1001')
         })
     })
 
