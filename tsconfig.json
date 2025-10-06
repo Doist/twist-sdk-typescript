@@ -6,6 +6,7 @@
         "allowJs": true,
         "skipLibCheck": true,
         "declaration": true,
+        "declarationMap": true,
         "outDir": "dist",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -23,6 +24,6 @@
         "alwaysStrict": true,
         "baseUrl": "./src"
     },
-    "include": ["src"],
-    "exclude": ["node_modules", "dist", "**/testData", "**/*.test.ts"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "**/testData", "src/**/*.test.ts", "src/testUtils/**/*"]
 }
