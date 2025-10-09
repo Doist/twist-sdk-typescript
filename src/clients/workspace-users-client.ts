@@ -1,4 +1,5 @@
 import { request } from '../rest-client'
+import { BatchRequestDescriptor } from '../types/batch'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
 
@@ -63,24 +64,40 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param userId - The user's ID.
-     * @returns The workspace user object.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
+     * @returns The workspace user object or a batch request descriptor.
      *
      * @example
      * ```typescript
+     * // Normal usage
      * const user = await api.workspaceUsers.getUserById(123, 456)
      * console.log(user.name, user.email)
+     *
+     * // Batch usage
+     * const batch = api.createBatch()
+     * batch.add((api) => api.workspaceUsers.getUserById(123, 456))
+     * const results = await batch.execute()
      * ```
      */
-    async getUserById(workspaceId: number, userId: number): Promise<WorkspaceUser> {
-        const response = await request<WorkspaceUser>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/getone',
-            this.apiToken,
-            { id: workspaceId, user_id: userId },
-        )
+    getUserById(workspaceId: number, userId: number, options: { batch: true }): BatchRequestDescriptor<WorkspaceUser>
+    getUserById(workspaceId: number, userId: number, options?: { batch?: false }): Promise<WorkspaceUser>
+    getUserById(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
+        const method = 'GET'
+        const url = 'workspace_users/getone'
+        const params = { id: workspaceId, user_id: userId }
+        const schema = WorkspaceUserSchema
 
-        return WorkspaceUserSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then((response) =>
+            schema.parse(response.data),
+        )
     }
 
     /**

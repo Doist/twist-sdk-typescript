@@ -1,3 +1,4 @@
+import { BatchBuilder } from './batch-builder'
 import { ChannelsClient } from './clients/channels-client'
 import { CommentsClient } from './clients/comments-client'
 import { ConversationMessagesClient } from './clients/conversation-messages-client'
@@ -36,6 +37,9 @@ export class TwistApi {
     public reactions: ReactionsClient
     public search: SearchClient
 
+    private authToken: string
+    private baseUrl?: string
+
     /**
      * Creates a new Twist API client.
      *
@@ -43,6 +47,8 @@ export class TwistApi {
      * @param baseUrl - Optional custom API base URL. If not provided, defaults to Twist's standard API endpoint.
      */
     constructor(authToken: string, baseUrl?: string) {
+        this.authToken = authToken
+        this.baseUrl = baseUrl
         this.users = new UsersClient(authToken, baseUrl)
         this.workspaces = new WorkspacesClient(authToken, baseUrl)
         this.workspaceUsers = new WorkspaceUsersClient(authToken, baseUrl)
@@ -55,5 +61,23 @@ export class TwistApi {
         this.inbox = new InboxClient(authToken, baseUrl)
         this.reactions = new ReactionsClient(authToken, baseUrl)
         this.search = new SearchClient(authToken, baseUrl)
+    }
+
+    /**
+     * Creates a batch builder for executing multiple API requests in a single HTTP call.
+     *
+     * @returns A BatchBuilder instance
+     *
+     * @example
+     * ```typescript
+     * const batch = api.createBatch()
+     * batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
+     * batch.add(() => api.workspaceUsers.getUserById(123, 789, { batch: true }))
+     * const results = await batch.execute()
+     * console.log(results[0].data.name, results[1].data.name)
+     * ```
+     */
+    createBatch(): BatchBuilder {
+        return new BatchBuilder(this.authToken, this.baseUrl)
     }
 }
