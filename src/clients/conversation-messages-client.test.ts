@@ -18,7 +18,7 @@ describe('ConversationMessagesClient', () => {
                 content: 'Test message',
                 conversation_id: 456,
                 creator: 1,
-                created_ts: 1609459200,
+                posted_ts: 1609459200,
             }
 
             server.use(
@@ -36,7 +36,7 @@ describe('ConversationMessagesClient', () => {
             expect(result.id).toBe(514069)
             expect(result.content).toBe('Test message')
             expect(result.conversationId).toBe(456)
-            expect(result.created).toBeInstanceOf(Date)
+            expect(result.posted).toBeInstanceOf(Date)
         })
     })
 })
