@@ -1,5 +1,6 @@
 import { ENDPOINT_INBOX, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { InboxThread, InboxThreadSchema } from '../types/entities'
 
 type GetInboxArgs = {
@@ -44,6 +45,7 @@ export class InboxClient {
      * @param args.until - Optional date to get items until.
      * @param args.limit - Optional limit on number of items returned.
      * @param args.cursor - Optional cursor for pagination.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Inbox threads.
      *
      * @example
@@ -54,7 +56,12 @@ export class InboxClient {
      * })
      * ```
      */
-    async getInbox(args: GetInboxArgs): Promise<InboxThread[]> {
+    getInbox(args: GetInboxArgs, options: { batch: true }): BatchRequestDescriptor<InboxThread[]>
+    getInbox(args: GetInboxArgs, options?: { batch?: false }): Promise<InboxThread[]>
+    getInbox(
+        args: GetInboxArgs,
+        options?: { batch?: boolean },
+    ): Promise<InboxThread[]> | BatchRequestDescriptor<InboxThread[]> {
         const params: Record<string, unknown> = {
             workspace_id: args.workspaceId,
         }
@@ -64,21 +71,23 @@ export class InboxClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<InboxThread[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_INBOX}/get`,
-            this.apiToken,
-            params,
-        )
+        const method = 'GET'
+        const url = `${ENDPOINT_INBOX}/get`
 
-        return response.data.map((thread) => InboxThreadSchema.parse(thread))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<InboxThread[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((thread) => InboxThreadSchema.parse(thread)),
+        )
     }
 
     /**
      * Gets unread count for inbox.
      *
      * @param workspaceId - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The unread count.
      *
      * @example
@@ -87,51 +96,86 @@ export class InboxClient {
      * console.log(`Unread items: ${count}`)
      * ```
      */
-    async getCount(workspaceId: number): Promise<number> {
-        const response = await request<InboxCountResponse>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_INBOX}/get_count`,
-            this.apiToken,
-            { workspace_id: workspaceId },
-        )
+    getCount(workspaceId: number, options: { batch: true }): BatchRequestDescriptor<number>
+    getCount(workspaceId: number, options?: { batch?: false }): Promise<number>
+    getCount(
+        workspaceId: number,
+        options?: { batch?: boolean },
+    ): Promise<number> | BatchRequestDescriptor<number> {
+        const method = 'GET'
+        const url = `${ENDPOINT_INBOX}/get_count`
+        const params = { workspace_id: workspaceId }
 
-        return response.data.data
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<InboxCountResponse>(
+            method,
+            this.getBaseUri(),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => response.data.data)
     }
 
     /**
      * Archives a thread in the inbox.
      *
      * @param id - The thread ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.inbox.archiveThread(456)
      * ```
      */
-    async archiveThread(id: number): Promise<void> {
-        await request<void>('POST', this.getBaseUri(), `${ENDPOINT_INBOX}/archive`, this.apiToken, {
-            id,
-        })
+    archiveThread(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    archiveThread(id: number, options?: { batch?: false }): Promise<void>
+    archiveThread(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_INBOX}/archive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Unarchives a thread in the inbox.
      *
      * @param id - The thread ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.inbox.unarchiveThread(456)
      * ```
      */
-    async unarchiveThread(id: number): Promise<void> {
-        await request<void>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_INBOX}/unarchive`,
-            this.apiToken,
-            { id },
+    unarchiveThread(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    unarchiveThread(id: number, options?: { batch?: false }): Promise<void>
+    unarchiveThread(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_INBOX}/unarchive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 
@@ -139,19 +183,29 @@ export class InboxClient {
      * Marks all inbox items as read in a workspace.
      *
      * @param workspaceId - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.inbox.markAllRead(123)
      * ```
      */
-    async markAllRead(workspaceId: number): Promise<void> {
-        await request<void>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_INBOX}/mark_all_read`,
-            this.apiToken,
-            { workspace_id: workspaceId },
+    markAllRead(workspaceId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    markAllRead(workspaceId: number, options?: { batch?: false }): Promise<void>
+    markAllRead(
+        workspaceId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_INBOX}/mark_all_read`
+        const params = { workspace_id: workspaceId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 
@@ -163,6 +217,7 @@ export class InboxClient {
      * @param args.channelIds - Optional array of channel IDs to filter by.
      * @param args.since - Optional date to filter items since.
      * @param args.until - Optional date to filter items until.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
@@ -172,7 +227,12 @@ export class InboxClient {
      * })
      * ```
      */
-    async archiveAll(args: ArchiveAllArgs): Promise<void> {
+    archiveAll(args: ArchiveAllArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    archiveAll(args: ArchiveAllArgs, options?: { batch?: false }): Promise<void>
+    archiveAll(
+        args: ArchiveAllArgs,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
         const params: Record<string, unknown> = {
             workspace_id: args.workspaceId,
         }
@@ -181,12 +241,15 @@ export class InboxClient {
         if (args.since) params.since_ts_or_obj_idx = Math.floor(args.since.getTime() / 1000)
         if (args.until) params.until_ts_or_obj_idx = Math.floor(args.until.getTime() / 1000)
 
-        await request<void>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_INBOX}/archive_all`,
-            this.apiToken,
-            params,
+        const method = 'POST'
+        const url = `${ENDPOINT_INBOX}/archive_all`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 }

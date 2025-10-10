@@ -1,5 +1,6 @@
 import { ENDPOINT_GROUPS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { Group, GroupSchema } from '../types/entities'
 
 /**
@@ -19,6 +20,7 @@ export class GroupsClient {
      * Gets all groups for a given workspace.
      *
      * @param workspaceId - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of group objects.
      *
      * @example
@@ -27,34 +29,50 @@ export class GroupsClient {
      * groups.forEach(g => console.log(g.name))
      * ```
      */
-    async getGroups(workspaceId: number): Promise<Group[]> {
-        const response = await request<Group[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_GROUPS}/get`,
-            this.apiToken,
-            { workspaceId },
-        )
+    getGroups(workspaceId: number, options: { batch: true }): BatchRequestDescriptor<Group[]>
+    getGroups(workspaceId: number, options?: { batch?: false }): Promise<Group[]>
+    getGroups(
+        workspaceId: number,
+        options?: { batch?: boolean },
+    ): Promise<Group[]> | BatchRequestDescriptor<Group[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_GROUPS}/get`
+        const params = { workspaceId }
 
-        return response.data.map((group) => GroupSchema.parse(group))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Group[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((group) => GroupSchema.parse(group)),
+        )
     }
 
     /**
      * Gets a single group object by id.
      *
      * @param id - The group ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The group object.
      */
-    async getGroup(id: number): Promise<Group> {
-        const response = await request<Group>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_GROUPS}/getone`,
-            this.apiToken,
-            { id },
-        )
+    getGroup(id: number, options: { batch: true }): BatchRequestDescriptor<Group>
+    getGroup(id: number, options?: { batch?: false }): Promise<Group>
+    getGroup(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Group> | BatchRequestDescriptor<Group> {
+        const method = 'GET'
+        const url = `${ENDPOINT_GROUPS}/getone`
+        const params = { id }
+        const schema = GroupSchema
 
-        return GroupSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -66,6 +84,7 @@ export class GroupsClient {
      * @param args.description - Optional group description.
      * @param args.color - Optional group color.
      * @param args.userIds - Optional array of user IDs to add to the group.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created group object.
      *
      * @example
@@ -77,22 +96,45 @@ export class GroupsClient {
      * })
      * ```
      */
-    async createGroup(args: {
+    createGroup(
+        args: {
+            workspaceId: number
+            name: string
+            description?: string
+            color?: string
+            userIds?: number[]
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<Group>
+    createGroup(args: {
         workspaceId: number
         name: string
         description?: string
         color?: string
         userIds?: number[]
-    }): Promise<Group> {
-        const response = await request<Group>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_GROUPS}/add`,
-            this.apiToken,
-            args,
-        )
+    }): Promise<Group>
+    createGroup(
+        args: {
+            workspaceId: number
+            name: string
+            description?: string
+            color?: string
+            userIds?: number[]
+        },
+        options?: { batch?: boolean },
+    ): Promise<Group> | BatchRequestDescriptor<Group> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/add`
+        const params = args
+        const schema = GroupSchema
 
-        return GroupSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -103,32 +145,70 @@ export class GroupsClient {
      * @param args.name - Optional new group name.
      * @param args.description - Optional new group description.
      * @param args.color - Optional new group color.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated group object.
      */
-    async updateGroup(args: {
+    updateGroup(
+        args: {
+            id: number
+            name?: string
+            description?: string
+            color?: string
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<Group>
+    updateGroup(args: {
         id: number
         name?: string
         description?: string
         color?: string
-    }): Promise<Group> {
-        const response = await request<Group>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_GROUPS}/update`,
-            this.apiToken,
-            args,
-        )
+    }): Promise<Group>
+    updateGroup(
+        args: {
+            id: number
+            name?: string
+            description?: string
+            color?: string
+        },
+        options?: { batch?: boolean },
+    ): Promise<Group> | BatchRequestDescriptor<Group> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/update`
+        const params = args
+        const schema = GroupSchema
 
-        return GroupSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Permanently deletes a group.
      *
      * @param id - The group ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async deleteGroup(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/remove`, this.apiToken, { id })
+    deleteGroup(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    deleteGroup(id: number, options?: { batch?: false }): Promise<void>
+    deleteGroup(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/remove`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -136,12 +216,30 @@ export class GroupsClient {
      *
      * @param id - The group ID.
      * @param userId - The user ID to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async addUserToGroup(id: number, userId: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/add_user`, this.apiToken, {
-            id,
-            userId,
-        })
+    addUserToGroup(
+        id: number,
+        userId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    addUserToGroup(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    addUserToGroup(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/add_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -149,17 +247,31 @@ export class GroupsClient {
      *
      * @param id - The group ID.
      * @param userIds - Array of user IDs to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.groups.addUsers(123, [456, 789, 101])
      * ```
      */
-    async addUsers(id: number, userIds: number[]): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/add_users`, this.apiToken, {
-            id,
-            userIds,
-        })
+    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/add_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -167,12 +279,26 @@ export class GroupsClient {
      *
      * @param id - The group ID.
      * @param userId - The user ID to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUser(id: number, userId: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/remove_user`, this.apiToken, {
-            id,
-            userId,
-        })
+    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    removeUser(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/remove_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -180,11 +306,29 @@ export class GroupsClient {
      *
      * @param id - The group ID.
      * @param userIds - Array of user IDs to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUsers(id: number, userIds: number[]): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_GROUPS}/remove_users`, this.apiToken, {
-            id,
-            userIds,
-        })
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_GROUPS}/remove_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 }

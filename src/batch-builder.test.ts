@@ -1,8 +1,8 @@
 import { HttpResponse, http } from 'msw'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { server } from './testUtils/msw-setup'
-import { TwistApi } from './twist-api'
 import { TEST_API_TOKEN } from './testUtils/test-defaults'
+import { TwistApi } from './twist-api'
 
 describe('BatchBuilder', () => {
     let api: TwistApi
@@ -11,12 +11,9 @@ describe('BatchBuilder', () => {
         api = new TwistApi(TEST_API_TOKEN)
     })
 
-    describe('createBatch', () => {
-        it('should create a BatchBuilder instance', () => {
-            const batch = api.createBatch()
-            expect(batch).toBeDefined()
-            expect(typeof batch.add).toBe('function')
-            expect(typeof batch.execute).toBe('function')
+    describe('batch', () => {
+        it('should have a batch method', () => {
+            expect(typeof api.batch).toBe('function')
         })
     })
 
@@ -78,11 +75,10 @@ describe('BatchBuilder', () => {
                 }),
             )
 
-            const batch = api.createBatch()
-            batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
-            batch.add(() => api.workspaceUsers.getUserById(123, 789, { batch: true }))
-
-            const results = await batch.execute()
+            const results = await api.batch(
+                api.workspaceUsers.getUserById(123, 456, { batch: true }),
+                api.workspaceUsers.getUserById(123, 789, { batch: true }),
+            )
 
             expect(results).toHaveLength(2)
             expect(results[0].code).toBe(200)
@@ -94,8 +90,7 @@ describe('BatchBuilder', () => {
         })
 
         it('should handle empty batch', async () => {
-            const batch = api.createBatch()
-            const results = await batch.execute()
+            const results = await api.batch()
             expect(results).toEqual([])
         })
 
@@ -127,23 +122,27 @@ describe('BatchBuilder', () => {
                 }),
             )
 
-            const batch = api.createBatch()
-            batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
-            batch.add(() => api.workspaceUsers.getUserById(123, 999, { batch: true }))
-
-            const results = await batch.execute()
+            const results = await api.batch(
+                api.workspaceUsers.getUserById(123, 456, { batch: true }),
+                api.workspaceUsers.getUserById(123, 999, { batch: true }),
+            )
 
             expect(results).toHaveLength(2)
             expect(results[0].code).toBe(200)
             expect(results[0].data.name).toBe('User One')
             expect(results[1].code).toBe(404)
-            expect(results[1].data.error).toBe('User not found')
+            // Type assertion needed for error responses - error responses don't match the expected type
+            expect((results[1].data as unknown as { error: string }).error).toBe('User not found')
         })
 
-        it('should support method chaining', () => {
-            const batch = api.createBatch()
-            const result = batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
-            expect(result).toBe(batch) // Chaining returns the same instance
+        it('should accept array of descriptors', () => {
+            const descriptors = [
+                api.workspaceUsers.getUserById(123, 456, { batch: true }),
+                api.workspaceUsers.getUserById(123, 789, { batch: true }),
+            ]
+            expect(descriptors).toHaveLength(2)
+            expect(descriptors[0].method).toBe('GET')
+            expect(descriptors[0].url).toBe('workspace_users/getone')
         })
     })
 

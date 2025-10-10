@@ -1,22 +1,20 @@
+import type { BatchApiResponse, BatchRequestDescriptor, BatchResponseArray } from './types/batch'
 import { TwistRequestError } from './types/errors'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
 import { transformTimestamps } from './utils/timestamp-conversion'
-import type { BatchApiResponse, BatchRequestDescriptor, BatchResponse } from './types/batch'
 
 /**
- * Builder for batching multiple API requests into a single HTTP call.
+ * Executes multiple API requests in a single HTTP call.
  *
  * @example
  * ```typescript
- * const batch = api.createBatch()
- * batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
- * batch.add(() => api.workspaceUsers.getUserById(123, 789, { batch: true }))
- * const results = await batch.execute()
+ * const results = await api.batch(
+ *   api.workspaceUsers.getUserById(123, 456, { batch: true }),
+ *   api.workspaceUsers.getUserById(123, 789, { batch: true })
+ * )
  * ```
  */
 export class BatchBuilder {
-    private requests: BatchRequestDescriptor<any>[] = []
-
     constructor(
         private apiToken: string,
         private baseUrl?: string,
@@ -27,36 +25,21 @@ export class BatchBuilder {
     }
 
     /**
-     * Adds a request to the batch using a callback function.
-     * The callback receives the original API instance, but you must pass `{ batch: true }` as the last argument.
+     * Executes an array of batch request descriptors in a single API call.
      *
-     * @param fn - A function that receives the API client and returns a descriptor
-     * @returns This BatchBuilder instance for chaining
-     *
-     * @example
-     * ```typescript
-     * batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
-     * ```
-     */
-    add<T>(fn: () => BatchRequestDescriptor<T>): this {
-        const descriptor = fn()
-        this.requests.push(descriptor)
-        return this
-    }
-
-    /**
-     * Executes all batched requests in a single API call.
-     *
+     * @param requests - Array of batch request descriptors
      * @returns Array of BatchResponse objects with processed data
      * @throws {TwistRequestError} If the batch request fails
      */
-    async execute(): Promise<BatchResponse<any>[]> {
-        if (this.requests.length === 0) {
-            return []
+    async execute<T extends readonly BatchRequestDescriptor<unknown>[]>(
+        requests: T,
+    ): Promise<BatchResponseArray<T>> {
+        if (requests.length === 0) {
+            return [] as BatchResponseArray<T>
         }
 
         // Build the batch requests array
-        const batchRequests = this.requests.map((descriptor) => {
+        const batchRequests = requests.map((descriptor) => {
             // Convert params to snake_case
             const snakeCaseParams = descriptor.params
                 ? (snakeCaseKeys(descriptor.params) as Record<string, unknown>)
@@ -120,13 +103,13 @@ export class BatchBuilder {
 
         // Process each response
         return batchApiResponses.map((apiResponse, index) => {
-            const descriptor = this.requests[index]
+            const descriptor = requests[index]
 
             // Parse the body JSON
             let parsedBody: unknown
             try {
                 parsedBody = apiResponse.body ? JSON.parse(apiResponse.body) : undefined
-            } catch (error) {
+            } catch (_error) {
                 parsedBody = apiResponse.body
             }
 
@@ -169,6 +152,6 @@ export class BatchBuilder {
                 headers,
                 data: finalData,
             }
-        })
+        }) as BatchResponseArray<T>
     }
 }

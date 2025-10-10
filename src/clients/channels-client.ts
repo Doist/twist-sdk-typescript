@@ -1,5 +1,6 @@
 import { ENDPOINT_CHANNELS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema } from '../types/entities'
 import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
 
@@ -22,6 +23,7 @@ export class ChannelsClient {
      * @param args - The arguments for getting channels.
      * @param args.workspaceId - The workspace ID.
      * @param args.archived - Optional flag to include archived channels.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of channel objects.
      *
      * @example
@@ -30,34 +32,50 @@ export class ChannelsClient {
      * channels.forEach(ch => console.log(ch.name))
      * ```
      */
-    async getChannels(args: GetChannelsArgs): Promise<Channel[]> {
-        const response = await request<Channel[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/get`,
-            this.apiToken,
-            args,
-        )
+    getChannels(args: GetChannelsArgs, options: { batch: true }): BatchRequestDescriptor<Channel[]>
+    getChannels(args: GetChannelsArgs, options?: { batch?: false }): Promise<Channel[]>
+    getChannels(
+        args: GetChannelsArgs,
+        options?: { batch?: boolean },
+    ): Promise<Channel[]> | BatchRequestDescriptor<Channel[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_CHANNELS}/get`
+        const params = args
 
-        return response.data.map((channel) => ChannelSchema.parse(channel))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Channel[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((channel) => ChannelSchema.parse(channel)),
+        )
     }
 
     /**
      * Gets a single channel object by id.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The channel object.
      */
-    async getChannel(id: number): Promise<Channel> {
-        const response = await request<Channel>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/getone`,
-            this.apiToken,
-            { id },
-        )
+    getChannel(id: number, options: { batch: true }): BatchRequestDescriptor<Channel>
+    getChannel(id: number, options?: { batch?: false }): Promise<Channel>
+    getChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Channel> | BatchRequestDescriptor<Channel> {
+        const method = 'GET'
+        const url = `${ENDPOINT_CHANNELS}/getone`
+        const params = { id }
+        const schema = ChannelSchema
 
-        return ChannelSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Channel>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -70,6 +88,7 @@ export class ChannelsClient {
      * @param args.color - Optional channel color.
      * @param args.userIds - Optional array of user IDs to add to the channel.
      * @param args.public - Optional flag to make the channel public.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created channel object.
      *
      * @example
@@ -81,16 +100,27 @@ export class ChannelsClient {
      * })
      * ```
      */
-    async createChannel(args: CreateChannelArgs): Promise<Channel> {
-        const response = await request<Channel>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/add`,
-            this.apiToken,
-            args,
-        )
+    createChannel(
+        args: CreateChannelArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Channel>
+    createChannel(args: CreateChannelArgs, options?: { batch?: false }): Promise<Channel>
+    createChannel(
+        args: CreateChannelArgs,
+        options?: { batch?: boolean },
+    ): Promise<Channel> | BatchRequestDescriptor<Channel> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/add`
+        const params = args
+        const schema = ChannelSchema
 
-        return ChannelSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Channel>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -102,73 +132,155 @@ export class ChannelsClient {
      * @param args.description - Optional new channel description.
      * @param args.color - Optional new channel color.
      * @param args.public - Optional flag to change channel visibility.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated channel object.
      */
-    async updateChannel(args: UpdateChannelArgs): Promise<Channel> {
-        const response = await request<Channel>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/update`,
-            this.apiToken,
-            args,
-        )
+    updateChannel(
+        args: UpdateChannelArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Channel>
+    updateChannel(args: UpdateChannelArgs, options?: { batch?: false }): Promise<Channel>
+    updateChannel(
+        args: UpdateChannelArgs,
+        options?: { batch?: boolean },
+    ): Promise<Channel> | BatchRequestDescriptor<Channel> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/update`
+        const params = args
+        const schema = ChannelSchema
 
-        return ChannelSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Channel>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Permanently deletes a channel.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async deleteChannel(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/remove`, this.apiToken, {
-            id,
-        })
+    deleteChannel(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    deleteChannel(id: number, options?: { batch?: false }): Promise<void>
+    deleteChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/remove`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Archives a channel.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async archiveChannel(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/archive`, this.apiToken, {
-            id,
-        })
+    archiveChannel(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    archiveChannel(id: number, options?: { batch?: false }): Promise<void>
+    archiveChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/archive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Unarchives a channel.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async unarchiveChannel(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/unarchive`, this.apiToken, {
-            id,
-        })
+    unarchiveChannel(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    unarchiveChannel(id: number, options?: { batch?: false }): Promise<void>
+    unarchiveChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/unarchive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Favorites a channel.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async favoriteChannel(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/favorite`, this.apiToken, {
-            id,
-        })
+    favoriteChannel(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    favoriteChannel(id: number, options?: { batch?: false }): Promise<void>
+    favoriteChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/favorite`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Unfavorites a channel.
      *
      * @param id - The channel ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async unfavoriteChannel(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/unfavorite`, this.apiToken, {
-            id,
-        })
+    unfavoriteChannel(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    unfavoriteChannel(id: number, options?: { batch?: false }): Promise<void>
+    unfavoriteChannel(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/unfavorite`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -176,17 +288,31 @@ export class ChannelsClient {
      *
      * @param id - The channel ID.
      * @param userId - The user ID to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.channels.addUser(456, 789)
      * ```
      */
-    async addUser(id: number, userId: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/add_user`, this.apiToken, {
-            id,
-            userId,
-        })
+    addUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    addUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    addUser(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/add_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -194,17 +320,31 @@ export class ChannelsClient {
      *
      * @param id - The channel ID.
      * @param userIds - Array of user IDs to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.channels.addUsers(456, [789, 790, 791])
      * ```
      */
-    async addUsers(id: number, userIds: number[]): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_CHANNELS}/add_users`, this.apiToken, {
-            id,
-            userIds,
-        })
+    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/add_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -212,17 +352,25 @@ export class ChannelsClient {
      *
      * @param id - The channel ID.
      * @param userId - The user ID to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUser(id: number, userId: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/remove_user`,
-            this.apiToken,
-            {
-                id,
-                userId,
-            },
+    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    removeUser(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/remove_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 
@@ -231,17 +379,29 @@ export class ChannelsClient {
      *
      * @param id - The channel ID.
      * @param userIds - Array of user IDs to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUsers(id: number, userIds: number[]): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CHANNELS}/remove_users`,
-            this.apiToken,
-            {
-                id,
-                userIds,
-            },
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CHANNELS}/remove_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 }

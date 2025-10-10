@@ -11,6 +11,7 @@ import { ThreadsClient } from './clients/threads-client'
 import { UsersClient } from './clients/users-client'
 import { WorkspaceUsersClient } from './clients/workspace-users-client'
 import { WorkspacesClient } from './clients/workspaces-client'
+import type { BatchRequestDescriptor, BatchResponseArray } from './types/batch'
 
 /**
  * The main API client for interacting with the Twist REST API.
@@ -64,20 +65,24 @@ export class TwistApi {
     }
 
     /**
-     * Creates a batch builder for executing multiple API requests in a single HTTP call.
+     * Executes multiple API requests in a single HTTP call using the batch endpoint.
      *
-     * @returns A BatchBuilder instance
+     * @param requests - Batch request descriptors (obtained by passing `{ batch: true }` to API methods)
+     * @returns Array of batch responses with processed data
      *
      * @example
      * ```typescript
-     * const batch = api.createBatch()
-     * batch.add(() => api.workspaceUsers.getUserById(123, 456, { batch: true }))
-     * batch.add(() => api.workspaceUsers.getUserById(123, 789, { batch: true }))
-     * const results = await batch.execute()
+     * const results = await api.batch(
+     *   api.workspaceUsers.getUserById(123, 456, { batch: true }),
+     *   api.workspaceUsers.getUserById(123, 789, { batch: true })
+     * )
      * console.log(results[0].data.name, results[1].data.name)
      * ```
      */
-    createBatch(): BatchBuilder {
-        return new BatchBuilder(this.authToken, this.baseUrl)
+    batch<T extends readonly BatchRequestDescriptor<unknown>[]>(
+        ...requests: T
+    ): Promise<BatchResponseArray<T>> {
+        const builder = new BatchBuilder(this.authToken, this.baseUrl)
+        return builder.execute(requests)
     }
 }

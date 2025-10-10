@@ -58,8 +58,8 @@ describe('ReactionsClient', () => {
             expect(result).toBeNull()
         })
 
-        it('should throw error when no id provided', async () => {
-            await expect(client.get({})).rejects.toThrow(
+        it('should throw error when no id provided', () => {
+            expect(() => client.get({})).toThrow(
                 'Must provide one of: threadId, commentId, or messageId',
             )
         })

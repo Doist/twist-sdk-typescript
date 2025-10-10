@@ -21,6 +21,14 @@ export type BatchResponse<T> = {
 }
 
 /**
+ * Maps an array of BatchRequestDescriptor types to their corresponding BatchResponse types.
+ * Preserves individual types in heterogeneous arrays for proper type inference.
+ */
+export type BatchResponseArray<T extends readonly BatchRequestDescriptor<unknown>[]> = {
+    [K in keyof T]: T[K] extends BatchRequestDescriptor<infer R> ? BatchResponse<R> : never
+}
+
+/**
  * Raw response format from the batch API endpoint.
  * @internal
  */

@@ -1,5 +1,6 @@
 import { ENDPOINT_SEARCH, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { SearchResult, SearchResultSchema } from '../types/entities'
 
 type SearchArgs = {
@@ -69,6 +70,7 @@ export class SearchClient {
      * @param args.dateTo - Optional end date for filtering (YYYY-MM-DD).
      * @param args.limit - Optional limit on number of results returned.
      * @param args.cursor - Optional cursor for pagination.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Search results with pagination.
      *
      * @example
@@ -79,7 +81,12 @@ export class SearchClient {
      * })
      * ```
      */
-    async search(args: SearchArgs): Promise<SearchResponse> {
+    search(args: SearchArgs, options: { batch: true }): BatchRequestDescriptor<SearchResponse>
+    search(args: SearchArgs, options?: { batch?: false }): Promise<SearchResponse>
+    search(
+        args: SearchArgs,
+        options?: { batch?: boolean },
+    ): Promise<SearchResponse> | BatchRequestDescriptor<SearchResponse> {
         const params: Record<string, unknown> = {
             query: args.query,
             workspace_id: args.workspaceId,
@@ -93,18 +100,19 @@ export class SearchClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<SearchResponse>(
-            'GET',
-            this.getBaseUri(),
-            ENDPOINT_SEARCH,
-            this.apiToken,
-            params,
-        )
+        const method = 'GET'
+        const url = ENDPOINT_SEARCH
 
-        return {
-            ...response.data,
-            items: response.data.items.map((result) => SearchResultSchema.parse(result)),
+        if (options?.batch) {
+            return { method, url, params }
         }
+
+        return request<SearchResponse>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => ({
+                ...response.data,
+                items: response.data.items.map((result) => SearchResultSchema.parse(result)),
+            }),
+        )
     }
 
     /**
@@ -115,6 +123,7 @@ export class SearchClient {
      * @param args.threadId - The thread ID to search in.
      * @param args.limit - Optional limit on number of results returned.
      * @param args.cursor - Optional cursor for pagination.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Comment IDs that match the search query.
      *
      * @example
@@ -125,7 +134,15 @@ export class SearchClient {
      * })
      * ```
      */
-    async searchThread(args: SearchThreadArgs): Promise<SearchThreadResponse> {
+    searchThread(
+        args: SearchThreadArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<SearchThreadResponse>
+    searchThread(args: SearchThreadArgs, options?: { batch?: false }): Promise<SearchThreadResponse>
+    searchThread(
+        args: SearchThreadArgs,
+        options?: { batch?: boolean },
+    ): Promise<SearchThreadResponse> | BatchRequestDescriptor<SearchThreadResponse> {
         const params: Record<string, unknown> = {
             query: args.query,
             thread_id: args.threadId,
@@ -134,15 +151,20 @@ export class SearchClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<SearchThreadResponse>(
-            'GET',
+        const method = 'GET'
+        const url = `${ENDPOINT_SEARCH}/thread`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<SearchThreadResponse>(
+            method,
             this.getBaseUri(),
-            `${ENDPOINT_SEARCH}/thread`,
+            url,
             this.apiToken,
             params,
-        )
-
-        return response.data
+        ).then((response) => response.data)
     }
 
     /**
@@ -153,6 +175,7 @@ export class SearchClient {
      * @param args.conversationId - The conversation ID to search in.
      * @param args.limit - Optional limit on number of results returned.
      * @param args.cursor - Optional cursor for pagination.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Message IDs that match the search query.
      *
      * @example
@@ -163,7 +186,18 @@ export class SearchClient {
      * })
      * ```
      */
-    async searchConversation(args: SearchConversationArgs): Promise<SearchConversationResponse> {
+    searchConversation(
+        args: SearchConversationArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<SearchConversationResponse>
+    searchConversation(
+        args: SearchConversationArgs,
+        options?: { batch?: false },
+    ): Promise<SearchConversationResponse>
+    searchConversation(
+        args: SearchConversationArgs,
+        options?: { batch?: boolean },
+    ): Promise<SearchConversationResponse> | BatchRequestDescriptor<SearchConversationResponse> {
         const params: Record<string, unknown> = {
             query: args.query,
             conversation_id: args.conversationId,
@@ -172,14 +206,19 @@ export class SearchClient {
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
-        const response = await request<SearchConversationResponse>(
-            'GET',
+        const method = 'GET'
+        const url = `${ENDPOINT_SEARCH}/conversation`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<SearchConversationResponse>(
+            method,
             this.getBaseUri(),
-            `${ENDPOINT_SEARCH}/conversation`,
+            url,
             this.apiToken,
             params,
-        )
-
-        return response.data
+        ).then((response) => response.data)
     }
 }
