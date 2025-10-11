@@ -54,6 +54,108 @@ const api = new TwistApi(tokenResponse.accessToken)
 const user = await api.users.getSessionUser()
 ```
 
+### Batch Requests
+
+The SDK supports making multiple API calls in a single HTTP request using the `/batch` endpoint. This can significantly improve performance when you need to fetch or update multiple resources.
+
+**Note:** Batch requests are completely optional. If you only need to make a single API call, simply call the method normally without the `{ batch: true }` option.
+
+#### How It Works
+
+To use batch requests:
+
+1. Pass `{ batch: true }` as the last parameter to any API method
+2. This returns a `BatchRequestDescriptor` instead of executing the request immediately
+3. Pass multiple descriptors to `api.batch()` to execute them together
+
+```typescript
+// Single requests (normal usage)
+const user1 = await api.workspaceUsers.getUserById(123, 456)
+const user2 = await api.workspaceUsers.getUserById(123, 789)
+
+// Batch requests - executes in a single HTTP call
+const results = await api.batch(
+    api.workspaceUsers.getUserById(123, 456, { batch: true }),
+    api.workspaceUsers.getUserById(123, 789, { batch: true })
+)
+
+console.log(results[0].data.name) // First user
+console.log(results[1].data.name) // Second user
+```
+
+#### Response Structure
+
+Each item in the batch response includes:
+
+- `code` - HTTP status code for that specific request (e.g., 200, 404)
+- `headers` - Response headers as a key-value object
+- `data` - The parsed and validated response data
+
+```typescript
+const results = await api.batch(
+    api.channels.getChannel(123, { batch: true }),
+    api.channels.getChannel(456, { batch: true })
+)
+
+results.forEach((result) => {
+    if (result.code === 200) {
+        console.log('Success:', result.data.name)
+    } else {
+        console.error('Error:', result.code)
+    }
+})
+```
+
+#### Performance Optimization
+
+When all requests in a batch are GET requests, they are executed in parallel on the server for optimal performance. Mixed GET and POST requests are executed sequentially.
+
+```typescript
+// These GET requests execute in parallel
+const results = await api.batch(
+    api.workspaceUsers.getUserById(123, 456, { batch: true }),
+    api.channels.getChannel(789, { batch: true }),
+    api.threads.getThread(101112, { batch: true })
+)
+```
+
+#### Mixing Different API Calls
+
+You can batch requests across different resource types:
+
+```typescript
+const results = await api.batch(
+    api.workspaceUsers.getUserById(123, 456, { batch: true }),
+    api.channels.getChannels({ workspaceId: 123 }, { batch: true }),
+    api.conversations.getConversations({ workspaceId: 123 }, { batch: true })
+)
+
+const [user, channels, conversations] = results
+// TypeScript maintains proper types for each result
+console.log(user.data.name)
+console.log(channels.data.length)
+console.log(conversations.data.length)
+```
+
+#### Error Handling
+
+Individual requests in a batch can fail independently. Always check the status code of each result:
+
+```typescript
+const results = await api.batch(
+    api.channels.getChannel(123, { batch: true }),
+    api.channels.getChannel(999999, { batch: true }) // Non-existent channel
+)
+
+results.forEach((result, index) => {
+    if (result.code >= 200 && result.code < 300) {
+        console.log(`Request ${index} succeeded:`, result.data)
+    } else {
+        console.error(`Request ${index} failed with status ${result.code}`)
+    }
+})
+```
+
 ## Documentation
 
 For detailed documentation, visit the [Twist SDK Documentation](https://doist.github.io/twist-sdk-typescript/).
