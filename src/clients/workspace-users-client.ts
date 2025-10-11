@@ -1,4 +1,5 @@
 import { request } from '../rest-client'
+import { BatchRequestDescriptor } from '../types/batch'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
 
@@ -20,6 +21,7 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param archived - Optional flag to filter archived users.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of workspace user objects.
      *
      * @example
@@ -28,34 +30,61 @@ export class WorkspaceUsersClient {
      * users.forEach(u => console.log(u.name, u.userType))
      * ```
      */
-    async getWorkspaceUsers(workspaceId: number, archived?: boolean): Promise<WorkspaceUser[]> {
-        const response = await request<WorkspaceUser[]>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/get',
-            this.apiToken,
-            { id: workspaceId, archived },
-        )
+    getWorkspaceUsers(
+        workspaceId: number,
+        archived: boolean | undefined,
+        options: { batch: true },
+    ): BatchRequestDescriptor<WorkspaceUser[]>
+    getWorkspaceUsers(
+        workspaceId: number,
+        archived?: boolean,
+        options?: { batch?: false },
+    ): Promise<WorkspaceUser[]>
+    getWorkspaceUsers(
+        workspaceId: number,
+        archived?: boolean,
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser[]> | BatchRequestDescriptor<WorkspaceUser[]> {
+        const method = 'GET'
+        const url = 'workspace_users/get'
+        const params = { id: workspaceId, archived }
 
-        return response.data.map((user) => WorkspaceUserSchema.parse(user))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<WorkspaceUser[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((user) => WorkspaceUserSchema.parse(user)),
+        )
     }
 
     /**
      * Returns a list of workspace user IDs for the given workspace id.
      *
      * @param workspaceId - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of user IDs.
      */
-    async getWorkspaceUserIds(workspaceId: number): Promise<number[]> {
-        const response = await request<number[]>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/get_ids',
-            this.apiToken,
-            { id: workspaceId },
-        )
+    getWorkspaceUserIds(
+        workspaceId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<number[]>
+    getWorkspaceUserIds(workspaceId: number, options?: { batch?: false }): Promise<number[]>
+    getWorkspaceUserIds(
+        workspaceId: number,
+        options?: { batch?: boolean },
+    ): Promise<number[]> | BatchRequestDescriptor<number[]> {
+        const method = 'GET'
+        const url = 'workspace_users/get_ids'
+        const params = { id: workspaceId }
 
-        return response.data
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<number[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data,
+        )
     }
 
     /**
@@ -63,24 +92,48 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param userId - The user's ID.
-     * @returns The workspace user object.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
+     * @returns The workspace user object or a batch request descriptor.
      *
      * @example
      * ```typescript
+     * // Normal usage
      * const user = await api.workspaceUsers.getUserById(123, 456)
      * console.log(user.name, user.email)
+     *
+     * // Batch usage
+     * const batch = api.createBatch()
+     * batch.add((api) => api.workspaceUsers.getUserById(123, 456))
+     * const results = await batch.execute()
      * ```
      */
-    async getUserById(workspaceId: number, userId: number): Promise<WorkspaceUser> {
-        const response = await request<WorkspaceUser>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/getone',
-            this.apiToken,
-            { id: workspaceId, user_id: userId },
-        )
+    getUserById(
+        workspaceId: number,
+        userId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<WorkspaceUser>
+    getUserById(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: false },
+    ): Promise<WorkspaceUser>
+    getUserById(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
+        const method = 'GET'
+        const url = 'workspace_users/getone'
+        const params = { id: workspaceId, user_id: userId }
+        const schema = WorkspaceUserSchema
 
-        return WorkspaceUserSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -88,6 +141,7 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param email - The user's email.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The workspace user object.
      *
      * @example
@@ -95,16 +149,33 @@ export class WorkspaceUsersClient {
      * const user = await api.workspaceUsers.getUserByEmail(123, 'user@example.com')
      * ```
      */
-    async getUserByEmail(workspaceId: number, email: string): Promise<WorkspaceUser> {
-        const response = await request<WorkspaceUser>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/get_by_email',
-            this.apiToken,
-            { id: workspaceId, email },
-        )
+    getUserByEmail(
+        workspaceId: number,
+        email: string,
+        options: { batch: true },
+    ): BatchRequestDescriptor<WorkspaceUser>
+    getUserByEmail(
+        workspaceId: number,
+        email: string,
+        options?: { batch?: false },
+    ): Promise<WorkspaceUser>
+    getUserByEmail(
+        workspaceId: number,
+        email: string,
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
+        const method = 'GET'
+        const url = 'workspace_users/get_by_email'
+        const params = { id: workspaceId, email }
+        const schema = WorkspaceUserSchema
 
-        return WorkspaceUserSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -112,18 +183,39 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param userId - The user's ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Information about the user in the workspace context.
      */
-    async getUserInfo(workspaceId: number, userId: number): Promise<Record<string, unknown>> {
-        const response = await request<Record<string, unknown>>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/get_info',
-            this.apiToken,
-            { id: workspaceId, user_id: userId },
-        )
+    getUserInfo(
+        workspaceId: number,
+        userId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Record<string, unknown>>
+    getUserInfo(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: false },
+    ): Promise<Record<string, unknown>>
+    getUserInfo(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<Record<string, unknown>> | BatchRequestDescriptor<Record<string, unknown>> {
+        const method = 'GET'
+        const url = 'workspace_users/get_info'
+        const params = { id: workspaceId, user_id: userId }
 
-        return response.data
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Record<string, unknown>>(
+            method,
+            this.getBaseUri(),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => response.data)
     }
 
     /**
@@ -131,6 +223,7 @@ export class WorkspaceUsersClient {
      *
      * @param workspaceId - The workspace ID.
      * @param userId - The user's ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The user's local time as a string (e.g., "2017-05-10 07:55:40").
      *
      * @example
@@ -139,16 +232,32 @@ export class WorkspaceUsersClient {
      * console.log('User local time:', localTime)
      * ```
      */
-    async getUserLocalTime(workspaceId: number, userId: number): Promise<string> {
-        const response = await request<string>(
-            'GET',
-            this.getBaseUri(),
-            'workspace_users/get_local_time',
-            this.apiToken,
-            { id: workspaceId, user_id: userId },
-        )
+    getUserLocalTime(
+        workspaceId: number,
+        userId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<string>
+    getUserLocalTime(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: false },
+    ): Promise<string>
+    getUserLocalTime(
+        workspaceId: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<string> | BatchRequestDescriptor<string> {
+        const method = 'GET'
+        const url = 'workspace_users/get_local_time'
+        const params = { id: workspaceId, user_id: userId }
 
-        return response.data
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<string>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data,
+        )
     }
 
     /**
@@ -160,30 +269,55 @@ export class WorkspaceUsersClient {
      * @param args.name - Optional name for the user.
      * @param args.userType - Optional user type (USER, GUEST, or ADMIN).
      * @param args.channelIds - Optional array of channel IDs to add the user to.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created workspace user object.
      */
-    async addUser(args: {
+    addUser(
+        args: {
+            workspaceId: number
+            email: string
+            name?: string
+            userType?: UserType
+            channelIds?: number[]
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<WorkspaceUser>
+    addUser(args: {
         workspaceId: number
         email: string
         name?: string
         userType?: UserType
         channelIds?: number[]
-    }): Promise<WorkspaceUser> {
-        const response = await request<WorkspaceUser>(
-            'POST',
-            this.getBaseUri(),
-            'workspace_users/add',
-            this.apiToken,
-            {
-                id: args.workspaceId,
-                email: args.email,
-                name: args.name,
-                userType: args.userType,
-                channelIds: args.channelIds,
-            },
-        )
+    }): Promise<WorkspaceUser>
+    addUser(
+        args: {
+            workspaceId: number
+            email: string
+            name?: string
+            userType?: UserType
+            channelIds?: number[]
+        },
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
+        const params = {
+            id: args.workspaceId,
+            email: args.email,
+            name: args.name,
+            userType: args.userType,
+            channelIds: args.channelIds,
+        }
 
-        return WorkspaceUserSchema.parse(response.data)
+        const method = 'POST'
+        const url = 'workspace_users/add'
+        const schema = WorkspaceUserSchema
+
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -194,28 +328,51 @@ export class WorkspaceUsersClient {
      * @param args.userType - The user type (USER, GUEST, or ADMIN).
      * @param args.email - Optional email of the user to update.
      * @param args.userId - Optional user ID to update (use either email or userId).
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated workspace user object.
      */
-    async updateUser(args: {
+    updateUser(
+        args: {
+            workspaceId: number
+            userType: UserType
+            email?: string
+            userId?: number
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<WorkspaceUser>
+    updateUser(args: {
         workspaceId: number
         userType: UserType
         email?: string
         userId?: number
-    }): Promise<WorkspaceUser> {
-        const response = await request<WorkspaceUser>(
-            'POST',
-            this.getBaseUri(),
-            'workspace_users/update',
-            this.apiToken,
-            {
-                id: args.workspaceId,
-                userType: args.userType,
-                email: args.email,
-                userId: args.userId,
-            },
-        )
+    }): Promise<WorkspaceUser>
+    updateUser(
+        args: {
+            workspaceId: number
+            userType: UserType
+            email?: string
+            userId?: number
+        },
+        options?: { batch?: boolean },
+    ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
+        const params = {
+            id: args.workspaceId,
+            userType: args.userType,
+            email: args.email,
+            userId: args.userId,
+        }
 
-        return WorkspaceUserSchema.parse(response.data)
+        const method = 'POST'
+        const url = 'workspace_users/update'
+        const schema = WorkspaceUserSchema
+
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -225,17 +382,41 @@ export class WorkspaceUsersClient {
      * @param args.workspaceId - The workspace ID.
      * @param args.email - Optional email of the user to remove.
      * @param args.userId - Optional user ID to remove (use either email or userId).
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUser(args: {
-        workspaceId: number
-        email?: string
-        userId?: number
-    }): Promise<void> {
-        await request('POST', this.getBaseUri(), 'workspace_users/remove', this.apiToken, {
+    removeUser(
+        args: {
+            workspaceId: number
+            email?: string
+            userId?: number
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeUser(args: { workspaceId: number; email?: string; userId?: number }): Promise<void>
+    removeUser(
+        args: {
+            workspaceId: number
+            email?: string
+            userId?: number
+        },
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const params = {
             id: args.workspaceId,
             email: args.email,
             userId: args.userId,
-        })
+        }
+
+        const method = 'POST'
+        const url = 'workspace_users/remove'
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -245,16 +426,40 @@ export class WorkspaceUsersClient {
      * @param args.workspaceId - The workspace ID.
      * @param args.email - The user's email.
      * @param args.userId - Optional user ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async resendInvite(args: {
-        workspaceId: number
-        email: string
-        userId?: number
-    }): Promise<void> {
-        await request('POST', this.getBaseUri(), 'workspace_users/resend_invite', this.apiToken, {
+    resendInvite(
+        args: {
+            workspaceId: number
+            email: string
+            userId?: number
+        },
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    resendInvite(args: { workspaceId: number; email: string; userId?: number }): Promise<void>
+    resendInvite(
+        args: {
+            workspaceId: number
+            email: string
+            userId?: number
+        },
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const params = {
             id: args.workspaceId,
             email: args.email,
             userId: args.userId,
-        })
+        }
+
+        const method = 'POST'
+        const url = 'workspace_users/resend_invite'
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 }

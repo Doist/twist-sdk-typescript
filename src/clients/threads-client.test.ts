@@ -157,8 +157,8 @@ describe('ThreadsClient', () => {
             await client.markAllRead({ channelId: 456 })
         })
 
-        it('should throw error if neither workspaceId nor channelId provided', async () => {
-            await expect(client.markAllRead({})).rejects.toThrow(
+        it('should throw error if neither workspaceId nor channelId provided', () => {
+            expect(() => client.markAllRead({})).toThrow(
                 'Either workspaceId or channelId is required',
             )
         })

@@ -1,5 +1,6 @@
 import { ENDPOINT_REACTIONS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 
 type AddReactionArgs = {
     threadId?: number
@@ -44,13 +45,23 @@ export class ReactionsClient {
      * @param args.commentId - Optional comment ID.
      * @param args.messageId - Optional message ID (for conversation messages).
      * @param args.reaction - The reaction emoji to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.reactions.add({ threadId: 789, reaction: '👍' })
+     *
+     * // Batch usage
+     * const batch = api.createBatch()
+     * batch.add(() => api.reactions.add({ threadId: 789, reaction: '👍' }, { batch: true }))
      * ```
      */
-    async add(args: AddReactionArgs): Promise<void> {
+    add(args: AddReactionArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    add(args: AddReactionArgs, options?: { batch?: false }): Promise<void>
+    add(
+        args: AddReactionArgs,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
         const params: Record<string, number | string | undefined> = {
             reaction: args.reaction,
         }
@@ -65,12 +76,15 @@ export class ReactionsClient {
             throw new Error('Must provide one of: threadId, commentId, or messageId')
         }
 
-        await request<void>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_REACTIONS}/add`,
-            this.apiToken,
-            params,
+        const method = 'POST'
+        const url = `${ENDPOINT_REACTIONS}/add`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 
@@ -81,6 +95,7 @@ export class ReactionsClient {
      * @param args.threadId - Optional thread ID.
      * @param args.commentId - Optional comment ID.
      * @param args.messageId - Optional message ID (for conversation messages).
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns A reaction object with emoji reactions as keys and arrays of user IDs as values, or null if no reactions.
      *
      * @example
@@ -89,7 +104,12 @@ export class ReactionsClient {
      * // Returns: { "👍": [1, 2, 3], "❤️": [4, 5] }
      * ```
      */
-    async get(args: GetReactionsArgs): Promise<ReactionObject> {
+    get(args: GetReactionsArgs, options: { batch: true }): BatchRequestDescriptor<ReactionObject>
+    get(args: GetReactionsArgs, options?: { batch?: false }): Promise<ReactionObject>
+    get(
+        args: GetReactionsArgs,
+        options?: { batch?: boolean },
+    ): Promise<ReactionObject> | BatchRequestDescriptor<ReactionObject> {
         const params: Record<string, number | undefined> = {}
 
         if (args.threadId) {
@@ -102,15 +122,16 @@ export class ReactionsClient {
             throw new Error('Must provide one of: threadId, commentId, or messageId')
         }
 
-        const response = await request<ReactionObject>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_REACTIONS}/get`,
-            this.apiToken,
-            params,
-        )
+        const method = 'POST'
+        const url = `${ENDPOINT_REACTIONS}/get`
 
-        return response.data
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<ReactionObject>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data,
+        )
     }
 
     /**
@@ -121,13 +142,19 @@ export class ReactionsClient {
      * @param args.commentId - Optional comment ID.
      * @param args.messageId - Optional message ID (for conversation messages).
      * @param args.reaction - The reaction emoji to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.reactions.remove({ threadId: 789, reaction: '👍' })
      * ```
      */
-    async remove(args: RemoveReactionArgs): Promise<void> {
+    remove(args: RemoveReactionArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    remove(args: RemoveReactionArgs, options?: { batch?: false }): Promise<void>
+    remove(
+        args: RemoveReactionArgs,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
         const params: Record<string, number | string | undefined> = {
             reaction: args.reaction,
         }
@@ -142,12 +169,15 @@ export class ReactionsClient {
             throw new Error('Must provide one of: threadId, commentId, or messageId')
         }
 
-        await request<void>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_REACTIONS}/remove`,
-            this.apiToken,
-            params,
+        const method = 'POST'
+        const url = `${ENDPOINT_REACTIONS}/remove`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 }

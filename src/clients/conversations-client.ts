@@ -1,5 +1,6 @@
 import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import {
     Conversation,
     ConversationSchema,
@@ -27,6 +28,7 @@ export class ConversationsClient {
      * @param args - The arguments for getting conversations.
      * @param args.workspaceId - The workspace ID.
      * @param args.archived - Optional flag to include archived conversations.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of conversation objects.
      *
      * @example
@@ -35,34 +37,57 @@ export class ConversationsClient {
      * conversations.forEach(c => console.log(c.title))
      * ```
      */
-    async getConversations(args: GetConversationsArgs): Promise<Conversation[]> {
-        const response = await request<Conversation[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/get`,
-            this.apiToken,
-            args,
-        )
+    getConversations(
+        args: GetConversationsArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Conversation[]>
+    getConversations(
+        args: GetConversationsArgs,
+        options?: { batch?: false },
+    ): Promise<Conversation[]>
+    getConversations(
+        args: GetConversationsArgs,
+        options?: { batch?: boolean },
+    ): Promise<Conversation[]> | BatchRequestDescriptor<Conversation[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_CONVERSATIONS}/get`
+        const params = args
 
-        return response.data.map((conversation) => ConversationSchema.parse(conversation))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Conversation[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) =>
+                response.data.map((conversation) => ConversationSchema.parse(conversation)),
+        )
     }
 
     /**
      * Gets a single conversation object by id.
      *
      * @param id - The conversation ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The conversation object.
      */
-    async getConversation(id: number): Promise<Conversation> {
-        const response = await request<Conversation>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/getone`,
-            this.apiToken,
-            { id },
-        )
+    getConversation(id: number, options: { batch: true }): BatchRequestDescriptor<Conversation>
+    getConversation(id: number, options?: { batch?: false }): Promise<Conversation>
+    getConversation(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
+        const method = 'GET'
+        const url = `${ENDPOINT_CONVERSATIONS}/getone`
+        const params = { id }
+        const schema = ConversationSchema
 
-        return ConversationSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -71,6 +96,7 @@ export class ConversationsClient {
      * @param args - The arguments for getting or creating a conversation.
      * @param args.workspaceId - The workspace ID.
      * @param args.userIds - Array of user IDs to include in the conversation.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The conversation object (existing or newly created).
      *
      * @example
@@ -81,16 +107,30 @@ export class ConversationsClient {
      * })
      * ```
      */
-    async getOrCreateConversation(args: GetOrCreateConversationArgs): Promise<Conversation> {
-        const response = await request<Conversation>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/get_or_create`,
-            this.apiToken,
-            args,
-        )
+    getOrCreateConversation(
+        args: GetOrCreateConversationArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Conversation>
+    getOrCreateConversation(
+        args: GetOrCreateConversationArgs,
+        options?: { batch?: false },
+    ): Promise<Conversation>
+    getOrCreateConversation(
+        args: GetOrCreateConversationArgs,
+        options?: { batch?: boolean },
+    ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/get_or_create`
+        const params = args
+        const schema = ConversationSchema
 
-        return ConversationSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -99,6 +139,7 @@ export class ConversationsClient {
      * @param id - The conversation ID.
      * @param title - The new title for the conversation.
      * @param archived - Optional flag to archive/unarchive the conversation.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated conversation object.
      *
      * @example
@@ -106,49 +147,84 @@ export class ConversationsClient {
      * const conversation = await api.conversations.updateConversation(123, 'New Title')
      * ```
      */
-    async updateConversation(id: number, title: string, archived?: boolean): Promise<Conversation> {
+    updateConversation(
+        id: number,
+        title: string,
+        archived: boolean | undefined,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Conversation>
+    updateConversation(
+        id: number,
+        title: string,
+        archived?: boolean,
+        options?: { batch?: false },
+    ): Promise<Conversation>
+    updateConversation(
+        id: number,
+        title: string,
+        archived?: boolean,
+        options?: { batch?: boolean },
+    ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
         const params: Record<string, unknown> = { id, title }
         if (archived !== undefined) params.archived = archived
 
-        const response = await request<Conversation>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/update`,
-            this.apiToken,
-            params,
-        )
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/update`
+        const schema = ConversationSchema
 
-        return ConversationSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Archives a conversation.
      *
      * @param id - The conversation ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async archiveConversation(id: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/archive`,
-            this.apiToken,
-            { id },
-        )
+    archiveConversation(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    archiveConversation(id: number, options?: { batch?: false }): Promise<void>
+    archiveConversation(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/archive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
      * Unarchives a conversation.
      *
      * @param id - The conversation ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async unarchiveConversation(id: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/unarchive`,
-            this.apiToken,
-            { id },
-        )
+    unarchiveConversation(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    unarchiveConversation(id: number, options?: { batch?: false }): Promise<void>
+    unarchiveConversation(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/unarchive`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -156,15 +232,24 @@ export class ConversationsClient {
      *
      * @param id - The conversation ID.
      * @param userId - The user ID to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async addUser(id: number, userId: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/add_user`,
-            this.apiToken,
-            { id, userId },
-        )
+    addUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    addUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    addUser(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/add_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -172,20 +257,29 @@ export class ConversationsClient {
      *
      * @param id - The conversation ID.
      * @param userIds - Array of user IDs to add.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.conversations.addUsers(123, [456, 789, 101])
      * ```
      */
-    async addUsers(id: number, userIds: number[]): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/add_users`,
-            this.apiToken,
-            { id, userIds },
-        )
+    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/add_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -193,15 +287,24 @@ export class ConversationsClient {
      *
      * @param id - The conversation ID.
      * @param userId - The user ID to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUser(id: number, userId: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/remove_user`,
-            this.apiToken,
-            { id, userId },
-        )
+    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    removeUser(
+        id: number,
+        userId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/remove_user`
+        const params = { id, userId }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -209,15 +312,28 @@ export class ConversationsClient {
      *
      * @param id - The conversation ID.
      * @param userIds - Array of user IDs to remove.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async removeUsers(id: number, userIds: number[]): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/remove_users`,
-            this.apiToken,
-            { id, userIds },
-        )
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    removeUsers(
+        id: number,
+        userIds: number[],
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/remove_users`
+        const params = { id, userIds }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -227,19 +343,32 @@ export class ConversationsClient {
      * @param args.id - The conversation ID.
      * @param args.objIndex - Optional index of the message to mark as last read.
      * @param args.messageId - Optional message ID to mark as last read.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async markRead(args: { id: number; objIndex?: number; messageId?: number }): Promise<void> {
+    markRead(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    markRead(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options?: { batch?: false },
+    ): Promise<void>
+    markRead(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
         const params: Record<string, unknown> = { id: args.id }
         if (args.objIndex !== undefined) params.obj_index = args.objIndex
         if (args.messageId !== undefined) params.message_id = args.messageId
 
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/mark_read`,
-            this.apiToken,
-            params,
-        )
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/mark_read`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
@@ -249,37 +378,67 @@ export class ConversationsClient {
      * @param args.id - The conversation ID.
      * @param args.objIndex - Optional index of the message to mark as last unread.
      * @param args.messageId - Optional message ID to mark as last unread.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async markUnread(args: { id: number; objIndex?: number; messageId?: number }): Promise<void> {
+    markUnread(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    markUnread(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options?: { batch?: false },
+    ): Promise<void>
+    markUnread(
+        args: { id: number; objIndex?: number; messageId?: number },
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
         const params: Record<string, unknown> = { id: args.id }
         if (args.objIndex !== undefined) params.obj_index = args.objIndex
         if (args.messageId !== undefined) params.message_id = args.messageId
 
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/mark_unread`,
-            this.apiToken,
-            params,
-        )
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/mark_unread`
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
     }
 
     /**
      * Gets unread conversations for a workspace.
      *
      * @param workspaceId - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Array of unread conversation references.
      */
-    async getUnread(workspaceId: number): Promise<UnreadConversation[]> {
-        const response = await request<UnreadConversation[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/get_unread`,
-            this.apiToken,
-            { workspace_id: workspaceId },
-        )
+    getUnread(
+        workspaceId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<UnreadConversation[]>
+    getUnread(workspaceId: number, options?: { batch?: false }): Promise<UnreadConversation[]>
+    getUnread(
+        workspaceId: number,
+        options?: { batch?: boolean },
+    ): Promise<UnreadConversation[]> | BatchRequestDescriptor<UnreadConversation[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_CONVERSATIONS}/get_unread`
+        const params = { workspace_id: workspaceId }
 
-        return response.data.map((conversation) => UnreadConversationSchema.parse(conversation))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<UnreadConversation[]>(
+            method,
+            this.getBaseUri(),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) =>
+            response.data.map((conversation) => UnreadConversationSchema.parse(conversation)),
+        )
     }
 
     /**
@@ -288,6 +447,7 @@ export class ConversationsClient {
      *
      * @param id - The conversation ID.
      * @param minutes - Number of minutes to mute the conversation.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated conversation object.
      *
      * @example
@@ -295,33 +455,59 @@ export class ConversationsClient {
      * const conversation = await api.conversations.muteConversation(123, 30)
      * ```
      */
-    async muteConversation(id: number, minutes: number): Promise<Conversation> {
-        const response = await request<Conversation>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/mute`,
-            this.apiToken,
-            { id, minutes },
-        )
+    muteConversation(
+        id: number,
+        minutes: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Conversation>
+    muteConversation(
+        id: number,
+        minutes: number,
+        options?: { batch?: false },
+    ): Promise<Conversation>
+    muteConversation(
+        id: number,
+        minutes: number,
+        options?: { batch?: boolean },
+    ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/mute`
+        const params = { id, minutes }
+        const schema = ConversationSchema
 
-        return ConversationSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Unmutes a conversation.
      *
      * @param id - The conversation ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated conversation object.
      */
-    async unmuteConversation(id: number): Promise<Conversation> {
-        const response = await request<Conversation>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_CONVERSATIONS}/unmute`,
-            this.apiToken,
-            { id },
-        )
+    unmuteConversation(id: number, options: { batch: true }): BatchRequestDescriptor<Conversation>
+    unmuteConversation(id: number, options?: { batch?: false }): Promise<Conversation>
+    unmuteConversation(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
+        const method = 'POST'
+        const url = `${ENDPOINT_CONVERSATIONS}/unmute`
+        const params = { id }
+        const schema = ConversationSchema
 
-        return ConversationSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 }

@@ -1,5 +1,6 @@
 import { ENDPOINT_COMMENTS, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { Comment, CommentSchema } from '../types/entities'
 import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
 
@@ -23,6 +24,7 @@ export class CommentsClient {
      * @param args.threadId - The thread ID.
      * @param args.from - Optional date to get comments from.
      * @param args.limit - Optional limit on number of comments returned.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of comment objects.
      *
      * @example
@@ -34,7 +36,12 @@ export class CommentsClient {
      * comments.forEach(c => console.log(c.content))
      * ```
      */
-    async getComments(args: GetCommentsArgs): Promise<Comment[]> {
+    getComments(args: GetCommentsArgs, options: { batch: true }): BatchRequestDescriptor<Comment[]>
+    getComments(args: GetCommentsArgs, options?: { batch?: false }): Promise<Comment[]>
+    getComments(
+        args: GetCommentsArgs,
+        options?: { batch?: boolean },
+    ): Promise<Comment[]> | BatchRequestDescriptor<Comment[]> {
         const params: Record<string, unknown> = {
             thread_id: args.threadId,
         }
@@ -42,33 +49,43 @@ export class CommentsClient {
         if (args.from) params.from = Math.floor(args.from.getTime() / 1000)
         if (args.limit) params.limit = args.limit
 
-        const response = await request<Comment[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_COMMENTS}/get`,
-            this.apiToken,
-            params,
-        )
+        const method = 'GET'
+        const url = `${ENDPOINT_COMMENTS}/get`
 
-        return response.data.map((comment) => CommentSchema.parse(comment))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Comment[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((comment) => CommentSchema.parse(comment)),
+        )
     }
 
     /**
      * Gets a single comment object by id.
      *
      * @param id - The comment ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The comment object.
      */
-    async getComment(id: number): Promise<Comment> {
-        const response = await request<Comment>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_COMMENTS}/getone`,
-            this.apiToken,
-            { id },
-        )
+    getComment(id: number, options: { batch: true }): BatchRequestDescriptor<Comment>
+    getComment(id: number, options?: { batch?: false }): Promise<Comment>
+    getComment(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        const method = 'GET'
+        const url = `${ENDPOINT_COMMENTS}/getone`
+        const params = { id }
+        const schema = CommentSchema
 
-        return CommentSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -80,6 +97,7 @@ export class CommentsClient {
      * @param args.recipients - Optional array of user IDs to notify.
      * @param args.attachments - Optional array of attachment objects.
      * @param args.sendAsIntegration - Optional flag to send as integration.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created comment object.
      *
      * @example
@@ -90,16 +108,27 @@ export class CommentsClient {
      * })
      * ```
      */
-    async createComment(args: CreateCommentArgs): Promise<Comment> {
-        const response = await request<Comment>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_COMMENTS}/add`,
-            this.apiToken,
-            args,
-        )
+    createComment(
+        args: CreateCommentArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Comment>
+    createComment(args: CreateCommentArgs, options?: { batch?: false }): Promise<Comment>
+    createComment(
+        args: CreateCommentArgs,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        const method = 'POST'
+        const url = `${ENDPOINT_COMMENTS}/add`
+        const params = args
+        const schema = CommentSchema
 
-        return CommentSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -110,29 +139,55 @@ export class CommentsClient {
      * @param args.content - Optional new comment content.
      * @param args.recipients - Optional array of user IDs to notify.
      * @param args.attachments - Optional array of attachment objects.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated comment object.
      */
-    async updateComment(args: UpdateCommentArgs): Promise<Comment> {
-        const response = await request<Comment>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_COMMENTS}/update`,
-            this.apiToken,
-            args,
-        )
+    updateComment(
+        args: UpdateCommentArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Comment>
+    updateComment(args: UpdateCommentArgs, options?: { batch?: false }): Promise<Comment>
+    updateComment(
+        args: UpdateCommentArgs,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        const method = 'POST'
+        const url = `${ENDPOINT_COMMENTS}/update`
+        const params = args
+        const schema = CommentSchema
 
-        return CommentSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Permanently deletes a comment.
      *
      * @param id - The comment ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    async deleteComment(id: number): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_COMMENTS}/remove`, this.apiToken, {
-            id,
-        })
+    deleteComment(id: number, options: { batch: true }): BatchRequestDescriptor<void>
+    deleteComment(id: number, options?: { batch?: false }): Promise<void>
+    deleteComment(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_COMMENTS}/remove`
+        const params = { id }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
@@ -141,22 +196,37 @@ export class CommentsClient {
      *
      * @param threadId - The thread ID.
      * @param commentId - The comment ID to mark as the last read position.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.comments.markPosition(789, 206113)
      * ```
      */
-    async markPosition(threadId: number, commentId: number): Promise<void> {
-        await request(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_COMMENTS}/mark_position`,
-            this.apiToken,
-            {
-                thread_id: threadId,
-                comment_id: commentId,
-            },
+    markPosition(
+        threadId: number,
+        commentId: number,
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    markPosition(threadId: number, commentId: number, options?: { batch?: false }): Promise<void>
+    markPosition(
+        threadId: number,
+        commentId: number,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_COMMENTS}/mark_position`
+        const params = {
+            thread_id: threadId,
+            comment_id: commentId,
+        }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
         )
     }
 }

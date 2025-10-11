@@ -1,5 +1,6 @@
 import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints'
 import { request } from '../rest-client'
+import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema, Workspace, WorkspaceSchema } from '../types/entities'
 
 /**
@@ -18,6 +19,7 @@ export class WorkspacesClient {
     /**
      * Gets all the user's workspaces.
      *
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of all workspaces the user belongs to.
      *
      * @example
@@ -26,21 +28,28 @@ export class WorkspacesClient {
      * workspaces.forEach(ws => console.log(ws.name))
      * ```
      */
-    async getWorkspaces(): Promise<Workspace[]> {
-        const response = await request<Workspace[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/get`,
-            this.apiToken,
-        )
+    getWorkspaces(options: { batch: true }): BatchRequestDescriptor<Workspace[]>
+    getWorkspaces(options?: { batch?: false }): Promise<Workspace[]>
+    getWorkspaces(options?: {
+        batch?: boolean
+    }): Promise<Workspace[]> | BatchRequestDescriptor<Workspace[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_WORKSPACES}/get`
 
-        return response.data.map((workspace) => WorkspaceSchema.parse(workspace))
+        if (options?.batch) {
+            return { method, url }
+        }
+
+        return request<Workspace[]>(method, this.getBaseUri(), url, this.apiToken).then(
+            (response) => response.data.map((workspace) => WorkspaceSchema.parse(workspace)),
+        )
     }
 
     /**
      * Gets a single workspace object by id.
      *
      * @param id - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The workspace object.
      *
      * @example
@@ -49,21 +58,30 @@ export class WorkspacesClient {
      * console.log(workspace.name)
      * ```
      */
-    async getWorkspace(id: number): Promise<Workspace> {
-        const response = await request<Workspace>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/getone`,
-            this.apiToken,
-            { id },
-        )
+    getWorkspace(id: number, options: { batch: true }): BatchRequestDescriptor<Workspace>
+    getWorkspace(id: number, options?: { batch?: false }): Promise<Workspace>
+    getWorkspace(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Workspace> | BatchRequestDescriptor<Workspace> {
+        const method = 'GET'
+        const url = `${ENDPOINT_WORKSPACES}/getone`
+        const params = { id }
+        const schema = WorkspaceSchema
 
-        return WorkspaceSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
      * Gets the user's default workspace.
      *
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The default workspace object.
      *
      * @example
@@ -72,15 +90,22 @@ export class WorkspacesClient {
      * console.log(workspace.name)
      * ```
      */
-    async getDefaultWorkspace(): Promise<Workspace> {
-        const response = await request<Workspace>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/get_default`,
-            this.apiToken,
-        )
+    getDefaultWorkspace(options: { batch: true }): BatchRequestDescriptor<Workspace>
+    getDefaultWorkspace(options?: { batch?: false }): Promise<Workspace>
+    getDefaultWorkspace(options?: {
+        batch?: boolean
+    }): Promise<Workspace> | BatchRequestDescriptor<Workspace> {
+        const method = 'GET'
+        const url = `${ENDPOINT_WORKSPACES}/get_default`
+        const schema = WorkspaceSchema
 
-        return WorkspaceSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, schema }
+        }
+
+        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken).then((response) =>
+            schema.parse(response.data),
+        )
     }
 
     /**
@@ -88,6 +113,7 @@ export class WorkspacesClient {
      *
      * @param name - The name of the new workspace.
      * @param tempId - Optional temporary ID for the workspace.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created workspace object.
      *
      * @example
@@ -96,19 +122,31 @@ export class WorkspacesClient {
      * console.log('Created:', workspace.name)
      * ```
      */
-    async createWorkspace(name: string, tempId?: number): Promise<Workspace> {
+    createWorkspace(
+        name: string,
+        tempId: number | undefined,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Workspace>
+    createWorkspace(name: string, tempId?: number, options?: { batch?: false }): Promise<Workspace>
+    createWorkspace(
+        name: string,
+        tempId?: number,
+        options?: { batch?: boolean },
+    ): Promise<Workspace> | BatchRequestDescriptor<Workspace> {
         const params: Record<string, unknown> = { name }
         if (tempId !== undefined) params.tempId = tempId
 
-        const response = await request<Workspace>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/add`,
-            this.apiToken,
-            params,
-        )
+        const method = 'POST'
+        const url = `${ENDPOINT_WORKSPACES}/add`
+        const schema = WorkspaceSchema
 
-        return WorkspaceSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -116,6 +154,7 @@ export class WorkspacesClient {
      *
      * @param id - The workspace ID.
      * @param name - The new name for the workspace.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated workspace object.
      *
      * @example
@@ -123,16 +162,29 @@ export class WorkspacesClient {
      * const workspace = await api.workspaces.updateWorkspace(123, 'New Team Name')
      * ```
      */
-    async updateWorkspace(id: number, name: string): Promise<Workspace> {
-        const response = await request<Workspace>(
-            'POST',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/update`,
-            this.apiToken,
-            { id, name },
-        )
+    updateWorkspace(
+        id: number,
+        name: string,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Workspace>
+    updateWorkspace(id: number, name: string, options?: { batch?: false }): Promise<Workspace>
+    updateWorkspace(
+        id: number,
+        name: string,
+        options?: { batch?: boolean },
+    ): Promise<Workspace> | BatchRequestDescriptor<Workspace> {
+        const method = 'POST'
+        const url = `${ENDPOINT_WORKSPACES}/update`
+        const params = { id, name }
+        const schema = WorkspaceSchema
 
-        return WorkspaceSchema.parse(response.data)
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => schema.parse(response.data),
+        )
     }
 
     /**
@@ -140,23 +192,42 @@ export class WorkspacesClient {
      *
      * @param id - The workspace ID.
      * @param currentPassword - The user's current password for confirmation.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.workspaces.removeWorkspace(123, 'mypassword')
      * ```
      */
-    async removeWorkspace(id: number, currentPassword: string): Promise<void> {
-        await request('POST', this.getBaseUri(), `${ENDPOINT_WORKSPACES}/remove`, this.apiToken, {
-            id,
-            currentPassword,
-        })
+    removeWorkspace(
+        id: number,
+        currentPassword: string,
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeWorkspace(id: number, currentPassword: string, options?: { batch?: false }): Promise<void>
+    removeWorkspace(
+        id: number,
+        currentPassword: string,
+        options?: { batch?: boolean },
+    ): Promise<void> | BatchRequestDescriptor<void> {
+        const method = 'POST'
+        const url = `${ENDPOINT_WORKSPACES}/remove`
+        const params = { id, currentPassword }
+
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            () => undefined,
+        )
     }
 
     /**
      * Gets the public channels of a workspace.
      *
      * @param id - The workspace ID.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of public channel objects.
      *
      * @example
@@ -165,15 +236,22 @@ export class WorkspacesClient {
      * channels.forEach(ch => console.log(ch.name))
      * ```
      */
-    async getPublicChannels(id: number): Promise<Channel[]> {
-        const response = await request<Channel[]>(
-            'GET',
-            this.getBaseUri(),
-            `${ENDPOINT_WORKSPACES}/get_public_channels`,
-            this.apiToken,
-            { id },
-        )
+    getPublicChannels(id: number, options: { batch: true }): BatchRequestDescriptor<Channel[]>
+    getPublicChannels(id: number, options?: { batch?: false }): Promise<Channel[]>
+    getPublicChannels(
+        id: number,
+        options?: { batch?: boolean },
+    ): Promise<Channel[]> | BatchRequestDescriptor<Channel[]> {
+        const method = 'GET'
+        const url = `${ENDPOINT_WORKSPACES}/get_public_channels`
+        const params = { id }
 
-        return response.data.map((channel) => ChannelSchema.parse(channel))
+        if (options?.batch) {
+            return { method, url, params }
+        }
+
+        return request<Channel[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+            (response) => response.data.map((channel) => ChannelSchema.parse(channel)),
+        )
     }
 }
