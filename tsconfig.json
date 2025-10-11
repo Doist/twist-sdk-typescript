@@ -6,7 +6,6 @@
         "allowJs": true,
         "skipLibCheck": true,
         "declaration": true,
-        "declarationMap": true,
         "outDir": "dist",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,

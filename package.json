@@ -3,9 +3,10 @@
     "version": "0.1.0-alpha.1",
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
+    "homepage": "https://doist.github.io/twist-sdk-typescript/",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Doist/twist-sdk-typescript.git"
+        "url": "git+https://github.com/Doist/twist-sdk-typescript.git"
     },
     "license": "MIT",
     "main": "dist/index.js",
@@ -65,6 +66,7 @@
     "files": [
         "dist/**/*",
         "!dist/**/*.test.*",
-        "!dist/testUtils"
+        "!dist/testUtils",
+        "!dist/scratch.*"
     ]
 }
