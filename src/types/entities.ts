@@ -4,18 +4,15 @@ import { USER_TYPES, WORKSPACE_PLANS } from './enums'
 // Reusable schema for system messages that can be either a string or an object
 export const SystemMessageSchema = z.union([z.string(), z.unknown()]).nullable().optional()
 
-// User entity from API
-export const UserSchema = z.object({
+// Base user schema with common fields shared between User and WorkspaceUser
+const BaseUserSchema = z.object({
     id: z.number(),
-    email: z.string().email(),
     name: z.string(),
     shortName: z.string(),
     firstName: z.string().nullable().optional(),
     contactInfo: z.string().nullable().optional(),
     bot: z.boolean(),
     profession: z.string().nullable().optional(),
-    snoozeDndStart: z.string().nullable().optional(),
-    clientId: z.string().nullable().optional(),
     timezone: z.string(),
     removed: z.boolean(),
     avatarId: z.string().nullable().optional(),
@@ -28,8 +25,6 @@ export const UserSchema = z.object({
         })
         .nullable()
         .optional(),
-    cometChannel: z.string().nullable().optional(),
-    lang: z.string(),
     awayMode: z
         .object({
             dateFrom: z.string(),
@@ -38,14 +33,23 @@ export const UserSchema = z.object({
         })
         .nullable()
         .optional(),
+    restricted: z.boolean().nullable().optional(),
+    setupPending: z.union([z.boolean(), z.number()]).nullable().optional(),
+})
+
+// User entity from API
+export const UserSchema = BaseUserSchema.extend({
+    email: z.email(),
+    snoozeDndStart: z.string().nullable().optional(),
+    clientId: z.string().nullable().optional(),
+    cometChannel: z.string().nullable().optional(),
+    lang: z.string(),
     cometServer: z.string().nullable().optional(),
     offDays: z.array(z.number()).nullable().optional(),
-    restricted: z.boolean().nullable().optional(),
     defaultWorkspace: z.number().nullable().optional(),
     token: z.string().nullable().optional(),
     snoozeDndEnd: z.string().nullable().optional(),
     snoozed: z.boolean().nullable().optional(),
-    setupPending: z.union([z.boolean(), z.number()]).nullable().optional(),
     snoozeUntil: z.number().nullable().optional(),
     scheduledBanners: z.array(z.string()).nullable().optional(),
 })
@@ -250,42 +254,13 @@ export const CommentSchema = z.object({
 export type Comment = z.infer<typeof CommentSchema>
 
 // WorkspaceUser entity from v4 API
-export const WorkspaceUserSchema = z.object({
-    id: z.number(),
-    name: z.string(),
+export const WorkspaceUserSchema = BaseUserSchema.extend({
     email: z.string().nullable().optional(),
     userType: z.enum(USER_TYPES),
-    shortName: z.string(),
-    firstName: z.string().nullable().optional(),
-    avatarId: z.string().nullable().optional(),
-    avatarUrls: z
-        .object({
-            s35: z.string(),
-            s60: z.string(),
-            s195: z.string(),
-            s640: z.string(),
-        })
-        .nullable()
-        .optional(),
-    awayMode: z
-        .object({
-            dateFrom: z.string(),
-            type: z.string(),
-            dateTo: z.string(),
-        })
-        .nullable()
-        .optional(),
-    bot: z.boolean(),
-    contactInfo: z.string().nullable().optional(),
     dateFormat: z.string().nullable().optional(),
     featureFlags: z.array(z.string()).nullable().optional(),
-    profession: z.string().nullable().optional(),
-    removed: z.boolean(),
-    restricted: z.boolean().nullable().optional(),
-    setupPending: z.union([z.boolean(), z.number()]).nullable().optional(),
     theme: z.string().nullable().optional(),
     timeFormat: z.string().nullable().optional(),
-    timezone: z.string(),
     version: z.number(),
 })
 
