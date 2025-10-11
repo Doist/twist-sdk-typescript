@@ -1,6 +1,6 @@
 {
     "name": "@doist/twist-sdk",
-    "version": "0.1.0-alpha.0",
+    "version": "0.1.0-alpha.1",
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
     "repository": {
@@ -64,7 +64,7 @@
     },
     "files": [
         "dist/**/*",
-        "!dist/**/*.test.js",
-        "!dist/**/*.test.d.ts"
+        "!dist/**/*.test.*",
+        "!dist/testUtils"
     ]
 }
