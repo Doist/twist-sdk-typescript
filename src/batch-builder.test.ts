@@ -53,7 +53,7 @@ describe('BatchBuilder', () => {
                     expect(requestsStr).toBeDefined()
                     expect(parallel).toBe('true') // All GET requests
 
-                    const requests = JSON.parse(requestsStr!)
+                    const requests = JSON.parse(requestsStr || '[]')
                     expect(requests).toHaveLength(2)
                     expect(requests[0].method).toBe('GET')
                     expect(requests[0].url).toContain('workspace_users/getone')
