@@ -1,12 +1,15 @@
 {
     "name": "@doist/twist-sdk",
-    "version": "0.1.0-alpha.2",
+    "version": "0.1.0-alpha.3",
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
     "homepage": "https://doist.github.io/twist-sdk-typescript/",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/Doist/twist-sdk-typescript.git"
+    },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
     },
     "license": "MIT",
     "main": "dist/index.js",
