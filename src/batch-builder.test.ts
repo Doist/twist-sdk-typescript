@@ -76,8 +76,8 @@ describe('BatchBuilder', () => {
             )
 
             const results = await api.batch(
-                api.workspaceUsers.getUserById(123, 456, { batch: true }),
-                api.workspaceUsers.getUserById(123, 789, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 }, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 789 }, { batch: true }),
             )
 
             expect(results).toHaveLength(2)
@@ -123,8 +123,8 @@ describe('BatchBuilder', () => {
             )
 
             const results = await api.batch(
-                api.workspaceUsers.getUserById(123, 456, { batch: true }),
-                api.workspaceUsers.getUserById(123, 999, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 }, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 999 }, { batch: true }),
             )
 
             expect(results).toHaveLength(2)
@@ -137,8 +137,8 @@ describe('BatchBuilder', () => {
 
         it('should accept array of descriptors', () => {
             const descriptors = [
-                api.workspaceUsers.getUserById(123, 456, { batch: true }),
-                api.workspaceUsers.getUserById(123, 789, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 }, { batch: true }),
+                api.workspaceUsers.getUserById({ workspaceId: 123, userId: 789 }, { batch: true }),
             ]
             expect(descriptors).toHaveLength(2)
             expect(descriptors[0].method).toBe('GET')
@@ -148,7 +148,10 @@ describe('BatchBuilder', () => {
 
     describe('getUserById with batch option', () => {
         it('should return descriptor when batch: true', () => {
-            const descriptor = api.workspaceUsers.getUserById(123, 456, { batch: true })
+            const descriptor = api.workspaceUsers.getUserById(
+                { workspaceId: 123, userId: 456 },
+                { batch: true },
+            )
 
             expect(descriptor).toEqual({
                 method: 'GET',
@@ -175,7 +178,7 @@ describe('BatchBuilder', () => {
                 }),
             )
 
-            const result = api.workspaceUsers.getUserById(123, 456)
+            const result = api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 })
             expect(result).toBeInstanceOf(Promise)
 
             const user = await result

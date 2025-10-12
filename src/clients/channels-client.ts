@@ -4,6 +4,26 @@ import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema } from '../types/entities'
 import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
 
+export type AddChannelUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddChannelUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveChannelUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveChannelUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
 /**
  * Client for interacting with Twist channel endpoints.
  */
@@ -286,25 +306,25 @@ export class ChannelsClient {
     /**
      * Adds a user to a channel.
      *
-     * @param id - The channel ID.
-     * @param userId - The user ID to add.
+     * @param args - The arguments for adding a user.
+     * @param args.id - The channel ID.
+     * @param args.userId - The user ID to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
-     * await api.channels.addUser(456, 789)
+     * await api.channels.addUser({ id: 456, userId: 789 })
      * ```
      */
-    addUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
-    addUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    addUser(args: AddChannelUserArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUser(args: AddChannelUserArgs, options?: { batch?: false }): Promise<void>
     addUser(
-        id: number,
-        userId: number,
+        args: AddChannelUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/add_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -318,25 +338,25 @@ export class ChannelsClient {
     /**
      * Adds multiple users to a channel.
      *
-     * @param id - The channel ID.
-     * @param userIds - Array of user IDs to add.
+     * @param args - The arguments for adding users.
+     * @param args.id - The channel ID.
+     * @param args.userIds - Array of user IDs to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
-     * await api.channels.addUsers(456, [789, 790, 791])
+     * await api.channels.addUsers({ id: 456, userIds: [789, 790, 791] })
      * ```
      */
-    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
-    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(args: AddChannelUsersArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(args: AddChannelUsersArgs, options?: { batch?: false }): Promise<void>
     addUsers(
-        id: number,
-        userIds: number[],
+        args: AddChannelUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/add_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }
@@ -350,20 +370,20 @@ export class ChannelsClient {
     /**
      * Removes a user from a channel.
      *
-     * @param id - The channel ID.
-     * @param userId - The user ID to remove.
+     * @param args - The arguments for removing a user.
+     * @param args.id - The channel ID.
+     * @param args.userId - The user ID to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
-    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    removeUser(args: RemoveChannelUserArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUser(args: RemoveChannelUserArgs, options?: { batch?: false }): Promise<void>
     removeUser(
-        id: number,
-        userId: number,
+        args: RemoveChannelUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/remove_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -377,24 +397,23 @@ export class ChannelsClient {
     /**
      * Removes multiple users from a channel.
      *
-     * @param id - The channel ID.
-     * @param userIds - Array of user IDs to remove.
+     * @param args - The arguments for removing users.
+     * @param args.id - The channel ID.
+     * @param args.userIds - Array of user IDs to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
     removeUsers(
-        id: number,
-        userIds: number[],
+        args: RemoveChannelUsersArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<void>
-    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    removeUsers(args: RemoveChannelUsersArgs, options?: { batch?: false }): Promise<void>
     removeUsers(
-        id: number,
-        userIds: number[],
+        args: RemoveChannelUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/remove_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }

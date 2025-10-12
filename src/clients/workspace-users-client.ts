@@ -3,6 +3,31 @@ import { BatchRequestDescriptor } from '../types/batch'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
 
+export type GetWorkspaceUsersArgs = {
+    workspaceId: number
+    archived?: boolean
+}
+
+export type GetUserByIdArgs = {
+    workspaceId: number
+    userId: number
+}
+
+export type GetUserByEmailArgs = {
+    workspaceId: number
+    email: string
+}
+
+export type GetUserInfoArgs = {
+    workspaceId: number
+    userId: number
+}
+
+export type GetUserLocalTimeArgs = {
+    workspaceId: number
+    userId: number
+}
+
 /**
  * Client for interacting with Twist workspace users endpoints (v4 API).
  */
@@ -19,35 +44,33 @@ export class WorkspaceUsersClient {
     /**
      * Returns a list of workspace user objects for the given workspace id.
      *
-     * @param workspaceId - The workspace ID.
-     * @param archived - Optional flag to filter archived users.
+     * @param args - The arguments for getting workspace users.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.archived - Optional flag to filter archived users.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of workspace user objects.
      *
      * @example
      * ```typescript
-     * const users = await api.workspaceUsers.getWorkspaceUsers(123)
+     * const users = await api.workspaceUsers.getWorkspaceUsers({ workspaceId: 123 })
      * users.forEach(u => console.log(u.name, u.userType))
      * ```
      */
     getWorkspaceUsers(
-        workspaceId: number,
-        archived: boolean | undefined,
+        args: GetWorkspaceUsersArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<WorkspaceUser[]>
     getWorkspaceUsers(
-        workspaceId: number,
-        archived?: boolean,
+        args: GetWorkspaceUsersArgs,
         options?: { batch?: false },
     ): Promise<WorkspaceUser[]>
     getWorkspaceUsers(
-        workspaceId: number,
-        archived?: boolean,
+        args: GetWorkspaceUsersArgs,
         options?: { batch?: boolean },
     ): Promise<WorkspaceUser[]> | BatchRequestDescriptor<WorkspaceUser[]> {
         const method = 'GET'
         const url = 'workspace_users/get'
-        const params = { id: workspaceId, archived }
+        const params = { id: args.workspaceId, archived: args.archived }
 
         if (options?.batch) {
             return { method, url, params }
@@ -90,41 +113,36 @@ export class WorkspaceUsersClient {
     /**
      * Gets a user by id.
      *
-     * @param workspaceId - The workspace ID.
-     * @param userId - The user's ID.
+     * @param args - The arguments for getting a user by ID.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.userId - The user's ID.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The workspace user object or a batch request descriptor.
      *
      * @example
      * ```typescript
      * // Normal usage
-     * const user = await api.workspaceUsers.getUserById(123, 456)
+     * const user = await api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 })
      * console.log(user.name, user.email)
      *
      * // Batch usage
      * const batch = api.createBatch()
-     * batch.add((api) => api.workspaceUsers.getUserById(123, 456))
+     * batch.add((api) => api.workspaceUsers.getUserById({ workspaceId: 123, userId: 456 }))
      * const results = await batch.execute()
      * ```
      */
     getUserById(
-        workspaceId: number,
-        userId: number,
+        args: GetUserByIdArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<WorkspaceUser>
+    getUserById(args: GetUserByIdArgs, options?: { batch?: false }): Promise<WorkspaceUser>
     getUserById(
-        workspaceId: number,
-        userId: number,
-        options?: { batch?: false },
-    ): Promise<WorkspaceUser>
-    getUserById(
-        workspaceId: number,
-        userId: number,
+        args: GetUserByIdArgs,
         options?: { batch?: boolean },
     ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
         const method = 'GET'
         const url = 'workspace_users/getone'
-        const params = { id: workspaceId, user_id: userId }
+        const params = { id: args.workspaceId, user_id: args.userId }
         const schema = WorkspaceUserSchema
 
         if (options?.batch) {
@@ -139,34 +157,29 @@ export class WorkspaceUsersClient {
     /**
      * Gets a user by email.
      *
-     * @param workspaceId - The workspace ID.
-     * @param email - The user's email.
+     * @param args - The arguments for getting a user by email.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.email - The user's email.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The workspace user object.
      *
      * @example
      * ```typescript
-     * const user = await api.workspaceUsers.getUserByEmail(123, 'user@example.com')
+     * const user = await api.workspaceUsers.getUserByEmail({ workspaceId: 123, email: 'user@example.com' })
      * ```
      */
     getUserByEmail(
-        workspaceId: number,
-        email: string,
+        args: GetUserByEmailArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<WorkspaceUser>
+    getUserByEmail(args: GetUserByEmailArgs, options?: { batch?: false }): Promise<WorkspaceUser>
     getUserByEmail(
-        workspaceId: number,
-        email: string,
-        options?: { batch?: false },
-    ): Promise<WorkspaceUser>
-    getUserByEmail(
-        workspaceId: number,
-        email: string,
+        args: GetUserByEmailArgs,
         options?: { batch?: boolean },
     ): Promise<WorkspaceUser> | BatchRequestDescriptor<WorkspaceUser> {
         const method = 'GET'
         const url = 'workspace_users/get_by_email'
-        const params = { id: workspaceId, email }
+        const params = { id: args.workspaceId, email: args.email }
         const schema = WorkspaceUserSchema
 
         if (options?.batch) {
@@ -181,29 +194,27 @@ export class WorkspaceUsersClient {
     /**
      * Gets the user's info in the context of the workspace.
      *
-     * @param workspaceId - The workspace ID.
-     * @param userId - The user's ID.
+     * @param args - The arguments for getting user info.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.userId - The user's ID.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Information about the user in the workspace context.
      */
     getUserInfo(
-        workspaceId: number,
-        userId: number,
+        args: GetUserInfoArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<Record<string, unknown>>
     getUserInfo(
-        workspaceId: number,
-        userId: number,
+        args: GetUserInfoArgs,
         options?: { batch?: false },
     ): Promise<Record<string, unknown>>
     getUserInfo(
-        workspaceId: number,
-        userId: number,
+        args: GetUserInfoArgs,
         options?: { batch?: boolean },
     ): Promise<Record<string, unknown>> | BatchRequestDescriptor<Record<string, unknown>> {
         const method = 'GET'
         const url = 'workspace_users/get_info'
-        const params = { id: workspaceId, user_id: userId }
+        const params = { id: args.workspaceId, user_id: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -221,35 +232,30 @@ export class WorkspaceUsersClient {
     /**
      * Gets the user's local time.
      *
-     * @param workspaceId - The workspace ID.
-     * @param userId - The user's ID.
+     * @param args - The arguments for getting user local time.
+     * @param args.workspaceId - The workspace ID.
+     * @param args.userId - The user's ID.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The user's local time as a string (e.g., "2017-05-10 07:55:40").
      *
      * @example
      * ```typescript
-     * const localTime = await api.workspaceUsers.getUserLocalTime(123, 456)
+     * const localTime = await api.workspaceUsers.getUserLocalTime({ workspaceId: 123, userId: 456 })
      * console.log('User local time:', localTime)
      * ```
      */
     getUserLocalTime(
-        workspaceId: number,
-        userId: number,
+        args: GetUserLocalTimeArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<string>
+    getUserLocalTime(args: GetUserLocalTimeArgs, options?: { batch?: false }): Promise<string>
     getUserLocalTime(
-        workspaceId: number,
-        userId: number,
-        options?: { batch?: false },
-    ): Promise<string>
-    getUserLocalTime(
-        workspaceId: number,
-        userId: number,
+        args: GetUserLocalTimeArgs,
         options?: { batch?: boolean },
     ): Promise<string> | BatchRequestDescriptor<string> {
         const method = 'GET'
         const url = 'workspace_users/get_local_time'
-        const params = { id: workspaceId, user_id: userId }
+        const params = { id: args.workspaceId, user_id: args.userId }
 
         if (options?.batch) {
             return { method, url, params }

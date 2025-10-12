@@ -9,6 +9,37 @@ import {
 } from '../types/entities'
 import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
 
+export type UpdateConversationArgs = {
+    id: number
+    title: string
+    archived?: boolean
+}
+
+export type AddConversationUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddConversationUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveConversationUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveConversationUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type MuteConversationArgs = {
+    id: number
+    minutes: number
+}
+
 /**
  * Client for interacting with Twist conversation endpoints.
  */
@@ -136,37 +167,32 @@ export class ConversationsClient {
     /**
      * Updates a conversation.
      *
-     * @param id - The conversation ID.
-     * @param title - The new title for the conversation.
-     * @param archived - Optional flag to archive/unarchive the conversation.
+     * @param args - The arguments for updating a conversation.
+     * @param args.id - The conversation ID.
+     * @param args.title - The new title for the conversation.
+     * @param args.archived - Optional flag to archive/unarchive the conversation.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated conversation object.
      *
      * @example
      * ```typescript
-     * const conversation = await api.conversations.updateConversation(123, 'New Title')
+     * const conversation = await api.conversations.updateConversation({ id: 123, title: 'New Title' })
      * ```
      */
     updateConversation(
-        id: number,
-        title: string,
-        archived: boolean | undefined,
+        args: UpdateConversationArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<Conversation>
     updateConversation(
-        id: number,
-        title: string,
-        archived?: boolean,
+        args: UpdateConversationArgs,
         options?: { batch?: false },
     ): Promise<Conversation>
     updateConversation(
-        id: number,
-        title: string,
-        archived?: boolean,
+        args: UpdateConversationArgs,
         options?: { batch?: boolean },
     ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
-        const params: Record<string, unknown> = { id, title }
-        if (archived !== undefined) params.archived = archived
+        const params: Record<string, unknown> = { id: args.id, title: args.title }
+        if (args.archived !== undefined) params.archived = args.archived
 
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/update`
@@ -230,20 +256,20 @@ export class ConversationsClient {
     /**
      * Adds a user to a conversation.
      *
-     * @param id - The conversation ID.
-     * @param userId - The user ID to add.
+     * @param args - The arguments for adding a user.
+     * @param args.id - The conversation ID.
+     * @param args.userId - The user ID to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    addUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
-    addUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    addUser(args: AddConversationUserArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUser(args: AddConversationUserArgs, options?: { batch?: false }): Promise<void>
     addUser(
-        id: number,
-        userId: number,
+        args: AddConversationUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/add_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -255,25 +281,25 @@ export class ConversationsClient {
     /**
      * Adds multiple users to a conversation.
      *
-     * @param id - The conversation ID.
-     * @param userIds - Array of user IDs to add.
+     * @param args - The arguments for adding users.
+     * @param args.id - The conversation ID.
+     * @param args.userIds - Array of user IDs to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
-     * await api.conversations.addUsers(123, [456, 789, 101])
+     * await api.conversations.addUsers({ id: 123, userIds: [456, 789, 101] })
      * ```
      */
-    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
-    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(args: AddConversationUsersArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(args: AddConversationUsersArgs, options?: { batch?: false }): Promise<void>
     addUsers(
-        id: number,
-        userIds: number[],
+        args: AddConversationUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/add_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }
@@ -285,20 +311,23 @@ export class ConversationsClient {
     /**
      * Removes a user from a conversation.
      *
-     * @param id - The conversation ID.
-     * @param userId - The user ID to remove.
+     * @param args - The arguments for removing a user.
+     * @param args.id - The conversation ID.
+     * @param args.userId - The user ID to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
-    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
     removeUser(
-        id: number,
-        userId: number,
+        args: RemoveConversationUserArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<void>
+    removeUser(args: RemoveConversationUserArgs, options?: { batch?: false }): Promise<void>
+    removeUser(
+        args: RemoveConversationUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/remove_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -310,24 +339,23 @@ export class ConversationsClient {
     /**
      * Removes multiple users from a conversation.
      *
-     * @param id - The conversation ID.
-     * @param userIds - Array of user IDs to remove.
+     * @param args - The arguments for removing users.
+     * @param args.id - The conversation ID.
+     * @param args.userIds - Array of user IDs to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
     removeUsers(
-        id: number,
-        userIds: number[],
+        args: RemoveConversationUsersArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<void>
-    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    removeUsers(args: RemoveConversationUsersArgs, options?: { batch?: false }): Promise<void>
     removeUsers(
-        id: number,
-        userIds: number[],
+        args: RemoveConversationUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/remove_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }
@@ -445,34 +473,29 @@ export class ConversationsClient {
      * Mutes a conversation for a specified number of minutes.
      * The user will receive no notifications from this conversation during that period.
      *
-     * @param id - The conversation ID.
-     * @param minutes - Number of minutes to mute the conversation.
+     * @param args - The arguments for muting a conversation.
+     * @param args.id - The conversation ID.
+     * @param args.minutes - Number of minutes to mute the conversation.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated conversation object.
      *
      * @example
      * ```typescript
-     * const conversation = await api.conversations.muteConversation(123, 30)
+     * const conversation = await api.conversations.muteConversation({ id: 123, minutes: 30 })
      * ```
      */
     muteConversation(
-        id: number,
-        minutes: number,
+        args: MuteConversationArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<Conversation>
+    muteConversation(args: MuteConversationArgs, options?: { batch?: false }): Promise<Conversation>
     muteConversation(
-        id: number,
-        minutes: number,
-        options?: { batch?: false },
-    ): Promise<Conversation>
-    muteConversation(
-        id: number,
-        minutes: number,
+        args: MuteConversationArgs,
         options?: { batch?: boolean },
     ): Promise<Conversation> | BatchRequestDescriptor<Conversation> {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/mute`
-        const params = { id, minutes }
+        const params = { id: args.id, minutes: args.minutes }
         const schema = ConversationSchema
 
         if (options?.batch) {

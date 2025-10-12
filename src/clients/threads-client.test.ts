@@ -70,7 +70,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.moveToChannel(123, 456)
+            await client.moveToChannel({ id: 123, toChannel: 456 })
         })
     })
 
@@ -85,7 +85,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.markUnread(123, 5)
+            await client.markUnread({ id: 123, objIndex: 5 })
         })
 
         it('should mark entire thread as unread with -1', async () => {
@@ -98,7 +98,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.markUnread(123, -1)
+            await client.markUnread({ id: 123, objIndex: -1 })
         })
     })
 
@@ -113,7 +113,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.markUnreadForOthers(123, 5)
+            await client.markUnreadForOthers({ id: 123, objIndex: 5 })
         })
 
         it('should mark entire thread as unread for others with -1', async () => {
@@ -126,7 +126,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.markUnreadForOthers(123, -1)
+            await client.markUnreadForOthers({ id: 123, objIndex: -1 })
         })
     })
 
@@ -175,7 +175,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            const result = await client.muteThread(123, 30)
+            const result = await client.muteThread({ id: 123, minutes: 30 })
             expect(result.id).toBe(123)
             expect(result.lastUpdated).toBeInstanceOf(Date)
             expect(result.posted).toBeInstanceOf(Date)

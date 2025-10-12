@@ -4,6 +4,11 @@ import type { BatchRequestDescriptor } from '../types/batch'
 import { Comment, CommentSchema } from '../types/entities'
 import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
 
+export type MarkCommentPositionArgs = {
+    threadId: number
+    commentId: number
+}
+
 /**
  * Client for interacting with Twist comment endpoints.
  */
@@ -194,31 +199,30 @@ export class CommentsClient {
      * Marks the user's read position in a thread. Used to track where the user has read up to,
      * so clients can scroll to this position and show a visual indicator (blue line).
      *
-     * @param threadId - The thread ID.
-     * @param commentId - The comment ID to mark as the last read position.
+     * @param args - The arguments for marking read position.
+     * @param args.threadId - The thread ID.
+     * @param args.commentId - The comment ID to mark as the last read position.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
-     * await api.comments.markPosition(789, 206113)
+     * await api.comments.markPosition({ threadId: 789, commentId: 206113 })
      * ```
      */
     markPosition(
-        threadId: number,
-        commentId: number,
+        args: MarkCommentPositionArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<void>
-    markPosition(threadId: number, commentId: number, options?: { batch?: false }): Promise<void>
+    markPosition(args: MarkCommentPositionArgs, options?: { batch?: false }): Promise<void>
     markPosition(
-        threadId: number,
-        commentId: number,
+        args: MarkCommentPositionArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_COMMENTS}/mark_position`
         const params = {
-            thread_id: threadId,
-            comment_id: commentId,
+            thread_id: args.threadId,
+            comment_id: args.commentId,
         }
 
         if (options?.batch) {

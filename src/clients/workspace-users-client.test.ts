@@ -23,7 +23,7 @@ describe('WorkspaceUsersClient', () => {
                 }),
             )
 
-            const result = await client.getUserById(123, 456)
+            const result = await client.getUserById({ workspaceId: 123, userId: 456 })
             expect(result).toEqual(mockWorkspaceUser)
         })
     })
@@ -40,7 +40,10 @@ describe('WorkspaceUsersClient', () => {
                 }),
             )
 
-            const result = await client.getUserByEmail(123, 'user@example.com')
+            const result = await client.getUserByEmail({
+                workspaceId: 123,
+                email: 'user@example.com',
+            })
             expect(result).toEqual(mockWorkspaceUser)
         })
     })
@@ -64,7 +67,7 @@ describe('WorkspaceUsersClient', () => {
                 }),
             )
 
-            const result = await client.getUserInfo(123, 456)
+            const result = await client.getUserInfo({ workspaceId: 123, userId: 456 })
             expect(result).toEqual(mockUserInfo)
         })
     })
@@ -83,7 +86,7 @@ describe('WorkspaceUsersClient', () => {
                 }),
             )
 
-            const result = await client.getUserLocalTime(123, 456)
+            const result = await client.getUserLocalTime({ workspaceId: 123, userId: 456 })
             expect(result).toBe(mockLocalTime)
         })
     })

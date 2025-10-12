@@ -52,7 +52,7 @@ describe('ChannelsClient', () => {
                 }),
             )
 
-            await client.addUser(123, 456)
+            await client.addUser({ id: 123, userId: 456 })
         })
     })
 
@@ -67,7 +67,7 @@ describe('ChannelsClient', () => {
                 }),
             )
 
-            await client.addUsers(123, [456, 789, 101])
+            await client.addUsers({ id: 123, userIds: [456, 789, 101] })
         })
     })
 
@@ -82,7 +82,7 @@ describe('ChannelsClient', () => {
                 }),
             )
 
-            await client.removeUser(123, 456)
+            await client.removeUser({ id: 123, userId: 456 })
         })
     })
 
@@ -97,7 +97,7 @@ describe('ChannelsClient', () => {
                 }),
             )
 
-            await client.removeUsers(123, [456, 789, 101])
+            await client.removeUsers({ id: 123, userIds: [456, 789, 101] })
         })
     })
 })
