@@ -37,7 +37,7 @@ describe('ConversationsClient', () => {
                 }),
             )
 
-            const result = await client.updateConversation(123, 'New Title')
+            const result = await client.updateConversation({ id: 123, title: 'New Title' })
             expect(result.id).toBe(123)
             expect(result.lastActive).toBeInstanceOf(Date)
             expect(result.created).toBeInstanceOf(Date)
@@ -53,7 +53,7 @@ describe('ConversationsClient', () => {
                 }),
             )
 
-            await client.updateConversation(123, 'New Title', true)
+            await client.updateConversation({ id: 123, title: 'New Title', archived: true })
         })
     })
 
@@ -68,7 +68,7 @@ describe('ConversationsClient', () => {
                 }),
             )
 
-            await client.addUsers(123, [456, 789, 101])
+            await client.addUsers({ id: 123, userIds: [456, 789, 101] })
         })
     })
 
@@ -83,7 +83,7 @@ describe('ConversationsClient', () => {
                 }),
             )
 
-            await client.removeUsers(123, [456, 789, 101])
+            await client.removeUsers({ id: 123, userIds: [456, 789, 101] })
         })
     })
 
@@ -98,7 +98,7 @@ describe('ConversationsClient', () => {
                 }),
             )
 
-            const result = await client.muteConversation(123, 30)
+            const result = await client.muteConversation({ id: 123, minutes: 30 })
             expect(result.id).toBe(123)
             expect(result.lastActive).toBeInstanceOf(Date)
         })

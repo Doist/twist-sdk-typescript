@@ -4,6 +4,31 @@ import type { BatchRequestDescriptor } from '../types/batch'
 import { Thread, ThreadSchema, UnreadThread, UnreadThreadSchema } from '../types/entities'
 import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
 
+export type MoveThreadToChannelArgs = {
+    id: number
+    toChannel: number
+}
+
+export type MarkThreadReadArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MarkThreadUnreadArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MarkThreadUnreadForOthersArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MuteThreadArgs = {
+    id: number
+    minutes: number
+}
+
 /**
  * Client for interacting with Twist thread endpoints.
  */
@@ -320,24 +345,23 @@ export class ThreadsClient {
     /**
      * Moves a thread to a different channel.
      *
-     * @param id - The thread ID.
-     * @param toChannel - The target channel ID.
+     * @param args - The arguments for moving a thread.
+     * @param args.id - The thread ID.
+     * @param args.toChannel - The target channel ID.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
     moveToChannel(
-        id: number,
-        toChannel: number,
+        args: MoveThreadToChannelArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<void>
-    moveToChannel(id: number, toChannel: number, options?: { batch?: false }): Promise<void>
+    moveToChannel(args: MoveThreadToChannelArgs, options?: { batch?: false }): Promise<void>
     moveToChannel(
-        id: number,
-        toChannel: number,
+        args: MoveThreadToChannelArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/move_to_channel`
-        const params = { id, toChannel }
+        const params = { id: args.id, toChannel: args.toChannel }
 
         if (options?.batch) {
             return { method, url, params }
@@ -349,20 +373,20 @@ export class ThreadsClient {
     /**
      * Marks a thread as read.
      *
-     * @param id - The thread ID.
-     * @param objIndex - The index of the last known read message.
+     * @param args - The arguments for marking a thread as read.
+     * @param args.id - The thread ID.
+     * @param args.objIndex - The index of the last known read message.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    markRead(id: number, objIndex: number, options: { batch: true }): BatchRequestDescriptor<void>
-    markRead(id: number, objIndex: number, options?: { batch?: false }): Promise<void>
+    markRead(args: MarkThreadReadArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    markRead(args: MarkThreadReadArgs, options?: { batch?: false }): Promise<void>
     markRead(
-        id: number,
-        objIndex: number,
+        args: MarkThreadReadArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/mark_read`
-        const params = { id, obj_index: objIndex }
+        const params = { id: args.id, obj_index: args.objIndex }
 
         if (options?.batch) {
             return { method, url, params }
@@ -374,20 +398,20 @@ export class ThreadsClient {
     /**
      * Marks a thread as unread.
      *
-     * @param id - The thread ID.
-     * @param objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
+     * @param args - The arguments for marking a thread as unread.
+     * @param args.id - The thread ID.
+     * @param args.objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    markUnread(id: number, objIndex: number, options: { batch: true }): BatchRequestDescriptor<void>
-    markUnread(id: number, objIndex: number, options?: { batch?: false }): Promise<void>
+    markUnread(args: MarkThreadUnreadArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    markUnread(args: MarkThreadUnreadArgs, options?: { batch?: false }): Promise<void>
     markUnread(
-        id: number,
-        objIndex: number,
+        args: MarkThreadUnreadArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/mark_unread`
-        const params = { id, obj_index: objIndex }
+        const params = { id: args.id, obj_index: args.objIndex }
 
         if (options?.batch) {
             return { method, url, params }
@@ -399,24 +423,26 @@ export class ThreadsClient {
     /**
      * Marks a thread as unread for others. Useful to notify others about thread changes.
      *
-     * @param id - The thread ID.
-     * @param objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
+     * @param args - The arguments for marking a thread as unread for others.
+     * @param args.id - The thread ID.
+     * @param args.objIndex - The index of the last unread message. Use -1 to mark the whole thread as unread.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
     markUnreadForOthers(
-        id: number,
-        objIndex: number,
+        args: MarkThreadUnreadForOthersArgs,
         options: { batch: true },
     ): BatchRequestDescriptor<void>
-    markUnreadForOthers(id: number, objIndex: number, options?: { batch?: false }): Promise<void>
     markUnreadForOthers(
-        id: number,
-        objIndex: number,
+        args: MarkThreadUnreadForOthersArgs,
+        options?: { batch?: false },
+    ): Promise<void>
+    markUnreadForOthers(
+        args: MarkThreadUnreadForOthersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/mark_unread_for_others`
-        const params = { id, obj_index: objIndex }
+        const params = { id: args.id, obj_index: args.objIndex }
 
         if (options?.batch) {
             return { method, url, params }
@@ -525,30 +551,26 @@ export class ThreadsClient {
      * Mutes a thread for a specified number of minutes.
      * When muted, you will not get notified in your inbox about new comments.
      *
-     * @param id - The thread ID.
-     * @param minutes - Number of minutes to mute the thread.
+     * @param args - The arguments for muting a thread.
+     * @param args.id - The thread ID.
+     * @param args.minutes - Number of minutes to mute the thread.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated thread object.
      *
      * @example
      * ```typescript
-     * const thread = await api.threads.muteThread(789, 30)
+     * const thread = await api.threads.muteThread({ id: 789, minutes: 30 })
      * ```
      */
+    muteThread(args: MuteThreadArgs, options: { batch: true }): BatchRequestDescriptor<Thread>
+    muteThread(args: MuteThreadArgs, options?: { batch?: false }): Promise<Thread>
     muteThread(
-        id: number,
-        minutes: number,
-        options: { batch: true },
-    ): BatchRequestDescriptor<Thread>
-    muteThread(id: number, minutes: number, options?: { batch?: false }): Promise<Thread>
-    muteThread(
-        id: number,
-        minutes: number,
+        args: MuteThreadArgs,
         options?: { batch?: boolean },
     ): Promise<Thread> | BatchRequestDescriptor<Thread> {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/mute`
-        const params = { id, minutes }
+        const params = { id: args.id, minutes: args.minutes }
         const schema = ThreadSchema
 
         if (options?.batch) {

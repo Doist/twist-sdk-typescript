@@ -3,6 +3,26 @@ import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Group, GroupSchema } from '../types/entities'
 
+export type AddGroupUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddGroupUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveGroupUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveGroupUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
 /**
  * Client for interacting with Twist group endpoints.
  */
@@ -214,24 +234,20 @@ export class GroupsClient {
     /**
      * Adds a user to a group.
      *
-     * @param id - The group ID.
-     * @param userId - The user ID to add.
+     * @param args - The arguments for adding a user.
+     * @param args.id - The group ID.
+     * @param args.userId - The user ID to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
+    addUserToGroup(args: AddGroupUserArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUserToGroup(args: AddGroupUserArgs, options?: { batch?: false }): Promise<void>
     addUserToGroup(
-        id: number,
-        userId: number,
-        options: { batch: true },
-    ): BatchRequestDescriptor<void>
-    addUserToGroup(id: number, userId: number, options?: { batch?: false }): Promise<void>
-    addUserToGroup(
-        id: number,
-        userId: number,
+        args: AddGroupUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_GROUPS}/add_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -245,25 +261,25 @@ export class GroupsClient {
     /**
      * Adds multiple users to a group.
      *
-     * @param id - The group ID.
-     * @param userIds - Array of user IDs to add.
+     * @param args - The arguments for adding users.
+     * @param args.id - The group ID.
+     * @param args.userIds - Array of user IDs to add.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
-     * await api.groups.addUsers(123, [456, 789, 101])
+     * await api.groups.addUsers({ id: 123, userIds: [456, 789, 101] })
      * ```
      */
-    addUsers(id: number, userIds: number[], options: { batch: true }): BatchRequestDescriptor<void>
-    addUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
+    addUsers(args: AddGroupUsersArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    addUsers(args: AddGroupUsersArgs, options?: { batch?: false }): Promise<void>
     addUsers(
-        id: number,
-        userIds: number[],
+        args: AddGroupUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_GROUPS}/add_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }
@@ -277,20 +293,20 @@ export class GroupsClient {
     /**
      * Removes a user from a group.
      *
-     * @param id - The group ID.
-     * @param userId - The user ID to remove.
+     * @param args - The arguments for removing a user.
+     * @param args.id - The group ID.
+     * @param args.userId - The user ID to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
-    removeUser(id: number, userId: number, options: { batch: true }): BatchRequestDescriptor<void>
-    removeUser(id: number, userId: number, options?: { batch?: false }): Promise<void>
+    removeUser(args: RemoveGroupUserArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUser(args: RemoveGroupUserArgs, options?: { batch?: false }): Promise<void>
     removeUser(
-        id: number,
-        userId: number,
+        args: RemoveGroupUserArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_GROUPS}/remove_user`
-        const params = { id, userId }
+        const params = { id: args.id, userId: args.userId }
 
         if (options?.batch) {
             return { method, url, params }
@@ -304,24 +320,20 @@ export class GroupsClient {
     /**
      * Removes multiple users from a group.
      *
-     * @param id - The group ID.
-     * @param userIds - Array of user IDs to remove.
+     * @param args - The arguments for removing users.
+     * @param args.id - The group ID.
+     * @param args.userIds - Array of user IDs to remove.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      */
+    removeUsers(args: RemoveGroupUsersArgs, options: { batch: true }): BatchRequestDescriptor<void>
+    removeUsers(args: RemoveGroupUsersArgs, options?: { batch?: false }): Promise<void>
     removeUsers(
-        id: number,
-        userIds: number[],
-        options: { batch: true },
-    ): BatchRequestDescriptor<void>
-    removeUsers(id: number, userIds: number[], options?: { batch?: false }): Promise<void>
-    removeUsers(
-        id: number,
-        userIds: number[],
+        args: RemoveGroupUsersArgs,
         options?: { batch?: boolean },
     ): Promise<void> | BatchRequestDescriptor<void> {
         const method = 'POST'
         const url = `${ENDPOINT_GROUPS}/remove_users`
-        const params = { id, userIds }
+        const params = { id: args.id, userIds: args.userIds }
 
         if (options?.batch) {
             return { method, url, params }

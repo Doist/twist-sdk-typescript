@@ -22,7 +22,7 @@ describe('CommentsClient', () => {
                 }),
             )
 
-            await client.markPosition(32038, 206113)
+            await client.markPosition({ threadId: 32038, commentId: 206113 })
         })
     })
 })
