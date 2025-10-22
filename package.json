@@ -44,7 +44,7 @@
         "@biomejs/biome": "2.2.5",
         "@types/uuid": "9.0.8",
         "husky": "9.1.7",
-        "lint-staged": "13.3.0",
+        "lint-staged": "16.2.6",
         "msw": "^2.11.3",
         "npm-run-all2": "8.0.4",
         "rimraf": "6.0.1",
