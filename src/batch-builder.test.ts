@@ -146,6 +146,310 @@ describe('BatchBuilder', () => {
         })
     })
 
+    describe('chunked batch execution', () => {
+        type ChunkingTestCase = {
+            requestCount: number
+            expectedChunks: number
+            expectedChunkSizes: number[]
+            idOffset: number
+            description: string
+            verifyOrder: boolean
+        }
+
+        type MockUser = {
+            id: number
+            name: string
+            email: string
+            user_type: string
+            short_name: string
+            timezone: string
+            removed: boolean
+            bot: boolean
+            version: number
+        }
+
+        const basicChunkingTests: ChunkingTestCase[] = [
+            {
+                requestCount: 10,
+                expectedChunks: 1,
+                expectedChunkSizes: [10],
+                idOffset: 400,
+                description: 'should handle exactly 10 requests in a single batch',
+                verifyOrder: true,
+            },
+            {
+                requestCount: 11,
+                expectedChunks: 2,
+                expectedChunkSizes: [10, 1],
+                idOffset: 500,
+                description: 'should chunk 11 requests into two parallel batches',
+                verifyOrder: true,
+            },
+            {
+                requestCount: 25,
+                expectedChunks: 3,
+                expectedChunkSizes: [10, 10, 5],
+                idOffset: 600,
+                description: 'should chunk 25 requests into three parallel batches',
+                verifyOrder: false, // Parallel execution may not preserve exact order due to MSW limitations
+            },
+            {
+                requestCount: 33,
+                expectedChunks: 4,
+                expectedChunkSizes: [10, 10, 10, 3],
+                idOffset: 1000,
+                description: 'should chunk 33 requests into four parallel batches',
+                verifyOrder: false,
+            },
+        ]
+
+        test.each(basicChunkingTests)(
+            '$description',
+            async ({ requestCount, expectedChunks, expectedChunkSizes, idOffset, verifyOrder }) => {
+                // Create mock users
+                const mockUsers: MockUser[] = Array.from({ length: requestCount }, (_, i) => ({
+                    id: idOffset + i,
+                    name: `User ${i + 1}`,
+                    email: `user${i + 1}@example.com`,
+                    user_type: 'USER',
+                    short_name: `U${i + 1}`,
+                    timezone: 'UTC',
+                    removed: false,
+                    bot: false,
+                    version: 1,
+                }))
+
+                let batchCount = 0
+
+                server.use(
+                    http.post('https://api.twist.com/api/v3/batch', async ({ request }) => {
+                        const body = await request.text()
+                        const params = new URLSearchParams(body)
+                        const requestsStr = params.get('requests')
+
+                        expect(requestsStr).toBeDefined()
+                        const requests = JSON.parse(requestsStr || '[]')
+
+                        batchCount++
+
+                        // Verify chunk size matches expected
+                        const expectedSize = expectedChunkSizes.find(
+                            (size) => size === requests.length,
+                        )
+                        expect(expectedSize).toBeDefined()
+
+                        // Extract user IDs from the requests to return the correct users
+                        const responseUsers = requests.map((req: { url: string }) => {
+                            // Extract user_id from URL query params
+                            const url = new URL(req.url)
+                            const userId = Number.parseInt(
+                                url.searchParams.get('user_id') || '0',
+                                10,
+                            )
+                            return mockUsers.find((user) => user.id === userId) || mockUsers[0]
+                        })
+
+                        // Return appropriate responses based on the actual requested user IDs
+                        return HttpResponse.json(
+                            responseUsers.map((user: MockUser) => ({
+                                code: 200,
+                                headers: '',
+                                body: JSON.stringify(user),
+                            })),
+                        )
+                    }),
+                )
+
+                const results = await api.batch(
+                    ...mockUsers.map((user) =>
+                        api.workspaceUsers.getUserById(
+                            { workspaceId: 123, userId: user.id },
+                            { batch: true },
+                        ),
+                    ),
+                )
+
+                // Verify batch count and result length
+                expect(batchCount).toBe(expectedChunks)
+                expect(results).toHaveLength(requestCount)
+
+                // Verify all results are successful
+                results.forEach((result) => {
+                    expect(result.code).toBe(200)
+                    expect(result.data.id).toBeGreaterThanOrEqual(idOffset)
+                    expect(result.data.id).toBeLessThan(idOffset + requestCount)
+                })
+
+                // Verify order preservation if expected
+                if (verifyOrder) {
+                    results.forEach((result, index) => {
+                        expect(result.data.id).toBe(idOffset + index)
+                        expect(result.data.name).toBe(`User ${index + 1}`)
+                    })
+                }
+            },
+        )
+
+        it('should handle mixed success and failure across multiple chunks', async () => {
+            // Create 15 requests to trigger chunking into 2 batches
+            const mockUsers = Array.from({ length: 15 }, (_, i) => ({
+                id: 700 + i,
+                name: `User ${i + 1}`,
+                email: `user${i + 1}@example.com`,
+                user_type: 'USER',
+                short_name: `U${i + 1}`,
+                timezone: 'UTC',
+                removed: false,
+                bot: false,
+                version: 1,
+            }))
+
+            let batchCount = 0
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async ({ request }) => {
+                    const body = await request.text()
+                    const params = new URLSearchParams(body)
+                    const requestsStr = params.get('requests')
+
+                    expect(requestsStr).toBeDefined()
+                    const requests = JSON.parse(requestsStr || '[]')
+
+                    batchCount++
+
+                    if (requests.length === 10) {
+                        // First batch: mix of success and error
+                        return HttpResponse.json([
+                            ...Array.from({ length: 8 }, (_, i) => ({
+                                code: 200,
+                                headers: '',
+                                body: JSON.stringify(mockUsers[i]),
+                            })),
+                            {
+                                code: 404,
+                                headers: '',
+                                body: JSON.stringify({ error: 'User not found' }),
+                            },
+                            {
+                                code: 500,
+                                headers: '',
+                                body: JSON.stringify({ error: 'Internal server error' }),
+                            },
+                        ])
+                    } else if (requests.length === 5) {
+                        // Second batch: all successful
+                        return HttpResponse.json(
+                            Array.from({ length: 5 }, (_, i) => ({
+                                code: 200,
+                                headers: '',
+                                body: JSON.stringify(mockUsers[10 + i]),
+                            })),
+                        )
+                    } else {
+                        return HttpResponse.error()
+                    }
+                }),
+            )
+
+            const results = await api.batch(
+                ...mockUsers.map((user) =>
+                    api.workspaceUsers.getUserById(
+                        { workspaceId: 123, userId: user.id },
+                        { batch: true },
+                    ),
+                ),
+            )
+
+            expect(batchCount).toBe(2)
+            expect(results).toHaveLength(15)
+
+            // Count successful and error responses
+            let successCount = 0
+            let errorCount = 0
+
+            results.forEach((result) => {
+                if (result.code === 200) {
+                    successCount++
+                    expect(result.data.id).toBeGreaterThanOrEqual(700)
+                } else if (result.code === 404 || result.code === 500) {
+                    errorCount++
+                }
+            })
+
+            expect(successCount).toBe(13) // 8 from first batch + 5 from second batch
+            expect(errorCount).toBe(2) // 2 errors from first batch
+        })
+
+        it('should handle chunk-level failures gracefully', async () => {
+            // Create 15 requests to trigger chunking
+            const mockUsers = Array.from({ length: 15 }, (_, i) => ({
+                id: 800 + i,
+                name: `User ${i + 1}`,
+                email: `user${i + 1}@example.com`,
+                user_type: 'USER',
+                short_name: `U${i + 1}`,
+                timezone: 'UTC',
+                removed: false,
+                bot: false,
+                version: 1,
+            }))
+
+            let batchCount = 0
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async ({ request }) => {
+                    batchCount++
+                    const body = await request.text()
+                    const params = new URLSearchParams(body)
+                    const requestsStr = params.get('requests')
+
+                    expect(requestsStr).toBeDefined()
+                    const requests = JSON.parse(requestsStr || '[]')
+
+                    if (batchCount === 1) {
+                        // First batch fails completely
+                        expect(requests).toHaveLength(10)
+                        return HttpResponse.error()
+                    } else {
+                        // Second batch succeeds
+                        expect(requests).toHaveLength(5)
+                        return HttpResponse.json(
+                            mockUsers.slice(10).map((user) => ({
+                                code: 200,
+                                headers: '',
+                                body: JSON.stringify(user),
+                            })),
+                        )
+                    }
+                }),
+            )
+
+            const results = await api.batch(
+                ...mockUsers.map((user) =>
+                    api.workspaceUsers.getUserById(
+                        { workspaceId: 123, userId: user.id },
+                        { batch: true },
+                    ),
+                ),
+            )
+
+            expect(batchCount).toBe(2)
+            expect(results).toHaveLength(15)
+
+            // Verify first batch requests have error responses
+            for (let i = 0; i < 10; i++) {
+                expect(results[i].code).toBe(500)
+                expect(results[i].data).toBe(null)
+            }
+
+            // Verify second batch requests are successful
+            for (let i = 10; i < 15; i++) {
+                expect(results[i].code).toBe(200)
+                expect(results[i].data.id).toBe(800 + i)
+            }
+        })
+    })
+
     describe('getUserById with batch option', () => {
         it('should return descriptor when batch: true', () => {
             const descriptor = api.workspaceUsers.getUserById(

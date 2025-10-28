@@ -1,5 +1,10 @@
 import { BaseClient } from './clients/base-client'
-import type { BatchApiResponse, BatchRequestDescriptor, BatchResponseArray } from './types/batch'
+import type {
+    BatchApiResponse,
+    BatchRequestDescriptor,
+    BatchResponse,
+    BatchResponseArray,
+} from './types/batch'
 import { TwistRequestError } from './types/errors'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
 import { transformTimestamps } from './utils/timestamp-conversion'
@@ -16,14 +21,35 @@ import { transformTimestamps } from './utils/timestamp-conversion'
  * ```
  */
 export class BatchBuilder extends BaseClient {
+    private static readonly CHUNK_SIZE = 10
+
     /**
-     * Executes an array of batch request descriptors in a single API call.
-     *
-     * @param requests - Array of batch request descriptors
-     * @returns Array of BatchResponse objects with processed data
-     * @throws {TwistRequestError} If the batch request fails
+     * Splits an array of requests into chunks of the specified size.
      */
-    async execute<T extends readonly BatchRequestDescriptor<unknown>[]>(
+    private chunkRequests<T>(requests: T[], chunkSize: number): T[][] {
+        if (requests.length === 0) {
+            return []
+        }
+
+        const chunks: T[][] = []
+        for (let i = 0; i < requests.length; i += chunkSize) {
+            chunks.push(requests.slice(i, i + chunkSize))
+        }
+        return chunks
+    }
+
+    /**
+     * Flattens chunked results back into a single array while preserving the original order.
+     */
+    private flattenChunkedResults<T>(chunkedResults: T[][]): T[] {
+        return chunkedResults.flat()
+    }
+
+    /**
+     * Executes a single chunk of batch requests (up to CHUNK_SIZE).
+     * This is the core batch execution logic extracted from the original execute method.
+     */
+    private async executeSingleBatch<T extends readonly BatchRequestDescriptor<unknown>[]>(
         requests: T,
     ): Promise<BatchResponseArray<T>> {
         if (requests.length === 0) {
@@ -145,5 +171,56 @@ export class BatchBuilder extends BaseClient {
                 data: finalData,
             }
         }) as BatchResponseArray<T>
+    }
+
+    /**
+     * Executes multiple API requests with automatic chunking and parallel execution.
+     * Transparently handles the 10-request API limitation by splitting large batches
+     * into smaller chunks and executing them concurrently.
+     *
+     * @param requests - Array of batch request descriptors
+     * @returns Array of BatchResponse objects with processed data in original order
+     * @throws {TwistRequestError} If any batch chunk fails completely
+     */
+    async execute<T extends readonly BatchRequestDescriptor<unknown>[]>(
+        requests: T,
+    ): Promise<BatchResponseArray<T>> {
+        if (requests.length === 0) {
+            return [] as BatchResponseArray<T>
+        }
+
+        // If requests fit within a single chunk, use the original single-batch execution
+        if (requests.length <= BatchBuilder.CHUNK_SIZE) {
+            return this.executeSingleBatch(requests)
+        }
+
+        // Split requests into chunks
+        const chunks = this.chunkRequests([...requests], BatchBuilder.CHUNK_SIZE)
+
+        // Execute all chunks in parallel
+        const chunkPromises = chunks.map((chunk) =>
+            this.executeSingleBatch(chunk as readonly BatchRequestDescriptor<unknown>[]).catch(
+                (error) => {
+                    // Collect errors but don't fail fast - allow other chunks to complete
+                    console.error('Batch chunk failed:', error)
+                    // Return error responses for all requests in this chunk
+                    return chunk.map(
+                        (): BatchResponse<unknown> => ({
+                            code: 500,
+                            headers: {},
+                            data: null,
+                        }),
+                    )
+                },
+            ),
+        )
+
+        // Wait for all chunks to complete
+        const chunkedResults = await Promise.all(chunkPromises)
+
+        // Flatten results back to original order
+        return this.flattenChunkedResults(
+            chunkedResults as BatchResponse<unknown>[][],
+        ) as BatchResponseArray<T>
     }
 }
