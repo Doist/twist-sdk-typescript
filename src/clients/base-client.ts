@@ -1,7 +1,7 @@
 import { getTwistBaseUri } from '../consts/endpoints'
 import type { ApiVersion } from '../types/api-version'
 
-export interface ClientConfig {
+export type ClientConfig = {
     /** API token for authentication */
     apiToken: string
     /** Optional custom base URL. If not provided, uses the default Twist API URL */
