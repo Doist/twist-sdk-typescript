@@ -1,10 +1,22 @@
+import type { ApiVersion } from '../types/api-version'
+
 const BASE_URI = 'https://api.twist.com'
 
 export const API_VERSION = 'v3'
+/**
+ * @deprecated Use getTwistBaseUri() instead. This constant is kept for backward compatibility.
+ */
 export const API_BASE_URI = `/api/${API_VERSION}/`
 
-export function getTwistBaseUri(domainBase: string = BASE_URI): string {
-    return new URL(API_BASE_URI, domainBase).toString()
+/**
+ * Gets the base URI for Twist API requests.
+ *
+ * @param version - API version ('v3' or 'v4'). Defaults to 'v3'.
+ * @param domainBase - Custom domain base URL. Defaults to Twist's API domain.
+ * @returns Complete base URI with trailing slash (e.g., 'https://api.twist.com/api/v3/')
+ */
+export function getTwistBaseUri(version: ApiVersion = 'v3', domainBase: string = BASE_URI): string {
+    return new URL(`/api/${version}/`, domainBase).toString()
 }
 
 export const ENDPOINT_USERS = 'users'

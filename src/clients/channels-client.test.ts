@@ -8,7 +8,7 @@ describe('ChannelsClient', () => {
     let client: ChannelsClient
 
     beforeEach(() => {
-        client = new ChannelsClient(TEST_API_TOKEN)
+        client = new ChannelsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('favoriteChannel', () => {

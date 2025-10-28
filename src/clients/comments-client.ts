@@ -1,8 +1,9 @@
-import { ENDPOINT_COMMENTS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Comment, CommentSchema } from '../types/entities'
 import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
+import { BaseClient } from './base-client'
 
 export type MarkCommentPositionArgs = {
     threadId: number
@@ -12,16 +13,7 @@ export type MarkCommentPositionArgs = {
 /**
  * Client for interacting with Twist comment endpoints.
  */
-export class CommentsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class CommentsClient extends BaseClient {
     /**
      * Gets all comments for a thread.
      *

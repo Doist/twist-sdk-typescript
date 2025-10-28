@@ -26,7 +26,7 @@ describe('ThreadsClient', () => {
     }
 
     beforeEach(() => {
-        client = new ThreadsClient(TEST_API_TOKEN)
+        client = new ThreadsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('pinThread', () => {

@@ -1,7 +1,8 @@
-import { ENDPOINT_USERS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_USERS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { User, UserSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 type AwayMode = {
     type: 'parental' | 'vacation' | 'sickleave' | 'other'
@@ -32,16 +33,7 @@ type GoogleConnectionStatus = {
 /**
  * Client for interacting with Twist user endpoints.
  */
-export class UsersClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class UsersClient extends BaseClient {
     /**
      * Logs in an existing user.
      *

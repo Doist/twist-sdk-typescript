@@ -1,8 +1,9 @@
-import { ENDPOINT_THREADS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_THREADS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Thread, ThreadSchema, UnreadThread, UnreadThreadSchema } from '../types/entities'
 import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
+import { BaseClient } from './base-client'
 
 export type MoveThreadToChannelArgs = {
     id: number
@@ -32,16 +33,7 @@ export type MuteThreadArgs = {
 /**
  * Client for interacting with Twist thread endpoints.
  */
-export class ThreadsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class ThreadsClient extends BaseClient {
     /**
      * Gets all threads in a channel.
      *

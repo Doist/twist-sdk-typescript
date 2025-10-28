@@ -1,7 +1,8 @@
-import { ENDPOINT_SEARCH, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_SEARCH } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { SearchResult, SearchResultSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 type SearchArgs = {
     query: string
@@ -47,16 +48,7 @@ type SearchConversationResponse = {
 /**
  * Client for interacting with Twist search endpoints.
  */
-export class SearchClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class SearchClient extends BaseClient {
     /**
      * Searches across all threads and conversations in a workspace.
      *
@@ -77,6 +69,7 @@ export class SearchClient {
      * ```typescript
      * const results = await api.search.search({
      *   query: 'important meeting',
+import { BaseClient, type ClientConfig } from './base-client'
      *   workspaceId: 123
      * })
      * ```

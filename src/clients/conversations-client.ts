@@ -1,4 +1,4 @@
-import { ENDPOINT_CONVERSATIONS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_CONVERSATIONS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import {
@@ -8,6 +8,7 @@ import {
     UnreadConversationSchema,
 } from '../types/entities'
 import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
+import { BaseClient } from './base-client'
 
 export type UpdateConversationArgs = {
     id: number
@@ -43,16 +44,7 @@ export type MuteConversationArgs = {
 /**
  * Client for interacting with Twist conversation endpoints.
  */
-export class ConversationsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class ConversationsClient extends BaseClient {
     /**
      * Gets all conversations for a workspace.
      *

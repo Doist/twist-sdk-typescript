@@ -1,21 +1,13 @@
-import { ENDPOINT_WORKSPACES, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_WORKSPACES } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema, Workspace, WorkspaceSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 /**
  * Client for interacting with Twist workspace endpoints.
  */
-export class WorkspacesClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class WorkspacesClient extends BaseClient {
     /**
      * Gets all the user's workspaces.
      *

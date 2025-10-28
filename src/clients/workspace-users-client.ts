@@ -2,6 +2,7 @@ import { request } from '../rest-client'
 import { BatchRequestDescriptor } from '../types/batch'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
+import { BaseClient } from './base-client'
 
 export type GetWorkspaceUsersArgs = {
     workspaceId: number
@@ -31,16 +32,7 @@ export type GetUserLocalTimeArgs = {
 /**
  * Client for interacting with Twist workspace users endpoints (v4 API).
  */
-export class WorkspaceUsersClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v4` : 'https://api.twist.com/api/v4/'
-    }
-
+export class WorkspaceUsersClient extends BaseClient {
     /**
      * Returns a list of workspace user objects for the given workspace id.
      *
@@ -76,9 +68,13 @@ export class WorkspaceUsersClient {
             return { method, url, params }
         }
 
-        return request<WorkspaceUser[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => response.data.map((user) => WorkspaceUserSchema.parse(user)),
-        )
+        return request<WorkspaceUser[]>(
+            method,
+            this.getBaseUri('v4'),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => response.data.map((user) => WorkspaceUserSchema.parse(user)))
     }
 
     /**
@@ -105,7 +101,7 @@ export class WorkspaceUsersClient {
             return { method, url, params }
         }
 
-        return request<number[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
+        return request<number[]>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
             (response) => response.data,
         )
     }
@@ -149,9 +145,13 @@ export class WorkspaceUsersClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<WorkspaceUser>(
+            method,
+            this.getBaseUri('v4'),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -186,9 +186,13 @@ export class WorkspaceUsersClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<WorkspaceUser>(
+            method,
+            this.getBaseUri('v4'),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -222,7 +226,7 @@ export class WorkspaceUsersClient {
 
         return request<Record<string, unknown>>(
             method,
-            this.getBaseUri(),
+            this.getBaseUri('v4'),
             url,
             this.apiToken,
             params,
@@ -261,7 +265,7 @@ export class WorkspaceUsersClient {
             return { method, url, params }
         }
 
-        return request<string>(method, this.getBaseUri(), url, this.apiToken, params).then(
+        return request<string>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
             (response) => response.data,
         )
     }
@@ -321,9 +325,13 @@ export class WorkspaceUsersClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<WorkspaceUser>(
+            method,
+            this.getBaseUri('v4'),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -376,9 +384,13 @@ export class WorkspaceUsersClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<WorkspaceUser>(
+            method,
+            this.getBaseUri('v4'),
+            url,
+            this.apiToken,
+            params,
+        ).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -420,7 +432,7 @@ export class WorkspaceUsersClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+        return request<void>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
             () => undefined,
         )
     }
@@ -464,7 +476,7 @@ export class WorkspaceUsersClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
+        return request<void>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
             () => undefined,
         )
     }

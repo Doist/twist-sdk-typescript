@@ -8,7 +8,7 @@ describe('WorkspaceUsersClient', () => {
     let client: WorkspaceUsersClient
 
     beforeEach(() => {
-        client = new WorkspaceUsersClient(TEST_API_TOKEN)
+        client = new WorkspaceUsersClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('getUserById', () => {

@@ -8,7 +8,7 @@ describe('ConversationMessagesClient', () => {
     let client: ConversationMessagesClient
 
     beforeEach(() => {
-        client = new ConversationMessagesClient(TEST_API_TOKEN)
+        client = new ConversationMessagesClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('getMessage', () => {

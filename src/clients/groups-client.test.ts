@@ -8,7 +8,7 @@ describe('GroupsClient', () => {
     let client: GroupsClient
 
     beforeEach(() => {
-        client = new GroupsClient(TEST_API_TOKEN)
+        client = new GroupsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('addUsers', () => {

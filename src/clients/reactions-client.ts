@@ -1,6 +1,7 @@
-import { ENDPOINT_REACTIONS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_REACTIONS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
+import { BaseClient } from './base-client'
 
 type AddReactionArgs = {
     threadId?: number
@@ -27,16 +28,7 @@ type ReactionObject = Record<string, number[]> | null
 /**
  * Client for interacting with Twist reaction endpoints.
  */
-export class ReactionsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class ReactionsClient extends BaseClient {
     /**
      * Adds an emoji reaction to a thread, comment, or conversation message.
      *

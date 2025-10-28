@@ -20,7 +20,7 @@ describe('UsersClient', () => {
     }
 
     beforeEach(() => {
-        client = new UsersClient(TEST_API_TOKEN)
+        client = new UsersClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('login', () => {
