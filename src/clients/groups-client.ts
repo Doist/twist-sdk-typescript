@@ -1,7 +1,8 @@
-import { ENDPOINT_GROUPS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_GROUPS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Group, GroupSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 export type AddGroupUserArgs = {
     id: number
@@ -26,16 +27,7 @@ export type RemoveGroupUsersArgs = {
 /**
  * Client for interacting with Twist group endpoints.
  */
-export class GroupsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class GroupsClient extends BaseClient {
     /**
      * Gets all groups for a given workspace.
      *

@@ -1,7 +1,8 @@
-import { ENDPOINT_CONVERSATION_MESSAGES, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_CONVERSATION_MESSAGES } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { ConversationMessage, ConversationMessageSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 type GetConversationMessagesArgs = {
     conversationId: number
@@ -27,16 +28,7 @@ type UpdateConversationMessageArgs = {
 /**
  * Client for interacting with Twist conversation message endpoints.
  */
-export class ConversationMessagesClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class ConversationMessagesClient extends BaseClient {
     /**
      * Gets all messages in a conversation.
      *

@@ -8,7 +8,7 @@ describe('ReactionsClient', () => {
     let client: ReactionsClient
 
     beforeEach(() => {
-        client = new ReactionsClient(TEST_API_TOKEN)
+        client = new ReactionsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('get', () => {

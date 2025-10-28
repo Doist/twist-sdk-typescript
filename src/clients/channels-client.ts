@@ -1,8 +1,9 @@
-import { ENDPOINT_CHANNELS, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_CHANNELS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema } from '../types/entities'
 import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
+import { BaseClient } from './base-client'
 
 export type AddChannelUserArgs = {
     id: number
@@ -27,16 +28,7 @@ export type RemoveChannelUsersArgs = {
 /**
  * Client for interacting with Twist channel endpoints.
  */
-export class ChannelsClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class ChannelsClient extends BaseClient {
     /**
      * Gets all channels for a given workspace.
      *

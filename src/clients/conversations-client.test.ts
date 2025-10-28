@@ -23,7 +23,7 @@ describe('ConversationsClient', () => {
     }
 
     beforeEach(() => {
-        client = new ConversationsClient(TEST_API_TOKEN)
+        client = new ConversationsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('updateConversation', () => {

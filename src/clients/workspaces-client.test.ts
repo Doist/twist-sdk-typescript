@@ -27,7 +27,7 @@ describe('WorkspacesClient', () => {
     }
 
     beforeEach(() => {
-        client = new WorkspacesClient(TEST_API_TOKEN)
+        client = new WorkspacesClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('getDefaultWorkspace', () => {

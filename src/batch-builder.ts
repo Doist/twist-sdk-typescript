@@ -1,3 +1,4 @@
+import { BaseClient } from './clients/base-client'
 import type { BatchApiResponse, BatchRequestDescriptor, BatchResponseArray } from './types/batch'
 import { TwistRequestError } from './types/errors'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
@@ -14,16 +15,7 @@ import { transformTimestamps } from './utils/timestamp-conversion'
  * )
  * ```
  */
-export class BatchBuilder {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : 'https://api.twist.com/api/v3/'
-    }
-
+export class BatchBuilder extends BaseClient {
     /**
      * Executes an array of batch request descriptors in a single API call.
      *

@@ -50,18 +50,21 @@ export class TwistApi {
     constructor(authToken: string, baseUrl?: string) {
         this.authToken = authToken
         this.baseUrl = baseUrl
-        this.users = new UsersClient(authToken, baseUrl)
-        this.workspaces = new WorkspacesClient(authToken, baseUrl)
-        this.workspaceUsers = new WorkspaceUsersClient(authToken, baseUrl)
-        this.channels = new ChannelsClient(authToken, baseUrl)
-        this.threads = new ThreadsClient(authToken, baseUrl)
-        this.groups = new GroupsClient(authToken, baseUrl)
-        this.conversations = new ConversationsClient(authToken, baseUrl)
-        this.comments = new CommentsClient(authToken, baseUrl)
-        this.conversationMessages = new ConversationMessagesClient(authToken, baseUrl)
-        this.inbox = new InboxClient(authToken, baseUrl)
-        this.reactions = new ReactionsClient(authToken, baseUrl)
-        this.search = new SearchClient(authToken, baseUrl)
+        const clientConfig = { apiToken: authToken, baseUrl }
+        const workspaceUserConfig = { apiToken: authToken, baseUrl, version: 'v4' as const }
+
+        this.users = new UsersClient(clientConfig)
+        this.workspaces = new WorkspacesClient(clientConfig)
+        this.workspaceUsers = new WorkspaceUsersClient(workspaceUserConfig)
+        this.channels = new ChannelsClient(clientConfig)
+        this.threads = new ThreadsClient(clientConfig)
+        this.groups = new GroupsClient(clientConfig)
+        this.conversations = new ConversationsClient(clientConfig)
+        this.comments = new CommentsClient(clientConfig)
+        this.conversationMessages = new ConversationMessagesClient(clientConfig)
+        this.inbox = new InboxClient(clientConfig)
+        this.reactions = new ReactionsClient(clientConfig)
+        this.search = new SearchClient(clientConfig)
     }
 
     /**
@@ -82,7 +85,7 @@ export class TwistApi {
     batch<T extends readonly BatchRequestDescriptor<unknown>[]>(
         ...requests: T
     ): Promise<BatchResponseArray<T>> {
-        const builder = new BatchBuilder(this.authToken, this.baseUrl)
+        const builder = new BatchBuilder({ apiToken: this.authToken, baseUrl: this.baseUrl })
         return builder.execute(requests)
     }
 }

@@ -8,7 +8,7 @@ describe('CommentsClient', () => {
     let client: CommentsClient
 
     beforeEach(() => {
-        client = new CommentsClient(TEST_API_TOKEN)
+        client = new CommentsClient({ apiToken: TEST_API_TOKEN })
     })
 
     describe('markPosition', () => {

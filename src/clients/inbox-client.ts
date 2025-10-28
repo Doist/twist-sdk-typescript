@@ -1,7 +1,8 @@
-import { ENDPOINT_INBOX, getTwistBaseUri } from '../consts/endpoints'
+import { ENDPOINT_INBOX } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { InboxThread, InboxThreadSchema } from '../types/entities'
+import { BaseClient } from './base-client'
 
 type GetInboxArgs = {
     workspaceId: number
@@ -26,16 +27,7 @@ type ArchiveAllArgs = {
 /**
  * Client for interacting with Twist inbox endpoints.
  */
-export class InboxClient {
-    constructor(
-        private apiToken: string,
-        private baseUrl?: string,
-    ) {}
-
-    private getBaseUri(): string {
-        return this.baseUrl ? `${this.baseUrl}/api/v3` : getTwistBaseUri()
-    }
-
+export class InboxClient extends BaseClient {
     /**
      * Gets inbox items (threads).
      *
