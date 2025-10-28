@@ -37,7 +37,7 @@
     "dependencies": {
         "camelcase": "8.0.0",
         "ts-custom-error": "^3.2.0",
-        "uuid": "^9.0.0",
+        "uuid": "^13.0.0",
         "zod": "4.1.12"
     },
     "devDependencies": {
