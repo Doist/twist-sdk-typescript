@@ -53,6 +53,6 @@
         "useIgnoreFile": true
     },
     "files": {
-        "includes": ["**", "!**/test/fixtures/**/*", "!**/package.json"]
+        "includes": ["**", "!**/test/fixtures/**/*", "!**/package.json", "!CHANGELOG.md"]
     }
 }
