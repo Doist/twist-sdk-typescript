@@ -47,6 +47,7 @@
         "lint-staged": "16.2.6",
         "msw": "^2.11.3",
         "npm-run-all2": "8.0.4",
+        "obsidian": "^1.10.2-1",
         "rimraf": "6.0.1",
         "ts-node": "10.9.2",
         "type-fest": "^5.0.0",
