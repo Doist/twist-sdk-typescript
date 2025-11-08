@@ -80,9 +80,15 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<Conversation[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) =>
-                response.data.map((conversation) => ConversationSchema.parse(conversation)),
+        return request<Conversation[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) =>
+            response.data.map((conversation) => ConversationSchema.parse(conversation)),
         )
     }
 
@@ -108,9 +114,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Conversation>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -151,9 +162,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Conversation>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -194,9 +210,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Conversation>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -219,7 +240,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -242,7 +270,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -267,7 +302,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -297,7 +339,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -325,7 +374,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -353,7 +409,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -388,7 +451,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -423,7 +493,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -450,13 +527,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<UnreadConversation[]>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) =>
+        return request<UnreadConversation[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) =>
             response.data.map((conversation) => UnreadConversationSchema.parse(conversation)),
         )
     }
@@ -494,9 +572,14 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Conversation>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -521,8 +604,13 @@ export class ConversationsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Conversation>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Conversation>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 }

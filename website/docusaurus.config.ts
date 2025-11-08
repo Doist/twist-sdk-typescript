@@ -122,6 +122,7 @@ const config: Config = {
                 excludeNotDocumented: true,
                 excludeNotDocumentedKinds: ['Variable'],
                 excludeInternal: true,
+                sanitizeComments: true,
                 pageTitleTemplates: { member: '{name}' },
 
                 /**

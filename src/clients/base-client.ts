@@ -1,5 +1,6 @@
 import { getTwistBaseUri } from '../consts/endpoints'
 import type { ApiVersion } from '../types/api-version'
+import type { CustomFetch } from '../types/http'
 
 export type ClientConfig = {
     /** API token for authentication */
@@ -8,6 +9,8 @@ export type ClientConfig = {
     baseUrl?: string
     /** Optional API version. Defaults to 'v3' */
     version?: ApiVersion
+    /** Optional custom fetch implementation for cross-platform compatibility */
+    customFetch?: CustomFetch
 }
 
 /**
@@ -18,11 +21,13 @@ export class BaseClient {
     protected readonly apiToken: string
     protected readonly baseUrl?: string
     protected readonly defaultVersion: ApiVersion
+    protected readonly customFetch?: CustomFetch
 
     constructor(config: ClientConfig) {
         this.apiToken = config.apiToken
         this.baseUrl = config.baseUrl
         this.defaultVersion = config.version || 'v3'
+        this.customFetch = config.customFetch
     }
 
     /**

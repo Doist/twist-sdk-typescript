@@ -16,7 +16,7 @@ describe('TwistApi', () => {
 
     it('should pass custom base URL to all clients', () => {
         const customBaseUrl = 'https://custom.api.com'
-        const api = new TwistApi(TEST_API_TOKEN, customBaseUrl)
+        const api = new TwistApi(TEST_API_TOKEN, { baseUrl: customBaseUrl })
 
         // Test that clients are initialized (we can't easily test the private baseUrl without exposing it)
         expect(api.users).toBeDefined()

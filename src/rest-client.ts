@@ -1,5 +1,11 @@
 import { TwistRequestError } from './types/errors'
-import { HttpMethod, HttpResponse, RequestConfig } from './types/http'
+import {
+    CustomFetch,
+    CustomFetchResponse,
+    HttpMethod,
+    HttpResponse,
+    RequestConfig,
+} from './types/http'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
 import { transformTimestamps } from './utils/timestamp-conversion'
 
@@ -52,16 +58,39 @@ function getRetryDelay(retryCount: number): number {
     return retryCount === 1 ? 0 : 500
 }
 
-async function fetchWithRetry<T>(
+/**
+ * Converts native fetch Response to CustomFetchResponse for consistent interface
+ */
+function convertResponseToCustomFetch(response: Response): CustomFetchResponse {
+    const headers: Record<string, string> = {}
+    response.headers.forEach((value, key) => {
+        headers[key] = value
+    })
+
+    return {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+        text: () => response.clone().text(),
+        json: () => response.json(),
+    }
+}
+
+export async function fetchWithRetry<T>(
     url: string,
     options: RequestInit,
     maxRetries: number = 3,
+    customFetch?: CustomFetch,
 ): Promise<HttpResponse<T>> {
     let lastError: Error | undefined
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
-            const response = await fetch(url, options)
+            // Use custom fetch if provided, otherwise use native fetch
+            const response: CustomFetchResponse = customFetch
+                ? await customFetch(url, options)
+                : convertResponseToCustomFetch(await fetch(url, options))
 
             const responseText = await response.text()
             let responseData: T
@@ -80,11 +109,6 @@ async function fetchWithRetry<T>(
                 )
             }
 
-            const headers: Record<string, string> = {}
-            response.headers.forEach((value, key) => {
-                headers[key] = value
-            })
-
             // Convert snake_case keys to camelCase, then transform timestamps to Dates
             const camelCased = camelCaseKeys(responseData)
             const transformed = transformTimestamps(camelCased)
@@ -92,7 +116,7 @@ async function fetchWithRetry<T>(
             return {
                 data: transformed as T,
                 status: response.status,
-                headers,
+                headers: response.headers,
             }
         } catch (error) {
             lastError = error instanceof Error ? error : new Error('Unknown error')
@@ -116,14 +140,19 @@ async function fetchWithRetry<T>(
     throw new TwistRequestError(lastError?.message ?? 'Request failed')
 }
 
-export async function request<T>(
-    httpMethod: HttpMethod,
-    baseUri: string,
-    relativePath: string,
-    apiToken?: string,
-    payload?: Record<string, unknown>,
-    requestId?: string,
-): Promise<HttpResponse<T>> {
+export type RequestArgs = {
+    httpMethod: HttpMethod
+    baseUri: string
+    relativePath: string
+    apiToken?: string
+    payload?: Record<string, unknown>
+    requestId?: string
+    customFetch?: CustomFetch
+}
+
+export async function request<T>(args: RequestArgs): Promise<HttpResponse<T>> {
+    const { httpMethod, baseUri, relativePath, apiToken, payload, requestId, customFetch } = args
+
     const config = getRequestConfiguration(baseUri, apiToken, requestId)
     const url = new URL(relativePath, config.baseURL).toString()
 
@@ -135,14 +164,14 @@ export async function request<T>(
     if (httpMethod === 'GET' && payload) {
         const searchParams = paramsSerializer(snakeCaseKeys(payload) as Record<string, unknown>)
         const urlWithParams = searchParams ? `${url}?${searchParams}` : url
-        return fetchWithRetry<T>(urlWithParams, options)
+        return fetchWithRetry<T>(urlWithParams, options, 3, customFetch)
     }
 
     if (payload && httpMethod !== 'GET') {
         options.body = JSON.stringify(snakeCaseKeys(payload))
     }
 
-    return fetchWithRetry<T>(url, options)
+    return fetchWithRetry<T>(url, options, 3, customFetch)
 }
 
 export function isSuccess(response: HttpResponse): boolean {

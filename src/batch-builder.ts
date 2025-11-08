@@ -1,11 +1,11 @@
 import { BaseClient } from './clients/base-client'
+import { fetchWithRetry } from './rest-client'
 import type {
     BatchApiResponse,
     BatchRequestDescriptor,
     BatchResponse,
     BatchResponseArray,
 } from './types/batch'
-import { TwistRequestError } from './types/errors'
 import { camelCaseKeys, snakeCaseKeys } from './utils/case-conversion'
 import { transformTimestamps } from './utils/timestamp-conversion'
 
@@ -98,26 +98,20 @@ export class BatchBuilder extends BaseClient {
             formData.append('parallel', 'true')
         }
 
-        // Execute the batch request
-        const response = await fetch(`${this.getBaseUri()}batch`, {
+        // Execute the batch request using fetchWithRetry for consistency and retry logic
+        const url = `${this.getBaseUri()}batch`
+        const options: RequestInit = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 Authorization: `Bearer ${this.apiToken}`,
             },
             body: formData.toString(),
-        })
-
-        if (!response.ok) {
-            const errorText = await response.text()
-            throw new TwistRequestError(
-                `Batch request failed with status ${response.status}`,
-                response.status,
-                errorText,
-            )
         }
 
-        const batchApiResponses: BatchApiResponse[] = await response.json()
+        const response = await fetchWithRetry<BatchApiResponse[]>(url, options, 3, this.customFetch)
+
+        const batchApiResponses = response.data
 
         // Process each response
         return batchApiResponses.map((apiResponse, index) => {

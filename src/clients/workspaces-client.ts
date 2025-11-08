@@ -32,9 +32,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url }
         }
 
-        return request<Workspace[]>(method, this.getBaseUri(), url, this.apiToken).then(
-            (response) => response.data.map((workspace) => WorkspaceSchema.parse(workspace)),
-        )
+        return request<Workspace[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then((response) => response.data.map((workspace) => WorkspaceSchema.parse(workspace)))
     }
 
     /**
@@ -65,9 +70,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Workspace>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -95,9 +105,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, schema }
         }
 
-        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken).then((response) =>
-            schema.parse(response.data),
-        )
+        return request<Workspace>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -136,9 +151,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Workspace>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -174,9 +194,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Workspace>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Workspace>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -210,9 +235,14 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -242,8 +272,13 @@ export class WorkspacesClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<Channel[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => response.data.map((channel) => ChannelSchema.parse(channel)),
-        )
+        return request<Channel[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data.map((channel) => ChannelSchema.parse(channel)))
     }
 }

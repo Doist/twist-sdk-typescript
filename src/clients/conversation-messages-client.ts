@@ -77,13 +77,14 @@ export class ConversationMessagesClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<ConversationMessage[]>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) =>
+        return request<ConversationMessage[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) =>
             response.data.map((message) => ConversationMessageSchema.parse(message)),
         )
     }
@@ -115,13 +116,14 @@ export class ConversationMessagesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<ConversationMessage>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<ConversationMessage>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -171,13 +173,14 @@ export class ConversationMessagesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<ConversationMessage>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<ConversationMessage>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -225,13 +228,14 @@ export class ConversationMessagesClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<ConversationMessage>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<ConversationMessage>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -259,8 +263,13 @@ export class ConversationMessagesClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 }

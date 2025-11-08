@@ -12,6 +12,14 @@ import { UsersClient } from './clients/users-client'
 import { WorkspaceUsersClient } from './clients/workspace-users-client'
 import { WorkspacesClient } from './clients/workspaces-client'
 import type { BatchRequestDescriptor, BatchResponseArray } from './types/batch'
+import type { CustomFetch } from './types/http'
+
+export type TwistApiOptions = {
+    /** Optional custom API base URL. If not provided, defaults to Twist's standard API endpoint. */
+    baseUrl?: string
+    /** Optional custom fetch implementation for cross-platform compatibility (e.g., Obsidian, React Native, Electron). */
+    customFetch?: CustomFetch
+}
 
 /**
  * The main API client for interacting with the Twist REST API.
@@ -40,18 +48,44 @@ export class TwistApi {
 
     private authToken: string
     private baseUrl?: string
+    private customFetch?: CustomFetch
 
     /**
      * Creates a new Twist API client.
      *
      * @param authToken - Your Twist API token.
-     * @param baseUrl - Optional custom API base URL. If not provided, defaults to Twist's standard API endpoint.
+     * @param options - Optional configuration options.
+     * @param options.baseUrl - Optional custom API base URL. If not provided, defaults to Twist's standard API endpoint.
+     * @param options.customFetch - Optional custom fetch implementation for cross-platform compatibility.
+     *
+     * @example
+     * ```typescript
+     * // Basic usage
+     * const api = new TwistApi('your-api-token')
+     *
+     * // With custom base URL
+     * const api = new TwistApi('your-api-token', { baseUrl: 'https://custom.api.com' })
+     *
+     * // With custom fetch (e.g., for Obsidian)
+     * const api = new TwistApi('your-api-token', { customFetch: myCustomFetch })
+     * ```
      */
-    constructor(authToken: string, baseUrl?: string) {
+    constructor(authToken: string, options?: TwistApiOptions) {
         this.authToken = authToken
-        this.baseUrl = baseUrl
-        const clientConfig = { apiToken: authToken, baseUrl }
-        const workspaceUserConfig = { apiToken: authToken, baseUrl, version: 'v4' as const }
+        this.baseUrl = options?.baseUrl
+        this.customFetch = options?.customFetch
+
+        const clientConfig = {
+            apiToken: authToken,
+            baseUrl: options?.baseUrl,
+            customFetch: options?.customFetch,
+        }
+        const workspaceUserConfig = {
+            apiToken: authToken,
+            baseUrl: options?.baseUrl,
+            version: 'v4' as const,
+            customFetch: options?.customFetch,
+        }
 
         this.users = new UsersClient(clientConfig)
         this.workspaces = new WorkspacesClient(clientConfig)
@@ -85,7 +119,11 @@ export class TwistApi {
     batch<T extends readonly BatchRequestDescriptor<unknown>[]>(
         ...requests: T
     ): Promise<BatchResponseArray<T>> {
-        const builder = new BatchBuilder({ apiToken: this.authToken, baseUrl: this.baseUrl })
+        const builder = new BatchBuilder({
+            apiToken: this.authToken,
+            baseUrl: this.baseUrl,
+            customFetch: this.customFetch,
+        })
         return builder.execute(requests)
     }
 }

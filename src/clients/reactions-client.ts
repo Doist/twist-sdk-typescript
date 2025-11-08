@@ -75,9 +75,14 @@ export class ReactionsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -121,9 +126,14 @@ export class ReactionsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<ReactionObject>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => response.data,
-        )
+        return request<ReactionObject>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -168,8 +178,13 @@ export class ReactionsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 }
