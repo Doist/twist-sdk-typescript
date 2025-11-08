@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { http } from 'msw'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { apiUrl, createSuccessResponse } from './testUtils/msw-handlers'
+import { server } from './testUtils/msw-setup'
+import { mockUser, TEST_API_TOKEN } from './testUtils/test-defaults'
 import { TwistApi } from './twist-api'
 import type { CustomFetch, CustomFetchResponse } from './types/http'
-import { server } from './testUtils/msw-setup'
-import { createSuccessResponse, apiUrl } from './testUtils/msw-handlers'
-import { mockUser, TEST_API_TOKEN } from './testUtils/test-defaults'
-import { http } from 'msw'
 
 describe('Custom Fetch Core Functionality', () => {
     beforeEach(() => {

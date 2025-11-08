@@ -12,15 +12,28 @@
         "registry": "https://registry.npmjs.org"
     },
     "license": "MIT",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "type": "module",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "types": "dist/types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/esm/index.js",
+            "require": "./dist/cjs/index.js"
+        }
+    },
     "sideEffects": false,
     "scripts": {
         "clean": "rimraf dist",
         "test": "vitest run",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
-        "build": "rimraf dist && npx tsc -p tsconfig.json",
+        "build:cjs": "npx tsc -p tsconfig.cjs.json",
+        "build:esm": "npx tsc -p tsconfig.esm.json",
+        "build:fix-esm": "node scripts/fix-esm-imports.cjs",
+        "build:post": "echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+        "build": "npm-run-all clean build:cjs build:esm build:fix-esm build:post",
         "type-check": "npx tsc --noEmit",
         "biome:sort-imports": "biome check --formatter-enabled=false --linter-enabled=false --organize-imports-enabled=true --write .",
         "lint:check": "biome lint",
@@ -68,7 +81,9 @@
         ]
     },
     "files": [
-        "dist/**/*",
+        "dist/cjs/**/*",
+        "dist/esm/**/*",
+        "dist/types/**/*",
         "!dist/**/*.test.*",
         "!dist/testUtils",
         "!dist/scratch.*"

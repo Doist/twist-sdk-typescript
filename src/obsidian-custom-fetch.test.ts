@@ -7,13 +7,13 @@
  */
 
 import type { RequestUrlParam, RequestUrlResponse } from 'obsidian'
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import { TwistApi } from './twist-api'
-import { createObsidianFetchAdapter } from './testUtils/obsidian-fetch-adapter'
-import { server } from './testUtils/msw-setup'
-import { http, HttpResponse } from './testUtils/msw-handlers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getTwistBaseUri } from './consts/endpoints'
+import { HttpResponse, http } from './testUtils/msw-handlers'
+import { server } from './testUtils/msw-setup'
+import { createObsidianFetchAdapter } from './testUtils/obsidian-fetch-adapter'
 import { TEST_API_TOKEN } from './testUtils/test-defaults'
+import { TwistApi } from './twist-api'
 
 // API format responses (snake_case, timestamps as Unix epoch)
 const mockUserApiResponse = {
