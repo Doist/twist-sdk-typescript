@@ -50,12 +50,11 @@
     "dependencies": {
         "camelcase": "8.0.0",
         "ts-custom-error": "^3.2.0",
-        "uuid": "^9.0.0",
+        "uuid": "^11.1.0",
         "zod": "4.1.12"
     },
     "devDependencies": {
         "@biomejs/biome": "2.3.4",
-        "@types/uuid": "9.0.8",
         "husky": "9.1.7",
         "lint-staged": "16.2.6",
         "msw": "^2.11.3",
