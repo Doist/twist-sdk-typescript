@@ -100,12 +100,17 @@ import { BaseClient, type ClientConfig } from './base-client'
             return { method, url, params }
         }
 
-        return request<SearchResponse>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => ({
-                ...response.data,
-                items: response.data.items.map((result) => SearchResultSchema.parse(result)),
-            }),
-        )
+        return request<SearchResponse>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => ({
+            ...response.data,
+            items: response.data.items.map((result) => SearchResultSchema.parse(result)),
+        }))
     }
 
     /**
@@ -151,13 +156,14 @@ import { BaseClient, type ClientConfig } from './base-client'
             return { method, url, params }
         }
 
-        return request<SearchThreadResponse>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => response.data)
+        return request<SearchThreadResponse>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -206,12 +212,13 @@ import { BaseClient, type ClientConfig } from './base-client'
             return { method, url, params }
         }
 
-        return request<SearchConversationResponse>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => response.data)
+        return request<SearchConversationResponse>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 }

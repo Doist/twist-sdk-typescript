@@ -1,6 +1,14 @@
 import { v4 as uuid } from 'uuid'
 import { isSuccess, request } from './rest-client'
 import { TwistRequestError } from './types/errors'
+import type { CustomFetch } from './types/http'
+
+export type AuthOptions = {
+    /** Optional custom base URL for OAuth endpoints */
+    baseUrl?: string
+    /** Optional custom fetch implementation for cross-platform compatibility */
+    customFetch?: CustomFetch
+}
 
 /**
  * OAuth scopes for the Twist API.
@@ -140,9 +148,11 @@ export function getAuthorizationUrl(
 
 export async function getAuthToken(
     args: AuthTokenRequestArgs,
-    baseUrl?: string,
+    options?: AuthOptions,
 ): Promise<AuthTokenResponse> {
-    const tokenUrl = baseUrl ? `${baseUrl}/oauth/token` : 'https://twist.com/oauth/token'
+    const tokenUrl = options?.baseUrl
+        ? `${options.baseUrl}/oauth/token`
+        : 'https://twist.com/oauth/token'
 
     const payload = {
         clientId: args.clientId,
@@ -152,7 +162,13 @@ export async function getAuthToken(
         ...(args.redirectUri && { redirectUri: args.redirectUri }),
     }
 
-    const response = await request<AuthTokenResponse>('POST', tokenUrl, '', undefined, payload)
+    const response = await request<AuthTokenResponse>({
+        httpMethod: 'POST',
+        baseUri: tokenUrl,
+        relativePath: '',
+        payload,
+        customFetch: options?.customFetch,
+    })
 
     if (!isSuccess(response) || !response.data?.accessToken) {
         throw new TwistRequestError(
@@ -167,14 +183,22 @@ export async function getAuthToken(
 
 export async function revokeAuthToken(
     args: RevokeAuthTokenRequestArgs,
-    baseUrl?: string,
+    options?: AuthOptions,
 ): Promise<boolean> {
-    const revokeUrl = baseUrl ? `${baseUrl}/oauth/revoke` : 'https://twist.com/oauth/revoke'
+    const revokeUrl = options?.baseUrl
+        ? `${options.baseUrl}/oauth/revoke`
+        : 'https://twist.com/oauth/revoke'
 
-    const response = await request('POST', revokeUrl, '', undefined, {
-        clientId: args.clientId,
-        clientSecret: args.clientSecret,
-        token: args.accessToken,
+    const response = await request({
+        httpMethod: 'POST',
+        baseUri: revokeUrl,
+        relativePath: '',
+        payload: {
+            clientId: args.clientId,
+            clientSecret: args.clientSecret,
+            token: args.accessToken,
+        },
+        customFetch: options?.customFetch,
     })
 
     return isSuccess(response)

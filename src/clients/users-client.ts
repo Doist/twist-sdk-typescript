@@ -70,9 +70,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, undefined, params).then((response) =>
-            schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: undefined,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -89,7 +94,14 @@ export class UsersClient extends BaseClient {
             return { method, url }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -115,9 +127,14 @@ export class UsersClient extends BaseClient {
             return { method, url, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, this.apiToken).then((response) =>
-            schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -150,9 +167,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -177,9 +199,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -205,9 +232,14 @@ export class UsersClient extends BaseClient {
             return { method, url, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, this.apiToken).then((response) =>
-            schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -230,7 +262,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, undefined, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: undefined,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -268,7 +307,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -291,7 +337,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -314,7 +367,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request(method, this.getBaseUri(), url, undefined, params).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: undefined,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -345,9 +405,14 @@ export class UsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<User>(method, this.getBaseUri(), url, undefined, params).then((response) =>
-            schema.parse(response.data),
-        )
+        return request<User>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: undefined,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -368,9 +433,14 @@ export class UsersClient extends BaseClient {
             return { method, url }
         }
 
-        return request<GoogleConnectionStatus>(method, this.getBaseUri(), url, this.apiToken).then(
-            (response) => response.data,
-        )
+        return request<GoogleConnectionStatus>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -387,7 +457,14 @@ export class UsersClient extends BaseClient {
             return { method, url }
         }
 
-        return request(method, this.getBaseUri(), url, this.apiToken).then(() => undefined)
+        return request({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: undefined,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -415,12 +492,13 @@ export class UsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<{ status: string }>(
-            method,
-            this.getBaseUri(),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => response.data)
+        return request<{ status: string }>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 }

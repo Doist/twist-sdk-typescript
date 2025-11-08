@@ -55,9 +55,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<Group[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => response.data.map((group) => GroupSchema.parse(group)),
-        )
+        return request<Group[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data.map((group) => GroupSchema.parse(group)))
     }
 
     /**
@@ -82,9 +87,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Group>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -144,9 +154,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Group>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -193,9 +208,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Group>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Group>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -218,9 +238,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -245,9 +270,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -277,9 +307,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -304,9 +339,14 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -331,8 +371,13 @@ export class GroupsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 }

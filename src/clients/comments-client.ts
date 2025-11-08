@@ -53,9 +53,14 @@ export class CommentsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<Comment[]>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => response.data.map((comment) => CommentSchema.parse(comment)),
-        )
+        return request<Comment[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data.map((comment) => CommentSchema.parse(comment)))
     }
 
     /**
@@ -80,9 +85,14 @@ export class CommentsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Comment>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -123,9 +133,14 @@ export class CommentsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Comment>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -157,9 +172,14 @@ export class CommentsClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<Comment>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            (response) => schema.parse(response.data),
-        )
+        return request<Comment>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -182,9 +202,14 @@ export class CommentsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -221,8 +246,13 @@ export class CommentsClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri(), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 }

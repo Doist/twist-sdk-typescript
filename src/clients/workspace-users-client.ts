@@ -68,13 +68,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<WorkspaceUser[]>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => response.data.map((user) => WorkspaceUserSchema.parse(user)))
+        return request<WorkspaceUser[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data.map((user) => WorkspaceUserSchema.parse(user)))
     }
 
     /**
@@ -101,9 +102,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<number[]>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
-            (response) => response.data,
-        )
+        return request<number[]>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -145,13 +151,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<WorkspaceUser>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -186,13 +193,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<WorkspaceUser>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -224,13 +232,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<Record<string, unknown>>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => response.data)
+        return request<Record<string, unknown>>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -265,9 +274,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<string>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
-            (response) => response.data,
-        )
+        return request<string>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => response.data)
     }
 
     /**
@@ -325,13 +339,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<WorkspaceUser>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -384,13 +399,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params, schema }
         }
 
-        return request<WorkspaceUser>(
-            method,
-            this.getBaseUri('v4'),
-            url,
-            this.apiToken,
-            params,
-        ).then((response) => schema.parse(response.data))
+        return request<WorkspaceUser>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
     }
 
     /**
@@ -432,9 +448,14 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 
     /**
@@ -476,8 +497,13 @@ export class WorkspaceUsersClient extends BaseClient {
             return { method, url, params }
         }
 
-        return request<void>(method, this.getBaseUri('v4'), url, this.apiToken, params).then(
-            () => undefined,
-        )
+        return request<void>({
+            httpMethod: method,
+            baseUri: this.getBaseUri('v4'),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then(() => undefined)
     }
 }

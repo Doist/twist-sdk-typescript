@@ -54,14 +54,23 @@ describe('restClient', () => {
 
     describe('request', () => {
         it('should make successful GET request', async () => {
-            mockFetch.mockResolvedValueOnce({
+            const mockResponse = {
                 ok: true,
                 status: 200,
                 text: () => Promise.resolve(JSON.stringify({ id: 1, user_name: 'test' })),
                 headers: new Headers({ 'content-type': 'application/json' }),
-            } as Response)
+                clone: function () {
+                    return this
+                },
+            }
+            mockFetch.mockResolvedValueOnce(mockResponse as Response)
 
-            const result = await request('GET', 'https://api.test.com', '/users', 'token')
+            const result = await request({
+                httpMethod: 'GET',
+                baseUri: 'https://api.test.com',
+                relativePath: '/users',
+                apiToken: 'token',
+            })
 
             expect(mockFetch).toHaveBeenCalledWith('https://api.test.com/users', {
                 method: 'GET',
@@ -75,15 +84,25 @@ describe('restClient', () => {
         })
 
         it('should make successful POST request with payload', async () => {
-            mockFetch.mockResolvedValueOnce({
+            const mockResponse = {
                 ok: true,
                 status: 201,
                 text: () => Promise.resolve(JSON.stringify({ id: 1, created_at: '2023-01-01' })),
                 headers: new Headers(),
-            } as Response)
+                clone: function () {
+                    return this
+                },
+            }
+            mockFetch.mockResolvedValueOnce(mockResponse as Response)
 
             const payload = { userName: 'test', isActive: true }
-            await request('POST', 'https://api.test.com', '/users', 'token', payload)
+            await request({
+                httpMethod: 'POST',
+                baseUri: 'https://api.test.com',
+                relativePath: '/users',
+                apiToken: 'token',
+                payload,
+            })
 
             expect(mockFetch).toHaveBeenCalledWith('https://api.test.com/users', {
                 method: 'POST',
@@ -96,15 +115,25 @@ describe('restClient', () => {
         })
 
         it('should handle GET request with query parameters', async () => {
-            mockFetch.mockResolvedValueOnce({
+            const mockResponse = {
                 ok: true,
                 status: 200,
                 text: () => Promise.resolve(JSON.stringify([])),
                 headers: new Headers(),
-            } as Response)
+                clone: function () {
+                    return this
+                },
+            }
+            mockFetch.mockResolvedValueOnce(mockResponse as Response)
 
             const params = { workspaceId: 1, isActive: true }
-            await request('GET', 'https://api.test.com', '/users', 'token', params)
+            await request({
+                httpMethod: 'GET',
+                baseUri: 'https://api.test.com',
+                relativePath: '/users',
+                apiToken: 'token',
+                payload: params,
+            })
 
             expect(mockFetch).toHaveBeenCalledWith(
                 'https://api.test.com/users?workspace_id=1&is_active=true',
@@ -115,30 +144,48 @@ describe('restClient', () => {
         })
 
         it('should throw TwistRequestError on HTTP error', async () => {
-            mockFetch.mockResolvedValueOnce({
+            const mockResponse = {
                 ok: false,
                 status: 404,
                 text: () => Promise.resolve(JSON.stringify({ error: 'Not found' })),
                 headers: new Headers(),
-            } as Response)
+                clone: function () {
+                    return this
+                },
+            }
+            mockFetch.mockResolvedValueOnce(mockResponse as Response)
 
-            await expect(request('GET', 'https://api.test.com', '/users', 'token')).rejects.toThrow(
-                TwistRequestError,
-            )
+            await expect(
+                request({
+                    httpMethod: 'GET',
+                    baseUri: 'https://api.test.com',
+                    relativePath: '/users',
+                    apiToken: 'token',
+                }),
+            ).rejects.toThrow(TwistRequestError)
         })
 
         it('should retry on network errors', async () => {
+            const mockResponse = {
+                ok: true,
+                status: 200,
+                text: () => Promise.resolve(JSON.stringify({ id: 1 })),
+                headers: new Headers(),
+                clone: function () {
+                    return this
+                },
+            }
             mockFetch
                 .mockRejectedValueOnce(new TypeError('Network error'))
                 .mockRejectedValueOnce(new TypeError('Network error'))
-                .mockResolvedValueOnce({
-                    ok: true,
-                    status: 200,
-                    text: () => Promise.resolve(JSON.stringify({ id: 1 })),
-                    headers: new Headers(),
-                } as Response)
+                .mockResolvedValueOnce(mockResponse as Response)
 
-            const result = await request('GET', 'https://api.test.com', '/users', 'token')
+            const result = await request({
+                httpMethod: 'GET',
+                baseUri: 'https://api.test.com',
+                relativePath: '/users',
+                apiToken: 'token',
+            })
 
             expect(mockFetch).toHaveBeenCalledTimes(3)
             expect(result.status).toBe(200)
