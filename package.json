@@ -4,10 +4,7 @@
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
     "homepage": "https://doist.github.io/twist-sdk-typescript/",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Doist/twist-sdk-typescript.git"
-    },
+    "repository": "https://github.com/Doist/twist-sdk-typescript",
     "publishConfig": {
         "registry": "https://registry.npmjs.org"
     },
