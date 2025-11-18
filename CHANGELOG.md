@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.0...v1.0.1) (2025-11-18)
+
+
+### Bug Fixes
+
+* Test publish workflow (no functional changes) ([20464ba](https://github.com/Doist/twist-sdk-typescript/commit/20464ba39d6897e75d8ae72d15a013e53e9a123d))
+* Test publish workflow (no functional changes) ([7f0385d](https://github.com/Doist/twist-sdk-typescript/commit/7f0385d8f38617c006d7390e5dd96560dd20b73b))
+
 ## [1.0.0](https://github.com/Doist/twist-sdk-typescript/compare/v0.1.0...v1.0.0) (2025-11-08)
 
 
