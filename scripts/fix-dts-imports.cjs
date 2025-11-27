@@ -16,29 +16,26 @@ function fixImportsInFile(filePath) {
     let modified = false
 
     // Fix relative imports - add .js extension if missing
-    content = content.replace(
-        /from\s+['"](\.[^'"]*?)['"];?/g,
-        (match, importPath) => {
-            // Skip if already has extension or is directory import
-            if (path.extname(importPath) || importPath.endsWith('/')) {
-                return match
-            }
-
-            // Check if this is a directory import (look for index file)
-            const fullPath = path.resolve(path.dirname(filePath), importPath)
-            const indexPath = path.join(fullPath, 'index.d.ts')
-
-            if (fs.existsSync(indexPath)) {
-                // Directory import - add /index.js
-                modified = true
-                return match.replace(importPath, importPath + '/index.js')
-            } else {
-                // File import - add .js
-                modified = true
-                return match.replace(importPath, importPath + '.js')
-            }
+    content = content.replace(/from\s+['"](\.[^'"]*?)['"];?/g, (match, importPath) => {
+        // Skip if already has extension or is directory import
+        if (path.extname(importPath) || importPath.endsWith('/')) {
+            return match
         }
-    )
+
+        // Check if this is a directory import (look for index file)
+        const fullPath = path.resolve(path.dirname(filePath), importPath)
+        const indexPath = path.join(fullPath, 'index.d.ts')
+
+        if (fs.existsSync(indexPath)) {
+            // Directory import - add /index.js
+            modified = true
+            return match.replace(importPath, importPath + '/index.js')
+        } else {
+            // File import - add .js
+            modified = true
+            return match.replace(importPath, importPath + '.js')
+        }
+    })
 
     // Fix export statements as well
     content = content.replace(
@@ -62,33 +59,30 @@ function fixImportsInFile(filePath) {
                 modified = true
                 return match.replace(importPath, importPath + '.js')
             }
-        }
+        },
     )
 
     // Fix dynamic import() type expressions
-    content = content.replace(
-        /import\(['"](\.[^'"]*?)['"]\)/g,
-        (match, importPath) => {
-            // Skip if already has extension or is directory import
-            if (path.extname(importPath) || importPath.endsWith('/')) {
-                return match
-            }
-
-            // Check if this is a directory import (look for index file)
-            const fullPath = path.resolve(path.dirname(filePath), importPath)
-            const indexPath = path.join(fullPath, 'index.d.ts')
-
-            if (fs.existsSync(indexPath)) {
-                // Directory import - add /index.js
-                modified = true
-                return match.replace(importPath, importPath + '/index.js')
-            } else {
-                // File import - add .js
-                modified = true
-                return match.replace(importPath, importPath + '.js')
-            }
+    content = content.replace(/import\(['"](\.[^'"]*?)['"]\)/g, (match, importPath) => {
+        // Skip if already has extension or is directory import
+        if (path.extname(importPath) || importPath.endsWith('/')) {
+            return match
         }
-    )
+
+        // Check if this is a directory import (look for index file)
+        const fullPath = path.resolve(path.dirname(filePath), importPath)
+        const indexPath = path.join(fullPath, 'index.d.ts')
+
+        if (fs.existsSync(indexPath)) {
+            // Directory import - add /index.js
+            modified = true
+            return match.replace(importPath, importPath + '/index.js')
+        } else {
+            // File import - add .js
+            modified = true
+            return match.replace(importPath, importPath + '.js')
+        }
+    })
 
     if (modified) {
         fs.writeFileSync(filePath, content, 'utf8')
