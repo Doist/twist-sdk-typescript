@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.2](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.1...v1.0.2) (2025-11-27)
+
+
+### Bug Fixes
+
+* add .js extensions to declaration file imports to resolve type re-export issue ([#64](https://github.com/Doist/twist-sdk-typescript/issues/64)) ([660cf10](https://github.com/Doist/twist-sdk-typescript/commit/660cf1056bca24e6928d657c5abdb911afbe19c5))
+* resolve 30-second connection hang in native fetch ([#62](https://github.com/Doist/twist-sdk-typescript/issues/62)) ([eddce29](https://github.com/Doist/twist-sdk-typescript/commit/eddce29d2a5bc31c3d583c6e50b764869df57938))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump glob from 11.0.3 to 11.1.0 ([#57](https://github.com/Doist/twist-sdk-typescript/issues/57)) ([cf1f72d](https://github.com/Doist/twist-sdk-typescript/commit/cf1f72d6b01c57df613998500b580bc2d103dfab))
+* **deps:** bump js-yaml from 3.14.1 to 3.14.2 in /website ([#56](https://github.com/Doist/twist-sdk-typescript/issues/56)) ([f8c05a2](https://github.com/Doist/twist-sdk-typescript/commit/f8c05a2203989dbf9594aaa7bd1b7615063e69d5))
+* **deps:** bump node-forge from 1.3.1 to 1.3.2 in /website ([#61](https://github.com/Doist/twist-sdk-typescript/issues/61)) ([69bef8d](https://github.com/Doist/twist-sdk-typescript/commit/69bef8d877394285a0be0d469c30d7638e0c1359))
+* Exclude the website from release please ([e49164f](https://github.com/Doist/twist-sdk-typescript/commit/e49164f78584a61d7607ddb58da19e0fac5e6935))
+* Lint fix ([7dd0e51](https://github.com/Doist/twist-sdk-typescript/commit/7dd0e5184b4a9d69190058ed732b584485ebd87c))
+
 ## [1.0.1](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.0...v1.0.1) (2025-11-18)
 
 
