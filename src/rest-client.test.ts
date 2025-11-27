@@ -72,13 +72,18 @@ describe('restClient', () => {
                 apiToken: 'token',
             })
 
-            expect(mockFetch).toHaveBeenCalledWith('https://api.test.com/users', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer token',
-                },
-            })
+            expect(mockFetch).toHaveBeenCalledWith(
+                'https://api.test.com/users',
+                expect.objectContaining({
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer token',
+                    },
+                    timeout: 30000,
+                    // Additional properties like dispatcher and signal will be added by our implementation
+                }),
+            )
             expect(result.data).toEqual({ id: 1, userName: 'test' })
             expect(result.status).toBe(200)
         })
@@ -104,14 +109,19 @@ describe('restClient', () => {
                 payload,
             })
 
-            expect(mockFetch).toHaveBeenCalledWith('https://api.test.com/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer token',
-                },
-                body: JSON.stringify({ user_name: 'test', is_active: true }),
-            })
+            expect(mockFetch).toHaveBeenCalledWith(
+                'https://api.test.com/users',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer token',
+                    },
+                    body: JSON.stringify({ user_name: 'test', is_active: true }),
+                    timeout: 30000,
+                    // Additional properties like dispatcher and signal will be added by our implementation
+                }),
+            )
         })
 
         it('should handle GET request with query parameters', async () => {
