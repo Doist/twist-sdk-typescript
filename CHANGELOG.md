@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.2...v1.0.3) (2025-12-02)
+
+
+### Miscellaneous
+
+* **deps:** update dependency vitest to v4 ([#39](https://github.com/Doist/twist-sdk-typescript/issues/39)) ([bf44639](https://github.com/Doist/twist-sdk-typescript/commit/bf44639b9107a855e41fb6539c72b7c851346a38))
+
 ## [1.0.2](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.1...v1.0.2) (2025-11-27)
 
 
