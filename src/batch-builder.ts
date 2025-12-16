@@ -82,10 +82,31 @@ export class BatchBuilder extends BaseClient {
                 }
             }
 
-            return {
+            // Build the batch request object
+            const batchRequest: { method: string; url: string; body?: string } = {
                 method: descriptor.method,
                 url,
             }
+
+            // For non-GET requests, add body with URL-encoded params
+            if (descriptor.method !== 'GET' && snakeCaseParams) {
+                const bodyParams = new URLSearchParams()
+                Object.entries(snakeCaseParams).forEach(([key, value]) => {
+                    if (value != null) {
+                        if (Array.isArray(value)) {
+                            bodyParams.append(key, value.join(','))
+                        } else {
+                            bodyParams.append(key, String(value))
+                        }
+                    }
+                })
+                const bodyString = bodyParams.toString()
+                if (bodyString) {
+                    batchRequest.body = bodyString
+                }
+            }
+
+            return batchRequest
         })
 
         // Check if all requests are GET (allows parallel execution)
