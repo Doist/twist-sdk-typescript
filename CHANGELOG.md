@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.3](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.2...v1.0.3) (2025-12-16)
+
+
+### Bug Fixes
+
+* Include body parameter in batch POST requests ([#68](https://github.com/Doist/twist-sdk-typescript/issues/68)) ([f765248](https://github.com/Doist/twist-sdk-typescript/commit/f765248469eabc12d925e22b63a42baabbdb1b4a))
+
+
+### Miscellaneous
+
+* **deps:** bump express from 4.21.2 to 4.22.1 in /website ([#67](https://github.com/Doist/twist-sdk-typescript/issues/67)) ([61420fe](https://github.com/Doist/twist-sdk-typescript/commit/61420fee39eca0b780e17c1aeba84e1cca50511d))
+* **deps:** bump mdast-util-to-hast from 13.2.0 to 13.2.1 in /website ([#65](https://github.com/Doist/twist-sdk-typescript/issues/65)) ([bcc7eb9](https://github.com/Doist/twist-sdk-typescript/commit/bcc7eb986575e05ceb133bc3c5a087d39de47630))
+* **deps:** update dependency vitest to v4 ([#39](https://github.com/Doist/twist-sdk-typescript/issues/39)) ([bf44639](https://github.com/Doist/twist-sdk-typescript/commit/bf44639b9107a855e41fb6539c72b7c851346a38))
+
 ## [1.0.2](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.1...v1.0.2) (2025-11-27)
 
 
