@@ -58,8 +58,8 @@ export class InboxClient extends BaseClient {
             workspace_id: args.workspaceId,
         }
 
-        if (args.since) params.since_ts_or_obj_idx = Math.floor(args.since.getTime() / 1000)
-        if (args.until) params.until_ts_or_obj_idx = Math.floor(args.until.getTime() / 1000)
+        if (args.since) params.newer_than_ts = Math.floor(args.since.getTime() / 1000)
+        if (args.until) params.older_than_ts = Math.floor(args.until.getTime() / 1000)
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
