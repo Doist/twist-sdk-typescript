@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.3...v1.0.4) (2026-01-29)
+
+
+### Bug Fixes
+
+* since and until params for getInbox ([#72](https://github.com/Doist/twist-sdk-typescript/issues/72)) ([c50eeb7](https://github.com/Doist/twist-sdk-typescript/commit/c50eeb753a42170bfa1aa7d7ca3748e2168e369c))
+
 ## [1.0.3](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.2...v1.0.3) (2025-12-16)
 
 
