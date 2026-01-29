@@ -1,6 +1,6 @@
 {
     "name": "@doist/twist-sdk",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
     "homepage": "https://doist.github.io/twist-sdk-typescript/",
