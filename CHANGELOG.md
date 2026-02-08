@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.0.0](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.4...v2.0.0) (2026-02-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* Comment and ConversationMessage types now require `workspaceId` (and `channelId` for Comment) to be present. All entity types gain a non-optional `url` property.
+
+### Features
+
+* add computed `url` property to main entity types ([#76](https://github.com/Doist/twist-sdk-typescript/issues/76)) ([1713fb9](https://github.com/Doist/twist-sdk-typescript/commit/1713fb9bde1dfd4247c2084fc872db50e895429c))
+
+
+### Miscellaneous
+
+* **deps:** bump lodash from 4.17.21 to 4.17.23 in /website ([#71](https://github.com/Doist/twist-sdk-typescript/issues/71)) ([30020a6](https://github.com/Doist/twist-sdk-typescript/commit/30020a695b3d90cc902c4baf079a701b829db32d))
+* **deps:** bump undici from 7.16.0 to 7.18.2 ([#69](https://github.com/Doist/twist-sdk-typescript/issues/69)) ([4641a8c](https://github.com/Doist/twist-sdk-typescript/commit/4641a8cad0deaa3d466ed8b5f9de21c5ad919d33))
+* **deps:** bump webpack from 5.97.1 to 5.105.0 in /website ([#74](https://github.com/Doist/twist-sdk-typescript/issues/74)) ([c866c4f](https://github.com/Doist/twist-sdk-typescript/commit/c866c4f5e91797021f8bf8d00b2acd546c5cb95c))
+* **deps:** update dependency undici to v7.18.2 [security] ([#70](https://github.com/Doist/twist-sdk-typescript/issues/70)) ([f702144](https://github.com/Doist/twist-sdk-typescript/commit/f702144aef3b44be8188979c68e36257e52defaa))
+
 ## [1.0.4](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.3...v1.0.4) (2026-01-29)
 
 
