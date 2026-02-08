@@ -19,6 +19,7 @@ describe('ConversationMessagesClient', () => {
                 conversation_id: 456,
                 creator: 1,
                 posted_ts: 1609459200,
+                workspace_id: 1,
             }
 
             server.use(
