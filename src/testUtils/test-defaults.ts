@@ -38,6 +38,7 @@ export const mockChannel: Channel = {
     archived: false,
     created: new Date('2021-01-01T00:00:00Z'),
     version: 0,
+    url: 'https://twist.com/a/1/ch/1/',
 }
 
 export const mockThread: Thread = {
@@ -55,6 +56,7 @@ export const mockThread: Thread = {
     snippetCreator: 1,
     starred: false,
     isArchived: false,
+    url: 'https://twist.com/a/1/ch/1/t/1/',
 }
 
 export const mockGroup: Group = {
@@ -77,6 +79,7 @@ export const mockConversation: Conversation = {
     archived: false,
     created: new Date('2021-01-01T00:00:00Z'),
     creator: 1,
+    url: 'https://twist.com/a/1/msg/1/',
 }
 
 export const mockComment: Comment = {
@@ -84,7 +87,10 @@ export const mockComment: Comment = {
     content: 'This is a comment',
     creator: 1,
     threadId: 1,
+    workspaceId: 1,
+    channelId: 1,
     posted: new Date('2021-01-01T00:00:00Z'),
+    url: 'https://twist.com/a/1/ch/1/t/1/c/1',
 }
 
 export const mockWorkspaceUser: WorkspaceUser = {
