@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_CONVERSATION_MESSAGES } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -74,7 +75,7 @@ export class ConversationMessagesClient extends BaseClient {
         const url = `${ENDPOINT_CONVERSATION_MESSAGES}/get`
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(ConversationMessageSchema) }
         }
 
         return request<ConversationMessage[]>({

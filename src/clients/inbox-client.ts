@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_INBOX } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -67,7 +68,7 @@ export class InboxClient extends BaseClient {
         const url = `${ENDPOINT_INBOX}/get`
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(InboxThreadSchema) }
         }
 
         return request<InboxThread[]>({

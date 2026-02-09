@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -50,7 +51,7 @@ export class CommentsClient extends BaseClient {
         const url = `${ENDPOINT_COMMENTS}/get`
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(CommentSchema) }
         }
 
         return request<Comment[]>({
