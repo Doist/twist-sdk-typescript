@@ -450,6 +450,225 @@ describe('BatchBuilder', () => {
         })
     })
 
+    describe('list endpoint batch schema transforms', () => {
+        it('should apply InboxThreadSchema transform to inbox.getInbox batch results', async () => {
+            const mockInboxThread = {
+                id: 100,
+                title: 'Inbox Thread',
+                content: 'test',
+                creator: 1,
+                channel_id: 10,
+                workspace_id: 5,
+                comment_count: 0,
+                last_updated_ts: 1609459200,
+                pinned: false,
+                posted_ts: 1609459200,
+                snippet: 'test',
+                snippet_creator: 1,
+                starred: false,
+                is_archived: false,
+                in_inbox: true,
+                closed: false,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockInboxThread]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.inbox.getInbox({ workspaceId: 5 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(100)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/ch/10/t/100/')
+        })
+
+        it('should apply CommentSchema transform to comments.getComments batch results', async () => {
+            const mockComment = {
+                id: 200,
+                content: 'A comment',
+                creator: 1,
+                thread_id: 50,
+                workspace_id: 5,
+                channel_id: 10,
+                posted_ts: 1609459200,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockComment]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.comments.getComments({ threadId: 50 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(200)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/ch/10/t/50/c/200')
+        })
+
+        it('should apply ConversationSchema transform to conversations.getConversations batch results', async () => {
+            const mockConversation = {
+                id: 300,
+                workspace_id: 5,
+                user_ids: [1, 2],
+                last_obj_index: 3,
+                snippet: 'hello',
+                snippet_creators: [1],
+                last_active_ts: 1609459200,
+                archived: false,
+                created_ts: 1609459200,
+                creator: 1,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockConversation]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.conversations.getConversations({ workspaceId: 5 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(300)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/msg/300/')
+        })
+
+        it('should apply ConversationMessageSchema transform to conversationMessages.getMessages batch results', async () => {
+            const mockMessage = {
+                id: 400,
+                content: 'A message',
+                creator: 1,
+                conversation_id: 300,
+                workspace_id: 5,
+                posted_ts: 1609459200,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockMessage]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.conversationMessages.getMessages({ conversationId: 300 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(400)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/msg/300/m/400')
+        })
+
+        it('should apply ThreadSchema transform to threads.getThreads batch results', async () => {
+            const mockThread = {
+                id: 500,
+                title: 'Test Thread',
+                content: 'test',
+                creator: 1,
+                channel_id: 10,
+                workspace_id: 5,
+                comment_count: 0,
+                last_updated_ts: 1609459200,
+                pinned: false,
+                posted_ts: 1609459200,
+                snippet: 'test',
+                snippet_creator: 1,
+                starred: false,
+                is_archived: false,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockThread]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.threads.getThreads({ workspaceId: 5, channelId: 10 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(500)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/ch/10/t/500/')
+        })
+
+        it('should apply ChannelSchema transform to channels.getChannels batch results', async () => {
+            const mockChannel = {
+                id: 600,
+                name: 'General',
+                creator: 1,
+                public: true,
+                workspace_id: 5,
+                archived: false,
+                created_ts: 1609459200,
+                version: 1,
+            }
+
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockChannel]),
+                        },
+                    ])
+                }),
+            )
+
+            const [result] = await api.batch(
+                api.channels.getChannels({ workspaceId: 5 }, { batch: true }),
+            )
+
+            expect(result.code).toBe(200)
+            expect(result.data).toHaveLength(1)
+            expect(result.data[0].id).toBe(600)
+            expect(result.data[0].url).toBe('https://twist.com/a/5/ch/600/')
+        })
+    })
+
     describe('getUserById with batch option', () => {
         it('should return descriptor when batch: true', () => {
             const descriptor = api.workspaceUsers.getUserById(

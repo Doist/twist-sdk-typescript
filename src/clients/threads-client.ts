@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_THREADS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -64,7 +65,7 @@ export class ThreadsClient extends BaseClient {
         const params = args
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(ThreadSchema) }
         }
 
         return request<Thread[]>({

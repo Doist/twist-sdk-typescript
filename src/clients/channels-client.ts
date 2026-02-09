@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_CHANNELS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -55,7 +56,7 @@ export class ChannelsClient extends BaseClient {
         const params = args
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(ChannelSchema) }
         }
 
         return request<Channel[]>({
