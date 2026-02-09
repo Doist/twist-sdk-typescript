@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.0...v2.0.1) (2026-02-09)
+
+
+### Bug Fixes
+
+* add schema to batch descriptors for list endpoints ([d1fedc6](https://github.com/Doist/twist-sdk-typescript/commit/d1fedc66f88a9c9c87aa8a27b67aac960b58b9db))
+* add schema to batch descriptors for list endpoints ([87409cd](https://github.com/Doist/twist-sdk-typescript/commit/87409cd69dbd0a50a305a7d12713bc050d0db709))
+
 ## [2.0.0](https://github.com/Doist/twist-sdk-typescript/compare/v1.0.4...v2.0.0) (2026-02-08)
 
 
