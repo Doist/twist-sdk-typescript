@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.1...v2.0.2) (2026-02-10)
+
+
+### Bug Fixes
+
+* InboxThread validation for snippetMaskPoster and pinned fields ([#79](https://github.com/Doist/twist-sdk-typescript/issues/79)) ([21b8fe0](https://github.com/Doist/twist-sdk-typescript/commit/21b8fe03b90bf8271a6969f6c2852b4becaeed47))
+
 ## [2.0.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.0...v2.0.1) (2026-02-09)
 
 
