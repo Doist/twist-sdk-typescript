@@ -30,7 +30,11 @@ export function transformTimestamps<T>(obj: T): T {
             if (key.endsWith('Ts') && typeof value === 'number') {
                 // Remove 'Ts' suffix and convert to Date
                 const newKey = key.slice(0, -2)
-                result[newKey] = timestampToDate(value)
+                // If the base key already exists in the original object, use *Date suffix
+                // to avoid overwriting it (e.g. pinned + pinnedTs → pinned + pinnedDate)
+                const targetKey =
+                    newKey in (obj as Record<string, unknown>) ? `${newKey}Date` : newKey
+                result[targetKey] = timestampToDate(value)
             } else if (typeof value === 'object' && value !== null) {
                 // Recursively transform nested objects
                 result[key] = transformTimestamps(value)
