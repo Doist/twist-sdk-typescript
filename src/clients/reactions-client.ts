@@ -1,5 +1,5 @@
 import { ENDPOINT_REACTIONS } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import type { ReactionObject } from '../types/entities'
 import type { AddReactionArgs, GetReactionsArgs, RemoveReactionArgs } from '../types/requests'

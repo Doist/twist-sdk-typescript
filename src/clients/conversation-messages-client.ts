@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ENDPOINT_CONVERSATION_MESSAGES } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { type ConversationMessage, ConversationMessageSchema } from '../types/entities'
 import type {
