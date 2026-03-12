@@ -41,6 +41,7 @@ describe('httpDispatcher', () => {
     })
 
     afterEach(() => {
+        vi.doUnmock('undici')
         restoreProxyEnvironment()
         resetDefaultDispatcherForTests()
     })
@@ -66,5 +67,29 @@ describe('httpDispatcher', () => {
         const secondDispatcher = await getDefaultDispatcher()
 
         expect(secondDispatcher).not.toBe(firstDispatcher)
+    })
+
+    it('retries dispatcher initialization after a failure', async () => {
+        const MockEnvHttpProxyAgent = class {}
+        let shouldReject = true
+
+        vi.doMock('undici', () => ({
+            EnvHttpProxyAgent: class extends MockEnvHttpProxyAgent {
+                constructor() {
+                    super()
+
+                    if (shouldReject) {
+                        shouldReject = false
+                        throw new Error('init failed')
+                    }
+                }
+            },
+        }))
+
+        await expect(getDefaultDispatcher()).rejects.toThrow('init failed')
+
+        const dispatcher = await getDefaultDispatcher()
+
+        expect(dispatcher).toBeInstanceOf(MockEnvHttpProxyAgent)
     })
 })
