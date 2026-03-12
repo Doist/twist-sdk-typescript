@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.1.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.2...v2.1.0) (2026-03-12)
+
+
+### Features
+
+* export all client-specific types from SDK entry point ([#86](https://github.com/Doist/twist-sdk-typescript/issues/86)) ([1ddb877](https://github.com/Doist/twist-sdk-typescript/commit/1ddb8774ed4669c796f698369096a950c839bc4f))
+
+
+### Miscellaneous
+
+* **deps-dev:** bump minimatch from 10.1.1 to 10.2.4 ([#82](https://github.com/Doist/twist-sdk-typescript/issues/82)) ([4887464](https://github.com/Doist/twist-sdk-typescript/commit/48874642bf48c4f4136c1bf4ab4b8ba1e3613cfe))
+* **deps-dev:** bump rollup from 4.52.4 to 4.59.0 ([#83](https://github.com/Doist/twist-sdk-typescript/issues/83)) ([c89a85a](https://github.com/Doist/twist-sdk-typescript/commit/c89a85ae49d02398e361661657570af945dd21bc))
+* **deps:** bump ajv in /website ([#81](https://github.com/Doist/twist-sdk-typescript/issues/81)) ([c3fdc74](https://github.com/Doist/twist-sdk-typescript/commit/c3fdc74d7f3662de6bc535e446acc7ef5f506ed2))
+* **deps:** bump minimatch and serve-handler in /website ([#85](https://github.com/Doist/twist-sdk-typescript/issues/85)) ([5d24bbc](https://github.com/Doist/twist-sdk-typescript/commit/5d24bbccf2ee7bbfa766ddb60feecbb98d0942d9))
+* **deps:** bump svgo from 3.3.2 to 3.3.3 in /website ([#84](https://github.com/Doist/twist-sdk-typescript/issues/84)) ([3396e91](https://github.com/Doist/twist-sdk-typescript/commit/3396e91fbce6d243f76c360390553a480367e742))
+
 ## [2.0.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.1...v2.0.2) (2026-02-10)
 
 
