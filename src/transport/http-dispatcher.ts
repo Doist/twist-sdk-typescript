@@ -1,5 +1,7 @@
 import type { Dispatcher } from 'undici'
 
+// Use effectively-disabled keep-alive so short-lived CLI processes do not stay
+// open waiting on idle sockets. Undici requires positive values, so we use 1ms.
 const keepAliveOptions = {
     keepAliveTimeout: 1,
     keepAliveMaxTimeout: 1,
