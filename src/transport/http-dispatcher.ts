@@ -14,10 +14,16 @@ export async function getDefaultDispatcher(): Promise<Dispatcher | undefined> {
     }
 
     if (!defaultDispatcherPromise) {
-        defaultDispatcherPromise = createDefaultDispatcher().then((dispatcher) => {
-            defaultDispatcher = dispatcher
-            return dispatcher
-        })
+        defaultDispatcherPromise = createDefaultDispatcher()
+            .then((dispatcher) => {
+                defaultDispatcher = dispatcher
+                return dispatcher
+            })
+            .catch((error) => {
+                defaultDispatcher = undefined
+                defaultDispatcherPromise = undefined
+                throw error
+            })
     }
 
     return defaultDispatcherPromise
