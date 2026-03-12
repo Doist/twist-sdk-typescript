@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ENDPOINT_THREADS } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Thread, ThreadSchema, UnreadThread, UnreadThreadSchema } from '../types/entities'
 import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'

@@ -1,14 +1,12 @@
 import { vi } from 'vitest'
-import { isSuccess, paramsSerializer, request } from './rest-client'
-import { server } from './testUtils/msw-setup'
-import { TwistRequestError } from './types/errors'
+import { server } from '../testUtils/msw-setup'
+import { TwistRequestError } from '../types/errors'
+import { isSuccess, paramsSerializer, request } from './http-client'
 
-// Mock fetch globally
 const mockFetch = vi.fn()
 global.fetch = mockFetch as unknown as typeof fetch
 
-describe('restClient', () => {
-    // Disable MSW for this test file since we're testing the low-level fetch behavior
+describe('httpClient', () => {
     beforeAll(() => {
         server.close()
     })
@@ -81,7 +79,6 @@ describe('restClient', () => {
                         Authorization: 'Bearer token',
                     },
                     timeout: 30000,
-                    // Additional properties like dispatcher and signal will be added by our implementation
                 }),
             )
             expect(result.data).toEqual({ id: 1, userName: 'test' })
@@ -119,7 +116,6 @@ describe('restClient', () => {
                     },
                     body: JSON.stringify({ user_name: 'test', is_active: true }),
                     timeout: 30000,
-                    // Additional properties like dispatcher and signal will be added by our implementation
                 }),
             )
         })

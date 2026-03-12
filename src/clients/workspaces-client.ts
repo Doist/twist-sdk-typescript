@@ -1,5 +1,5 @@
 import { ENDPOINT_WORKSPACES } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Channel, ChannelSchema, Workspace, WorkspaceSchema } from '../types/entities'
 import { BaseClient } from './base-client'

@@ -1,4 +1,4 @@
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import { BatchRequestDescriptor } from '../types/batch'
 import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'

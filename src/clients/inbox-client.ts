@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ENDPOINT_INBOX } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { InboxThread, InboxThreadSchema } from '../types/entities'
 import { BaseClient } from './base-client'

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ENDPOINT_COMMENTS } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { Comment, CommentSchema } from '../types/entities'
 import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
