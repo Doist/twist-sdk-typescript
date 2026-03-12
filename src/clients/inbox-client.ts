@@ -2,27 +2,13 @@ import { z } from 'zod'
 import { ENDPOINT_INBOX } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { InboxThread, InboxThreadSchema } from '../types/entities'
+import { type InboxThread, InboxThreadSchema } from '../types/entities'
+import type { ArchiveAllArgs, GetInboxArgs } from '../types/requests'
 import { BaseClient } from './base-client'
-
-type GetInboxArgs = {
-    workspaceId: number
-    since?: Date
-    until?: Date
-    limit?: number
-    cursor?: string
-}
 
 type InboxCountResponse = {
     data: number
     version: number
-}
-
-type ArchiveAllArgs = {
-    workspaceId: number
-    channelIds?: number[]
-    since?: Date
-    until?: Date
 }
 
 /**

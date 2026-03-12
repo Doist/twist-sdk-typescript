@@ -2,34 +2,18 @@ import { z } from 'zod'
 import { ENDPOINT_THREADS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { Thread, ThreadSchema, UnreadThread, UnreadThreadSchema } from '../types/entities'
-import { CreateThreadArgs, GetThreadsArgs, UpdateThreadArgs } from '../types/requests'
+import { type Thread, ThreadSchema, type UnreadThread, UnreadThreadSchema } from '../types/entities'
+import {
+    type CreateThreadArgs,
+    type GetThreadsArgs,
+    type MarkThreadReadArgs,
+    type MarkThreadUnreadArgs,
+    type MarkThreadUnreadForOthersArgs,
+    type MoveThreadToChannelArgs,
+    type MuteThreadArgs,
+    type UpdateThreadArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type MoveThreadToChannelArgs = {
-    id: number
-    toChannel: number
-}
-
-export type MarkThreadReadArgs = {
-    id: number
-    objIndex: number
-}
-
-export type MarkThreadUnreadArgs = {
-    id: number
-    objIndex: number
-}
-
-export type MarkThreadUnreadForOthersArgs = {
-    id: number
-    objIndex: number
-}
-
-export type MuteThreadArgs = {
-    id: number
-    minutes: number
-}
 
 /**
  * Client for interacting with Twist thread endpoints.

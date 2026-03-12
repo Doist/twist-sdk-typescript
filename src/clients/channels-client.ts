@@ -2,29 +2,17 @@ import { z } from 'zod'
 import { ENDPOINT_CHANNELS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { Channel, ChannelSchema } from '../types/entities'
-import { CreateChannelArgs, GetChannelsArgs, UpdateChannelArgs } from '../types/requests'
+import { type Channel, ChannelSchema } from '../types/entities'
+import {
+    type AddChannelUserArgs,
+    type AddChannelUsersArgs,
+    type CreateChannelArgs,
+    type GetChannelsArgs,
+    type RemoveChannelUserArgs,
+    type RemoveChannelUsersArgs,
+    type UpdateChannelArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type AddChannelUserArgs = {
-    id: number
-    userId: number
-}
-
-export type AddChannelUsersArgs = {
-    id: number
-    userIds: number[]
-}
-
-export type RemoveChannelUserArgs = {
-    id: number
-    userId: number
-}
-
-export type RemoveChannelUsersArgs = {
-    id: number
-    userIds: number[]
-}
 
 /**
  * Client for interacting with Twist channel endpoints.

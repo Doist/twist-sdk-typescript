@@ -2,29 +2,13 @@ import { z } from 'zod'
 import { ENDPOINT_CONVERSATION_MESSAGES } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { ConversationMessage, ConversationMessageSchema } from '../types/entities'
+import { type ConversationMessage, ConversationMessageSchema } from '../types/entities'
+import type {
+    CreateConversationMessageArgs,
+    GetConversationMessagesArgs,
+    UpdateConversationMessageArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-type GetConversationMessagesArgs = {
-    conversationId: number
-    newerThan?: Date
-    olderThan?: Date
-    limit?: number
-    cursor?: string
-}
-
-type CreateConversationMessageArgs = {
-    conversationId: number
-    content: string
-    attachments?: unknown[]
-    actions?: unknown[]
-}
-
-type UpdateConversationMessageArgs = {
-    id: number
-    content: string
-    attachments?: unknown[]
-}
 
 /**
  * Client for interacting with Twist conversation message endpoints.

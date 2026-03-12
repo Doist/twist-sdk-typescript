@@ -131,3 +131,243 @@ export const GetOrCreateConversationArgsSchema = z.object({
 })
 
 export type GetOrCreateConversationArgs = z.infer<typeof GetOrCreateConversationArgsSchema>
+
+// Users
+export type AwayMode = {
+    type: 'parental' | 'vacation' | 'sickleave' | 'other'
+    dateFrom?: string
+    dateTo: string
+}
+
+export type UpdateUserArgs = {
+    name?: string
+    email?: string
+    password?: string
+    defaultWorkspace?: number
+    profession?: string
+    contactInfo?: string
+    timezone?: string
+    snoozeUntil?: number
+    snoozeDndStart?: string
+    snoozeDndEnd?: string
+    awayMode?: AwayMode
+    offDays?: number[]
+}
+
+// Search
+export type SearchArgs = {
+    query: string
+    workspaceId: number
+    channelIds?: number[]
+    authorIds?: number[]
+    mentionSelf?: boolean
+    dateFrom?: string
+    dateTo?: string
+    limit?: number
+    cursor?: string
+}
+
+export type SearchThreadArgs = {
+    query: string
+    threadId: number
+    limit?: number
+    cursor?: string
+}
+
+export type SearchConversationArgs = {
+    query: string
+    conversationId: number
+    limit?: number
+    cursor?: string
+}
+
+// Conversation Messages
+export type GetConversationMessagesArgs = {
+    conversationId: number
+    newerThan?: Date
+    olderThan?: Date
+    limit?: number
+    cursor?: string
+}
+
+export type CreateConversationMessageArgs = {
+    conversationId: number
+    content: string
+    attachments?: unknown[]
+    actions?: unknown[]
+}
+
+export type UpdateConversationMessageArgs = {
+    id: number
+    content: string
+    attachments?: unknown[]
+}
+
+// Inbox
+export type GetInboxArgs = {
+    workspaceId: number
+    since?: Date
+    until?: Date
+    limit?: number
+    cursor?: string
+}
+
+export type ArchiveAllArgs = {
+    workspaceId: number
+    channelIds?: number[]
+    since?: Date
+    until?: Date
+}
+
+// Reactions
+export type AddReactionArgs = {
+    threadId?: number
+    commentId?: number
+    messageId?: number
+    reaction: string
+}
+
+export type RemoveReactionArgs = {
+    threadId?: number
+    commentId?: number
+    messageId?: number
+    reaction: string
+}
+
+export type GetReactionsArgs = {
+    threadId?: number
+    commentId?: number
+    messageId?: number
+}
+
+// Channels
+export type AddChannelUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddChannelUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveChannelUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveChannelUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+// Threads
+export type MoveThreadToChannelArgs = {
+    id: number
+    toChannel: number
+}
+
+export type MarkThreadReadArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MarkThreadUnreadArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MarkThreadUnreadForOthersArgs = {
+    id: number
+    objIndex: number
+}
+
+export type MuteThreadArgs = {
+    id: number
+    minutes: number
+}
+
+// Comments
+export type MarkCommentPositionArgs = {
+    threadId: number
+    commentId: number
+}
+
+// Conversations
+export type UpdateConversationArgs = {
+    id: number
+    title: string
+    archived?: boolean
+}
+
+export type AddConversationUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddConversationUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveConversationUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveConversationUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type MuteConversationArgs = {
+    id: number
+    minutes: number
+}
+
+// Groups
+export type AddGroupUserArgs = {
+    id: number
+    userId: number
+}
+
+export type AddGroupUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+export type RemoveGroupUserArgs = {
+    id: number
+    userId: number
+}
+
+export type RemoveGroupUsersArgs = {
+    id: number
+    userIds: number[]
+}
+
+// Workspace Users
+export type GetWorkspaceUsersArgs = {
+    workspaceId: number
+    archived?: boolean
+}
+
+export type GetUserByIdArgs = {
+    workspaceId: number
+    userId: number
+}
+
+export type GetUserByEmailArgs = {
+    workspaceId: number
+    email: string
+}
+
+export type GetUserInfoArgs = {
+    workspaceId: number
+    userId: number
+}
+
+export type GetUserLocalTimeArgs = {
+    workspaceId: number
+    userId: number
+}

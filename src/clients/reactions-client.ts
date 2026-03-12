@@ -1,29 +1,9 @@
 import { ENDPOINT_REACTIONS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
+import type { ReactionObject } from '../types/entities'
+import type { AddReactionArgs, GetReactionsArgs, RemoveReactionArgs } from '../types/requests'
 import { BaseClient } from './base-client'
-
-type AddReactionArgs = {
-    threadId?: number
-    commentId?: number
-    messageId?: number
-    reaction: string
-}
-
-type RemoveReactionArgs = {
-    threadId?: number
-    commentId?: number
-    messageId?: number
-    reaction: string
-}
-
-type GetReactionsArgs = {
-    threadId?: number
-    commentId?: number
-    messageId?: number
-}
-
-type ReactionObject = Record<string, number[]> | null
 
 /**
  * Client for interacting with Twist reaction endpoints.

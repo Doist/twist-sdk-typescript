@@ -3,44 +3,22 @@ import { ENDPOINT_CONVERSATIONS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import {
-    Conversation,
+    type Conversation,
     ConversationSchema,
-    UnreadConversation,
+    type UnreadConversation,
     UnreadConversationSchema,
 } from '../types/entities'
-import { GetConversationsArgs, GetOrCreateConversationArgs } from '../types/requests'
+import {
+    type AddConversationUserArgs,
+    type AddConversationUsersArgs,
+    type GetConversationsArgs,
+    type GetOrCreateConversationArgs,
+    type MuteConversationArgs,
+    type RemoveConversationUserArgs,
+    type RemoveConversationUsersArgs,
+    type UpdateConversationArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type UpdateConversationArgs = {
-    id: number
-    title: string
-    archived?: boolean
-}
-
-export type AddConversationUserArgs = {
-    id: number
-    userId: number
-}
-
-export type AddConversationUsersArgs = {
-    id: number
-    userIds: number[]
-}
-
-export type RemoveConversationUserArgs = {
-    id: number
-    userId: number
-}
-
-export type RemoveConversationUsersArgs = {
-    id: number
-    userIds: number[]
-}
-
-export type MuteConversationArgs = {
-    id: number
-    minutes: number
-}
 
 /**
  * Client for interacting with Twist conversation endpoints.

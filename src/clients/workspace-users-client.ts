@@ -1,33 +1,15 @@
 import { request } from '../rest-client'
 import { BatchRequestDescriptor } from '../types/batch'
-import { WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
+import { type WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
 import { UserType } from '../types/enums'
+import type {
+    GetUserByEmailArgs,
+    GetUserByIdArgs,
+    GetUserInfoArgs,
+    GetUserLocalTimeArgs,
+    GetWorkspaceUsersArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type GetWorkspaceUsersArgs = {
-    workspaceId: number
-    archived?: boolean
-}
-
-export type GetUserByIdArgs = {
-    workspaceId: number
-    userId: number
-}
-
-export type GetUserByEmailArgs = {
-    workspaceId: number
-    email: string
-}
-
-export type GetUserInfoArgs = {
-    workspaceId: number
-    userId: number
-}
-
-export type GetUserLocalTimeArgs = {
-    workspaceId: number
-    userId: number
-}
 
 /**
  * Client for interacting with Twist workspace users endpoints (v4 API).

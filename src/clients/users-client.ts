@@ -1,34 +1,9 @@
 import { ENDPOINT_USERS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { User, UserSchema } from '../types/entities'
+import { type GoogleConnectionStatus, type User, UserSchema } from '../types/entities'
+import type { UpdateUserArgs } from '../types/requests'
 import { BaseClient } from './base-client'
-
-type AwayMode = {
-    type: 'parental' | 'vacation' | 'sickleave' | 'other'
-    dateFrom?: string
-    dateTo: string
-}
-
-type UpdateUserArgs = {
-    name?: string
-    email?: string
-    password?: string
-    defaultWorkspace?: number
-    profession?: string
-    contactInfo?: string
-    timezone?: string
-    snoozeUntil?: number
-    snoozeDndStart?: string
-    snoozeDndEnd?: string
-    awayMode?: AwayMode
-    offDays?: number[]
-}
-
-type GoogleConnectionStatus = {
-    googleConnection: boolean
-    googleEmail?: string
-}
 
 /**
  * Client for interacting with Twist user endpoints.
