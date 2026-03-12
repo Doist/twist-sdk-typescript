@@ -132,9 +132,12 @@ export const GetOrCreateConversationArgsSchema = z.object({
 
 export type GetOrCreateConversationArgs = z.infer<typeof GetOrCreateConversationArgsSchema>
 
+export const AWAY_MODE_TYPES = ['parental', 'vacation', 'sickleave', 'other'] as const
+export type AwayModeType = (typeof AWAY_MODE_TYPES)[number]
+
 // Users
 export type AwayMode = {
-    type: 'parental' | 'vacation' | 'sickleave' | 'other'
+    type: AwayModeType
     dateFrom?: string
     dateTo: string
 }
