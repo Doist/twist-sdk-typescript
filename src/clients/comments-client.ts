@@ -2,14 +2,14 @@ import { z } from 'zod'
 import { ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { Comment, CommentSchema } from '../types/entities'
-import { CreateCommentArgs, GetCommentsArgs, UpdateCommentArgs } from '../types/requests'
+import { type Comment, CommentSchema } from '../types/entities'
+import {
+    type CreateCommentArgs,
+    type GetCommentsArgs,
+    type MarkCommentPositionArgs,
+    type UpdateCommentArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type MarkCommentPositionArgs = {
-    threadId: number
-    commentId: number
-}
 
 /**
  * Client for interacting with Twist comment endpoints.

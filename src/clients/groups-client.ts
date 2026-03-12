@@ -1,28 +1,14 @@
 import { ENDPOINT_GROUPS } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { Group, GroupSchema } from '../types/entities'
+import { type Group, GroupSchema } from '../types/entities'
+import type {
+    AddGroupUserArgs,
+    AddGroupUsersArgs,
+    RemoveGroupUserArgs,
+    RemoveGroupUsersArgs,
+} from '../types/requests'
 import { BaseClient } from './base-client'
-
-export type AddGroupUserArgs = {
-    id: number
-    userId: number
-}
-
-export type AddGroupUsersArgs = {
-    id: number
-    userIds: number[]
-}
-
-export type RemoveGroupUserArgs = {
-    id: number
-    userId: number
-}
-
-export type RemoveGroupUsersArgs = {
-    id: number
-    userIds: number[]
-}
 
 /**
  * Client for interacting with Twist group endpoints.

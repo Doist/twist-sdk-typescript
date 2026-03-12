@@ -1,49 +1,14 @@
 import { ENDPOINT_SEARCH } from '../consts/endpoints'
 import { request } from '../rest-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { SearchResult, SearchResultSchema } from '../types/entities'
+import {
+    type SearchConversationResponse,
+    type SearchResponse,
+    SearchResultSchema,
+    type SearchThreadResponse,
+} from '../types/entities'
+import type { SearchArgs, SearchConversationArgs, SearchThreadArgs } from '../types/requests'
 import { BaseClient } from './base-client'
-
-type SearchArgs = {
-    query: string
-    workspaceId: number
-    channelIds?: number[]
-    authorIds?: number[]
-    mentionSelf?: boolean
-    dateFrom?: string
-    dateTo?: string
-    limit?: number
-    cursor?: string
-}
-
-type SearchThreadArgs = {
-    query: string
-    threadId: number
-    limit?: number
-    cursor?: string
-}
-
-type SearchConversationArgs = {
-    query: string
-    conversationId: number
-    limit?: number
-    cursor?: string
-}
-
-type SearchResponse = {
-    items: SearchResult[]
-    nextCursorMark?: string
-    hasMore: boolean
-    isPlanRestricted: boolean
-}
-
-type SearchThreadResponse = {
-    commentIds: number[]
-}
-
-type SearchConversationResponse = {
-    messageIds: number[]
-}
 
 /**
  * Client for interacting with Twist search endpoints.

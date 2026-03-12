@@ -416,3 +416,28 @@ export const SearchResultSchema = z.object({
 })
 
 export type SearchResult = z.infer<typeof SearchResultSchema>
+
+// Users
+export type GoogleConnectionStatus = {
+    googleConnection: boolean
+    googleEmail?: string
+}
+
+// Search
+export type SearchResponse = {
+    items: SearchResult[]
+    nextCursorMark?: string
+    hasMore: boolean
+    isPlanRestricted: boolean
+}
+
+export type SearchThreadResponse = {
+    commentIds: number[]
+}
+
+export type SearchConversationResponse = {
+    messageIds: number[]
+}
+
+// Reactions
+export type ReactionObject = Record<string, number[]> | null
