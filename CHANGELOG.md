@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.0...v2.1.1) (2026-03-14)
+
+
+### Miscellaneous
+
+* **deps:** update dependency undici to v7.24.0 [security] ([#90](https://github.com/Doist/twist-sdk-typescript/issues/90)) ([02ecd04](https://github.com/Doist/twist-sdk-typescript/commit/02ecd0431465a06b2aeeb915b27984dc2b0905b4))
+
 ## [2.1.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.0.2...v2.1.0) (2026-03-12)
 
 
