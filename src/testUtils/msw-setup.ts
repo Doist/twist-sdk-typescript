@@ -6,7 +6,7 @@ export const server = setupServer()
 
 // Start server before all tests
 beforeAll(() => {
-    // Only warn on unhandled requests instead of error, since rest-client.test.ts
+    // Only warn on unhandled requests instead of error, since transport/http-client.test.ts
     // uses direct fetch mocking which bypasses MSW
     server.listen({ onUnhandledRequest: 'warn' })
 })
