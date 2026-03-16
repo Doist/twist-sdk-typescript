@@ -131,23 +131,25 @@ function createTimeoutSignal(
     const timeoutId = setTimeout(() => {
         controller.abort(new Error(`Request timeout after ${timeoutMs}ms`))
     }, timeoutMs)
+    let abortHandler: (() => void) | undefined
 
     function clear() {
         clearTimeout(timeoutId)
+        if (existingSignal && abortHandler) {
+            existingSignal.removeEventListener('abort', abortHandler)
+        }
     }
 
     if (existingSignal) {
         if (existingSignal.aborted) {
+            clearTimeout(timeoutId)
             controller.abort(existingSignal.reason)
         } else {
-            existingSignal.addEventListener(
-                'abort',
-                () => {
-                    controller.abort(existingSignal.reason)
-                    clear()
-                },
-                { once: true },
-            )
+            abortHandler = () => {
+                clearTimeout(timeoutId)
+                controller.abort(existingSignal.reason)
+            }
+            existingSignal.addEventListener('abort', abortHandler, { once: true })
         }
     }
 
