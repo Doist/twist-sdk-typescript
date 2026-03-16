@@ -57,6 +57,10 @@ export async function fetchWithRetry<T>(
                 headers: response.headers,
             }
         } catch (error) {
+            if (clearTimeoutFn) {
+                clearTimeoutFn()
+            }
+
             lastError = error instanceof Error ? error : new Error('Unknown error')
 
             if (attempt < maxRetries && isNetworkError(lastError)) {
@@ -65,14 +69,7 @@ export async function fetchWithRetry<T>(
                     await sleep(delay)
                 }
 
-                if (clearTimeoutFn) {
-                    clearTimeoutFn()
-                }
                 continue
-            }
-
-            if (clearTimeoutFn) {
-                clearTimeoutFn()
             }
 
             break
