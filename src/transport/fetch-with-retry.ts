@@ -108,8 +108,20 @@ async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+const timeoutErrorName = 'TimeoutError'
+
+function createTimeoutError(timeoutMs: number): Error {
+    const error = new Error(`Request timeout after ${timeoutMs}ms`)
+    error.name = timeoutErrorName
+    return error
+}
+
 function isNetworkError(error: Error): boolean {
-    return error.name === 'TypeError' || error.message.toLowerCase().includes('network')
+    return (
+        error.name === 'TypeError' ||
+        error.name === timeoutErrorName ||
+        error.message.toLowerCase().includes('network')
+    )
 }
 
 function getRetryDelay(retryCount: number): number {
@@ -126,7 +138,7 @@ function createTimeoutSignal(
     const controller = new AbortController()
 
     const timeoutId = setTimeout(() => {
-        controller.abort(new Error(`Request timeout after ${timeoutMs}ms`))
+        controller.abort(createTimeoutError(timeoutMs))
     }, timeoutMs)
     let abortHandler: (() => void) | undefined
 

@@ -97,6 +97,42 @@ describe('fetchWithRetry transport selection', () => {
         expect(customFetch.mock.calls[0][1]).not.toHaveProperty('dispatcher')
     })
 
+    it('retries timeout failures consistently', async () => {
+        vi.useFakeTimers()
+
+        const dispatcher = { id: 'default-dispatcher' } as unknown as Dispatcher
+        const { fetchWithRetry } = await importFetchWithRetryWithMockedDispatcher(dispatcher)
+
+        mockFetch
+            .mockImplementationOnce(
+                (_url, options) =>
+                    new Promise((_resolve, reject) => {
+                        const signal = options?.signal as AbortSignal | undefined
+                        signal?.addEventListener(
+                            'abort',
+                            () => {
+                                reject(signal.reason)
+                            },
+                            { once: true },
+                        )
+                    }),
+            )
+            .mockResolvedValueOnce(createJsonResponse({ id: 1 }))
+
+        const requestPromise = fetchWithRetry(
+            'https://api.test.com/users',
+            { method: 'GET', timeout: 20 },
+            1,
+        )
+
+        await vi.advanceTimersByTimeAsync(20)
+
+        const response = await requestPromise
+
+        expect(mockFetch).toHaveBeenCalledTimes(2)
+        expect(response.status).toBe(200)
+    })
+
     it('keeps timeout handling working on the built-in fetch path', async () => {
         vi.useFakeTimers()
 
