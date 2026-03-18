@@ -153,12 +153,7 @@ export class BatchBuilder extends BaseClient {
             // Validate with schema if provided
             let finalData = transformed
             if (descriptor.schema && apiResponse.code >= 200 && apiResponse.code < 300) {
-                try {
-                    finalData = descriptor.schema.parse(transformed)
-                } catch (error) {
-                    // If validation fails, include the error in the response
-                    console.error('Batch response validation failed:', error)
-                }
+                finalData = descriptor.schema.parse(transformed)
             }
 
             // Parse headers string into object

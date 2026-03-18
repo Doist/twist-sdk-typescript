@@ -1,5 +1,6 @@
 import { HttpResponse, http } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { ZodError } from 'zod'
 import { server } from './testUtils/msw-setup'
 import { TEST_API_TOKEN } from './testUtils/test-defaults'
 import { TwistApi } from './twist-api'
@@ -666,6 +667,24 @@ describe('BatchBuilder', () => {
             expect(result.data).toHaveLength(1)
             expect(result.data[0].id).toBe(600)
             expect(result.data[0].url).toBe('https://twist.com/a/5/ch/600/')
+        })
+
+        it('should throw ZodError when batch response body does not match expected schema', async () => {
+            server.use(
+                http.post('https://api.twist.com/api/v3/batch', async () => {
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify({}),
+                        },
+                    ])
+                }),
+            )
+
+            await expect(
+                api.batch(api.comments.getComment(999, { batch: true })),
+            ).rejects.toThrow(ZodError)
         })
     })
 

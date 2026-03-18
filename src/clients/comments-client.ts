@@ -80,10 +80,13 @@ export class CommentsClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_COMMENTS}/getone`
         const params = { id }
-        const schema = CommentSchema
+        // The API wraps the response in {"comment": {...}}, so we need to unwrap it
+        const wrappedSchema = z
+            .object({ comment: CommentSchema })
+            .transform((data) => data.comment)
 
         if (options?.batch) {
-            return { method, url, params, schema }
+            return { method, url, params, schema: wrappedSchema }
         }
 
         return request<Comment>({
@@ -93,7 +96,7 @@ export class CommentsClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => schema.parse(response.data))
+        }).then((response) => wrappedSchema.parse(response.data))
     }
 
     /**
