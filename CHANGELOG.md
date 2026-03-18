@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.1...v2.1.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* add 'conversation' to SearchResultSchema type enum ([#93](https://github.com/Doist/twist-sdk-typescript/issues/93)) ([e2f4e2a](https://github.com/Doist/twist-sdk-typescript/commit/e2f4e2ab13b2cbca048c86cb536373c32ff96874))
+
 ## [2.1.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.0...v2.1.1) (2026-03-18)
 
 
