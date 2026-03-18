@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { BaseClient } from './clients/base-client'
 import { fetchWithRetry } from './rest-client'
 import type {
@@ -153,12 +154,7 @@ export class BatchBuilder extends BaseClient {
             // Validate with schema if provided
             let finalData = transformed
             if (descriptor.schema && apiResponse.code >= 200 && apiResponse.code < 300) {
-                try {
-                    finalData = descriptor.schema.parse(transformed)
-                } catch (error) {
-                    // If validation fails, include the error in the response
-                    console.error('Batch response validation failed:', error)
-                }
+                finalData = descriptor.schema.parse(transformed)
             }
 
             // Parse headers string into object
@@ -216,7 +212,13 @@ export class BatchBuilder extends BaseClient {
         const chunkPromises = chunks.map((chunk) =>
             this.executeSingleBatch(chunk as readonly BatchRequestDescriptor<unknown>[]).catch(
                 (error) => {
-                    // Collect errors but don't fail fast - allow other chunks to complete
+                    // Rethrow schema validation errors — they indicate a programming
+                    // issue (wrong schema or unexpected API response shape) and should
+                    // not be silently swallowed.
+                    if (error instanceof z.ZodError) {
+                        throw error
+                    }
+                    // Collect network/request errors but don't fail fast - allow other chunks to complete
                     console.error('Batch chunk failed:', error)
                     // Return error responses for all requests in this chunk
                     return chunk.map(
