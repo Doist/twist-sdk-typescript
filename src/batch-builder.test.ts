@@ -682,9 +682,9 @@ describe('BatchBuilder', () => {
                 }),
             )
 
-            await expect(
-                api.batch(api.comments.getComment(999, { batch: true })),
-            ).rejects.toThrow(ZodError)
+            await expect(api.batch(api.comments.getComment(999, { batch: true }))).rejects.toThrow(
+                ZodError,
+            )
         })
     })
 

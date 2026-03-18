@@ -81,9 +81,7 @@ export class CommentsClient extends BaseClient {
         const url = `${ENDPOINT_COMMENTS}/getone`
         const params = { id }
         // The API wraps the response in {"comment": {...}}, so we need to unwrap it
-        const wrappedSchema = z
-            .object({ comment: CommentSchema })
-            .transform((data) => data.comment)
+        const wrappedSchema = z.object({ comment: CommentSchema }).transform((data) => data.comment)
 
         if (options?.batch) {
             return { method, url, params, schema: wrappedSchema }
