@@ -399,9 +399,12 @@ export const UnreadConversationSchema = z.object({
 export type UnreadConversation = z.infer<typeof UnreadConversationSchema>
 
 // SearchResult entity from API
+export const SEARCH_RESULT_TYPES = ['thread', 'comment', 'message', 'conversation'] as const
+export type SearchResultType = (typeof SEARCH_RESULT_TYPES)[number]
+
 export const SearchResultSchema = z.object({
     id: z.string(),
-    type: z.enum(['thread', 'comment', 'message']),
+    type: z.enum(SEARCH_RESULT_TYPES),
     snippet: z.string(),
     snippetCreatorId: z.number(),
     snippetLastUpdated: z.date(),
