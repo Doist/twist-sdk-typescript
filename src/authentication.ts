@@ -94,6 +94,9 @@ export const TWIST_SCOPES = [
     'notifications:read',
     'notifications:write',
 ] as const
+/**
+ * Scopes determine what access a token has to the Twist API.
+ */
 export type TwistScope = (typeof TWIST_SCOPES)[number]
 
 export type AuthTokenRequestArgs = {
