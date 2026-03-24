@@ -1,4 +1,5 @@
-export type HttpMethod = 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE'
+export const HTTP_METHODS = ['POST', 'GET', 'PUT', 'PATCH', 'DELETE'] as const
+export type HttpMethod = (typeof HTTP_METHODS)[number]
 
 export type HttpResponse<T = unknown> = {
     data: T
