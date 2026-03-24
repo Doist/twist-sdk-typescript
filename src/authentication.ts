@@ -65,34 +65,39 @@ export type AuthOptions = {
  * - `notifications:read` - Read user's notifications settings
  * - `notifications:write` - Read and update user's notifications settings
  */
-export type TwistScope =
-    | 'user:read'
-    | 'user:write'
-    | 'workspaces:read'
-    | 'workspaces:write'
-    | 'channels:read'
-    | 'channels:write'
-    | 'channels:remove'
-    | 'threads:read'
-    | 'threads:write'
-    | 'threads:remove'
-    | 'comments:read'
-    | 'comments:write'
-    | 'comments:remove'
-    | 'groups:read'
-    | 'groups:write'
-    | 'groups:remove'
-    | 'messages:read'
-    | 'messages:write'
-    | 'messages:remove'
-    | 'reactions:read'
-    | 'reactions:write'
-    | 'reactions:remove'
-    | 'search:read'
-    | 'attachments:read'
-    | 'attachments:write'
-    | 'notifications:read'
-    | 'notifications:write'
+export const TWIST_SCOPES = [
+    'user:read',
+    'user:write',
+    'workspaces:read',
+    'workspaces:write',
+    'channels:read',
+    'channels:write',
+    'channels:remove',
+    'threads:read',
+    'threads:write',
+    'threads:remove',
+    'comments:read',
+    'comments:write',
+    'comments:remove',
+    'groups:read',
+    'groups:write',
+    'groups:remove',
+    'messages:read',
+    'messages:write',
+    'messages:remove',
+    'reactions:read',
+    'reactions:write',
+    'reactions:remove',
+    'search:read',
+    'attachments:read',
+    'attachments:write',
+    'notifications:read',
+    'notifications:write',
+] as const
+/**
+ * Scopes determine what access a token has to the Twist API.
+ */
+export type TwistScope = (typeof TWIST_SCOPES)[number]
 
 export type AuthTokenRequestArgs = {
     clientId: string

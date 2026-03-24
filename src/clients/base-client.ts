@@ -1,5 +1,6 @@
 import { getTwistBaseUri } from '../consts/endpoints'
 import type { ApiVersion } from '../types/api-version'
+import { DEFAULT_API_VERSION } from '../types/api-version'
 import type { CustomFetch } from '../types/http'
 
 export type ClientConfig = {
@@ -26,7 +27,7 @@ export class BaseClient {
     constructor(config: ClientConfig) {
         this.apiToken = config.apiToken
         this.baseUrl = config.baseUrl
-        this.defaultVersion = config.version || 'v3'
+        this.defaultVersion = config.version || DEFAULT_API_VERSION
         this.customFetch = config.customFetch
     }
 

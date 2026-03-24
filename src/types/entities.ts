@@ -6,7 +6,7 @@ import { USER_TYPES, WORKSPACE_PLANS } from './enums'
 export const SystemMessageSchema = z.union([z.string(), z.unknown()]).nullable().optional()
 
 // Base user schema with common fields shared between User and WorkspaceUser
-const BaseUserSchema = z.object({
+export const BaseUserSchema = z.object({
     id: z.number(),
     name: z.string(),
     shortName: z.string(),
