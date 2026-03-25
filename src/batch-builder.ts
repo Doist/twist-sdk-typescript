@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { BaseClient } from './clients/base-client'
-import { fetchWithRetry } from './rest-client'
+import { fetchWithRetry } from './transport/fetch-with-retry'
 import type {
     BatchApiResponse,
     BatchRequestDescriptor,

@@ -1,5 +1,5 @@
 import { ENDPOINT_USERS } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { type GoogleConnectionStatus, type User, UserSchema } from '../types/entities'
 import type { UpdateUserArgs } from '../types/requests'

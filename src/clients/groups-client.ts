@@ -1,5 +1,5 @@
 import { ENDPOINT_GROUPS } from '../consts/endpoints'
-import { request } from '../rest-client'
+import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import { type Group, GroupSchema } from '../types/entities'
 import type {

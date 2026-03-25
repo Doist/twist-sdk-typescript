@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { isSuccess, request } from './rest-client'
+import { isSuccess, request } from './transport/http-client'
 import { TwistRequestError } from './types/errors'
 import type { CustomFetch } from './types/http'
 
