@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.3...v2.1.4) (2026-03-25)
+
+
+### Bug Fixes
+
+* honor proxy env vars by default ([#87](https://github.com/Doist/twist-sdk-typescript/issues/87)) ([5ddd467](https://github.com/Doist/twist-sdk-typescript/commit/5ddd4672873239c2029d1e672c2ccff1c81c0edf))
+
 ## [2.1.3](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.2...v2.1.3) (2026-03-24)
 
 
