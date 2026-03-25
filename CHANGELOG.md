@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.2...v2.1.3) (2026-03-24)
+
+
+### Code Refactoring
+
+* Extract string unions to const/type pairings and export all schemas ([#95](https://github.com/Doist/twist-sdk-typescript/issues/95)) ([7a3cf90](https://github.com/Doist/twist-sdk-typescript/commit/7a3cf90429a1cdeb8c78a1fb58d4aec5e4eba216))
+
 ## [2.1.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.1...v2.1.2) (2026-03-18)
 
 
