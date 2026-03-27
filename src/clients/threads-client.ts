@@ -1,9 +1,17 @@
 import { z } from 'zod'
-import { ENDPOINT_THREADS } from '../consts/endpoints'
+import { ENDPOINT_COMMENTS, ENDPOINT_THREADS } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type Thread, ThreadSchema, type UnreadThread, UnreadThreadSchema } from '../types/entities'
 import {
+    type Comment,
+    CommentSchema,
+    type Thread,
+    ThreadSchema,
+    type UnreadThread,
+    UnreadThreadSchema,
+} from '../types/entities'
+import {
+    type CloseThreadArgs,
     type CreateThreadArgs,
     type GetThreadsArgs,
     type MarkThreadReadArgs,
@@ -11,6 +19,8 @@ import {
     type MarkThreadUnreadForOthersArgs,
     type MoveThreadToChannelArgs,
     type MuteThreadArgs,
+    type ReopenThreadArgs,
+    type ThreadAction,
     type UpdateThreadArgs,
 } from '../types/requests'
 import { BaseClient } from './base-client'
@@ -704,6 +714,96 @@ export class ThreadsClient extends BaseClient {
         }
 
         return request<Thread>({
+            httpMethod: method,
+            baseUri: this.getBaseUri(),
+            relativePath: url,
+            apiToken: this.apiToken,
+            payload: params,
+            customFetch: this.customFetch,
+        }).then((response) => schema.parse(response.data))
+    }
+
+    /**
+     * Closes a thread by adding a comment with a close action.
+     *
+     * @param args - The arguments for closing a thread.
+     * @param args.threadId - The thread ID.
+     * @param args.content - The comment content.
+     * @param args.tempId - Optional temporary identifier.
+     * @param args.attachments - Optional array of attachment objects.
+     * @param args.actions - Optional array of action objects.
+     * @param args.recipients - Optional array of user IDs to notify.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
+     * @returns The created comment object.
+     *
+     * @example
+     * ```typescript
+     * const comment = await api.threads.closeThread({
+     *   threadId: 789,
+     *   content: 'Closing this thread — resolved.'
+     * })
+     * ```
+     */
+    closeThread(
+        args: CloseThreadArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Comment>
+    closeThread(args: CloseThreadArgs, options?: { batch?: false }): Promise<Comment>
+    closeThread(
+        args: CloseThreadArgs,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        return this.addCommentWithAction(args, 'close', options)
+    }
+
+    /**
+     * Reopens a thread by adding a comment with a reopen action.
+     *
+     * @param args - The arguments for reopening a thread.
+     * @param args.threadId - The thread ID.
+     * @param args.content - The comment content.
+     * @param args.tempId - Optional temporary identifier.
+     * @param args.attachments - Optional array of attachment objects.
+     * @param args.actions - Optional array of action objects.
+     * @param args.recipients - Optional array of user IDs to notify.
+     * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
+     * @returns The created comment object.
+     *
+     * @example
+     * ```typescript
+     * const comment = await api.threads.reopenThread({
+     *   threadId: 789,
+     *   content: 'Reopening — need further discussion.'
+     * })
+     * ```
+     */
+    reopenThread(
+        args: ReopenThreadArgs,
+        options: { batch: true },
+    ): BatchRequestDescriptor<Comment>
+    reopenThread(args: ReopenThreadArgs, options?: { batch?: false }): Promise<Comment>
+    reopenThread(
+        args: ReopenThreadArgs,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        return this.addCommentWithAction(args, 'reopen', options)
+    }
+
+    private addCommentWithAction(
+        args: CloseThreadArgs | ReopenThreadArgs,
+        threadAction: ThreadAction,
+        options?: { batch?: boolean },
+    ): Promise<Comment> | BatchRequestDescriptor<Comment> {
+        const method = 'POST'
+        const url = `${ENDPOINT_COMMENTS}/add`
+        const params = { ...args, threadAction }
+        const schema = CommentSchema
+
+        if (options?.batch) {
+            return { method, url, params, schema }
+        }
+
+        return request<Comment>({
             httpMethod: method,
             baseUri: this.getBaseUri(),
             relativePath: url,
