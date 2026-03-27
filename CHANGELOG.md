@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.2.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.4...v2.2.0) (2026-03-27)
+
+
+### Features
+
+* add closeThread and reopenThread to ThreadsClient ([#103](https://github.com/Doist/twist-sdk-typescript/issues/103)) ([547c6c2](https://github.com/Doist/twist-sdk-typescript/commit/547c6c2b4b9bf41b2ae0ac6767a7eb12681e3180))
+
+
+### Miscellaneous
+
+* **deps:** bump brace-expansion from 1.1.12 to 1.1.13 in /website ([#102](https://github.com/Doist/twist-sdk-typescript/issues/102)) ([941e714](https://github.com/Doist/twist-sdk-typescript/commit/941e714da8cbed48cc80c2eb0053dbe331f144a9))
+* **deps:** bump node-forge from 1.3.2 to 1.4.0 in /website ([#101](https://github.com/Doist/twist-sdk-typescript/issues/101)) ([64bde6e](https://github.com/Doist/twist-sdk-typescript/commit/64bde6ee3024d5201357526ad7965dfe089c6c7a))
+* **deps:** bump picomatch ([#98](https://github.com/Doist/twist-sdk-typescript/issues/98)) ([4464e78](https://github.com/Doist/twist-sdk-typescript/commit/4464e78566bdd236ec8738a65870d77c4e2f8613))
+* **deps:** bump picomatch from 2.3.1 to 2.3.2 in /website ([#100](https://github.com/Doist/twist-sdk-typescript/issues/100)) ([4d51cb2](https://github.com/Doist/twist-sdk-typescript/commit/4d51cb26cfdc284a91330bb117533466c85ee51a))
+
 ## [2.1.4](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.3...v2.1.4) (2026-03-25)
 
 
