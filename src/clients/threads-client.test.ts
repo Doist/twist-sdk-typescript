@@ -199,4 +199,76 @@ describe('ThreadsClient', () => {
             expect(result.posted).toBeInstanceOf(Date)
         })
     })
+
+    describe('closeThread', () => {
+        const mockCommentApiResponse = {
+            id: 500,
+            content: 'Closing this thread.',
+            creator: 1,
+            thread_id: 789,
+            workspace_id: 1,
+            channel_id: 1,
+            posted_ts: 1609459200,
+            system_message: null,
+        }
+
+        it('should close a thread by adding a comment with thread_action', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Closing this thread.',
+                        thread_action: 'close',
+                    })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            const result = await client.closeThread({
+                id: 789,
+                content: 'Closing this thread.',
+            })
+            expect(result.id).toBe(500)
+            expect(result.content).toBe('Closing this thread.')
+            expect(result.threadId).toBe(789)
+        })
+    })
+
+    describe('reopenThread', () => {
+        const mockCommentApiResponse = {
+            id: 501,
+            content: 'Reopening for further discussion.',
+            creator: 1,
+            thread_id: 789,
+            workspace_id: 1,
+            channel_id: 1,
+            posted_ts: 1609459200,
+            system_message: null,
+        }
+
+        it('should reopen a thread by adding a comment with thread_action', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = await request.json()
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reopening for further discussion.',
+                        thread_action: 'reopen',
+                    })
+                    expect(request.headers.get('Authorization')).toBe(`Bearer ${TEST_API_TOKEN}`)
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            const result = await client.reopenThread({
+                id: 789,
+                content: 'Reopening for further discussion.',
+            })
+            expect(result.id).toBe(501)
+            expect(result.content).toBe('Reopening for further discussion.')
+            expect(result.threadId).toBe(789)
+        })
+    })
 })
