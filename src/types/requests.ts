@@ -268,8 +268,23 @@ export type RemoveChannelUsersArgs = {
 export const THREAD_ACTIONS = ['close', 'reopen'] as const
 export type ThreadAction = (typeof THREAD_ACTIONS)[number]
 
-export type CloseThreadArgs = CreateCommentArgs
-export type ReopenThreadArgs = CreateCommentArgs
+export type CloseThreadArgs = {
+    id: number
+    content: string
+    tempId?: number | null
+    attachments?: unknown | null
+    actions?: unknown | null
+    recipients?: number[] | null
+}
+
+export type ReopenThreadArgs = {
+    id: number
+    content: string
+    tempId?: number | null
+    attachments?: unknown | null
+    actions?: unknown | null
+    recipients?: number[] | null
+}
 
 export type MoveThreadToChannelArgs = {
     id: number

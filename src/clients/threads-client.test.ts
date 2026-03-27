@@ -227,7 +227,7 @@ describe('ThreadsClient', () => {
             )
 
             const result = await client.closeThread({
-                threadId: 789,
+                id: 789,
                 content: 'Closing this thread.',
             })
             expect(result.id).toBe(500)
@@ -263,7 +263,7 @@ describe('ThreadsClient', () => {
             )
 
             const result = await client.reopenThread({
-                threadId: 789,
+                id: 789,
                 content: 'Reopening for further discussion.',
             })
             expect(result.id).toBe(501)

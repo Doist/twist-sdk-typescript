@@ -9,6 +9,7 @@ import {
     type MarkCommentPositionArgs,
     type UpdateCommentArgs,
 } from '../types/requests'
+import { addCommentRequest } from './add-comment-helper'
 import { BaseClient } from './base-client'
 
 /**
@@ -126,23 +127,11 @@ export class CommentsClient extends BaseClient {
         args: CreateCommentArgs,
         options?: { batch?: boolean },
     ): Promise<Comment> | BatchRequestDescriptor<Comment> {
-        const method = 'POST'
-        const url = `${ENDPOINT_COMMENTS}/add`
-        const params = args
-        const schema = CommentSchema
-
-        if (options?.batch) {
-            return { method, url, params, schema }
-        }
-
-        return request<Comment>({
-            httpMethod: method,
-            baseUri: this.getBaseUri(),
-            relativePath: url,
-            apiToken: this.apiToken,
-            payload: params,
-            customFetch: this.customFetch,
-        }).then((response) => schema.parse(response.data))
+        return addCommentRequest(
+            { baseUri: this.getBaseUri(), apiToken: this.apiToken, customFetch: this.customFetch },
+            args,
+            options,
+        )
     }
 
     /**
