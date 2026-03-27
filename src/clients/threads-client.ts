@@ -744,10 +744,7 @@ export class ThreadsClient extends BaseClient {
      * })
      * ```
      */
-    closeThread(
-        args: CloseThreadArgs,
-        options: { batch: true },
-    ): BatchRequestDescriptor<Comment>
+    closeThread(args: CloseThreadArgs, options: { batch: true }): BatchRequestDescriptor<Comment>
     closeThread(args: CloseThreadArgs, options?: { batch?: false }): Promise<Comment>
     closeThread(
         args: CloseThreadArgs,
@@ -777,10 +774,7 @@ export class ThreadsClient extends BaseClient {
      * })
      * ```
      */
-    reopenThread(
-        args: ReopenThreadArgs,
-        options: { batch: true },
-    ): BatchRequestDescriptor<Comment>
+    reopenThread(args: ReopenThreadArgs, options: { batch: true }): BatchRequestDescriptor<Comment>
     reopenThread(args: ReopenThreadArgs, options?: { batch?: false }): Promise<Comment>
     reopenThread(
         args: ReopenThreadArgs,
