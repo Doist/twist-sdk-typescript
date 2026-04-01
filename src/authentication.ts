@@ -149,15 +149,15 @@ export type ClientRegistrationRequest = {
 
 type RawClientRegistrationResponse = {
     clientId: string
-    clientSecret: string
+    clientSecret?: string
     clientName: string
     redirectUris: string[]
-    scope: string
+    scope?: string
     grantTypes: string[]
     responseTypes: string[]
     tokenEndpointAuthMethod: string
     clientIdIssuedAt: number
-    clientSecretExpiresAt: number
+    clientSecretExpiresAt?: number
     clientUri?: string
     logoUri?: string
 }
@@ -170,7 +170,7 @@ export type ClientRegistrationResponse = Omit<
     RawClientRegistrationResponse,
     'clientIdIssuedAt' | 'clientSecretExpiresAt' | 'scope'
 > & {
-    scope: TwistScope[]
+    scope?: TwistScope[]
     clientIdIssuedAt: Date
     /** `null` indicates the client secret never expires. */
     clientSecretExpiresAt: Date | null
@@ -317,10 +317,11 @@ export async function registerClient(
         const { clientIdIssuedAt, clientSecretExpiresAt, scope, ...rest } = response.data
         return {
             ...rest,
-            scope: scope.split(' ') as TwistScope[],
+            scope: scope ? (scope.split(' ') as TwistScope[]) : undefined,
             clientIdIssuedAt: new Date(clientIdIssuedAt * 1000),
-            clientSecretExpiresAt:
-                clientSecretExpiresAt === 0 ? null : new Date(clientSecretExpiresAt * 1000),
+            clientSecretExpiresAt: !clientSecretExpiresAt
+                ? null
+                : new Date(clientSecretExpiresAt * 1000),
         }
     } catch (error) {
         const err = error as TwistRequestError
