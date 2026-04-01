@@ -21,7 +21,8 @@ import { TwistApi } from '@doist/twist-sdk'
 
 const api = new TwistApi('YOUR_API_TOKEN')
 
-api.users.getSessionUser()
+api.users
+    .getSessionUser()
     .then((user) => console.log(user))
     .catch((error) => console.log(error))
 ```
@@ -38,7 +39,7 @@ const authUrl = getAuthorizationUrl(
     'your-client-id',
     ['user:read', 'channels:read'],
     'state-parameter',
-    'https://yourapp.com/callback'
+    'https://yourapp.com/callback',
 )
 
 // Step 2: Exchange authorization code for access token
@@ -46,7 +47,7 @@ const tokenResponse = await getAuthToken({
     clientId: 'your-client-id',
     clientSecret: 'your-client-secret',
     code: 'authorization-code',
-    redirectUri: 'https://yourapp.com/callback'
+    redirectUri: 'https://yourapp.com/callback',
 })
 
 // Step 3: Use the access token
@@ -76,7 +77,7 @@ const user2 = await api.workspaceUsers.getUserById(123, 789)
 // Batch requests - executes in a single HTTP call
 const results = await api.batch(
     api.workspaceUsers.getUserById(123, 456, { batch: true }),
-    api.workspaceUsers.getUserById(123, 789, { batch: true })
+    api.workspaceUsers.getUserById(123, 789, { batch: true }),
 )
 
 console.log(results[0].data.name) // First user
@@ -94,7 +95,7 @@ Each item in the batch response includes:
 ```typescript
 const results = await api.batch(
     api.channels.getChannel(123, { batch: true }),
-    api.channels.getChannel(456, { batch: true })
+    api.channels.getChannel(456, { batch: true }),
 )
 
 results.forEach((result) => {
@@ -115,7 +116,7 @@ When all requests in a batch are GET requests, they are executed in parallel on 
 const results = await api.batch(
     api.workspaceUsers.getUserById(123, 456, { batch: true }),
     api.channels.getChannel(789, { batch: true }),
-    api.threads.getThread(101112, { batch: true })
+    api.threads.getThread(101112, { batch: true }),
 )
 ```
 
@@ -127,7 +128,7 @@ You can batch requests across different resource types:
 const results = await api.batch(
     api.workspaceUsers.getUserById(123, 456, { batch: true }),
     api.channels.getChannels({ workspaceId: 123 }, { batch: true }),
-    api.conversations.getConversations({ workspaceId: 123 }, { batch: true })
+    api.conversations.getConversations({ workspaceId: 123 }, { batch: true }),
 )
 
 const [user, channels, conversations] = results
@@ -144,7 +145,7 @@ Individual requests in a batch can fail independently. Always check the status c
 ```typescript
 const results = await api.batch(
     api.channels.getChannel(123, { batch: true }),
-    api.channels.getChannel(999999, { batch: true }) // Non-existent channel
+    api.channels.getChannel(999999, { batch: true }), // Non-existent channel
 )
 
 results.forEach((result, index) => {
@@ -178,7 +179,8 @@ import { TwistApi } from './twist-api'
 const token = 'YOUR_API_TOKEN'
 const api = new TwistApi(token)
 
-api.workspaces.getWorkspaces()
+api.workspaces
+    .getWorkspaces()
     .then((workspaces) => {
         console.log(workspaces)
     })

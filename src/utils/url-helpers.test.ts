@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/complexity/noExcessiveNestedTestSuites: In this instance, not excessive */
 import {
     getChannelURL,
     getCommentURL,

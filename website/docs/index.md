@@ -35,7 +35,7 @@ const channels = await api.channels.getChannels({ workspaceId: 123 })
 const thread = await api.threads.createThread({
     channelId: 456,
     content: 'Hello from the SDK!',
-    title: 'My First Thread'
+    title: 'My First Thread',
 })
 ```
 
