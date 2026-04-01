@@ -120,10 +120,73 @@ export type RevokeAuthTokenRequestArgs = {
     accessToken: string
 }
 
+/** Supported token endpoint authentication methods for dynamic client registration. */
+export const TOKEN_ENDPOINT_AUTH_METHODS = [
+    'client_secret_post',
+    'client_secret_basic',
+    'none',
+] as const
+/**
+ * Authentication method used at the token endpoint.
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc7591#section-2 RFC 7591 Section 2}
+ */
+export type TokenEndpointAuthMethod = (typeof TOKEN_ENDPOINT_AUTH_METHODS)[number]
+
+/**
+ * Parameters for registering a new OAuth client via Dynamic Client Registration.
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc7591 RFC 7591}
+ */
+export type ClientRegistrationRequest = {
+    redirectUris: string[]
+    clientName?: string
+    clientUri?: string
+    logoUri?: string
+    scope?: readonly TwistScope[]
+    grantTypes?: string[]
+    responseTypes?: string[]
+    tokenEndpointAuthMethod?: TokenEndpointAuthMethod
+}
+
+type RawClientRegistrationResponse = {
+    clientId: string
+    clientSecret?: string
+    clientName: string
+    redirectUris: string[]
+    scope?: string
+    grantTypes: string[]
+    responseTypes: string[]
+    tokenEndpointAuthMethod: string
+    clientIdIssuedAt?: number
+    clientSecretExpiresAt?: number
+    clientUri?: string
+    logoUri?: string
+}
+
+/**
+ * Response from a successful dynamic client registration.
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc7591#section-3.2.1 RFC 7591 Section 3.2.1}
+ */
+export type ClientRegistrationResponse = Omit<
+    RawClientRegistrationResponse,
+    'clientIdIssuedAt' | 'clientSecretExpiresAt' | 'scope'
+> & {
+    scope?: TwistScope[]
+    clientIdIssuedAt?: Date
+    /** `null` indicates the client secret never expires. Absent when no secret is issued. */
+    clientSecretExpiresAt?: Date | null
+}
+
 export function getAuthStateParameter(): string {
     return uuid()
 }
 
+/**
+ * Generates the authorization URL for the OAuth2 flow.
+ *
+ * The `clientId` can be either a traditional client ID string (e.g. from
+ * {@link registerClient}) or an HTTPS URL pointing to a client metadata document,
+ * as defined in {@link https://drafts.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/ RFC draft-ietf-oauth-client-id-metadata-document}.
+ */
 export function getAuthorizationUrl(
     clientId: string,
     scopes: TwistScope[],
@@ -207,4 +270,60 @@ export async function revokeAuthToken(
     })
 
     return isSuccess(response)
+}
+
+/**
+ * Registers a new OAuth client via Dynamic Client Registration (RFC 7591).
+ *
+ * @example
+ * ```typescript
+ * const client = await registerClient({
+ *   redirectUris: ['https://example.com/callback'],
+ *   clientName: 'My App',
+ *   scope: ['user:read', 'channels:read'],
+ * })
+ * // Use client.clientId and client.clientSecret for OAuth flows
+ * ```
+ *
+ * @returns The registered client details
+ * @throws {@link TwistRequestError} If the registration fails
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc7591 RFC 7591}
+ */
+export async function registerClient(
+    args: ClientRegistrationRequest,
+    options?: AuthOptions,
+): Promise<ClientRegistrationResponse> {
+    const registerUrl = options?.baseUrl
+        ? `${options.baseUrl}/oauth/register`
+        : 'https://twist.com/oauth/register'
+
+    const response = await request<RawClientRegistrationResponse>({
+        httpMethod: 'POST',
+        baseUri: registerUrl,
+        relativePath: '',
+        payload: { ...args, scope: args.scope?.join(' ') },
+        customFetch: options?.customFetch,
+    })
+
+    if (!isSuccess(response) || !response.data?.clientId) {
+        throw new TwistRequestError(
+            'Dynamic client registration failed.',
+            response.status,
+            response.data,
+        )
+    }
+
+    const { clientIdIssuedAt, clientSecretExpiresAt, scope, ...rest } = response.data
+    return {
+        ...rest,
+        scope: scope ? (scope.split(' ') as TwistScope[]) : undefined,
+        clientIdIssuedAt:
+            clientIdIssuedAt !== undefined ? new Date(clientIdIssuedAt * 1000) : undefined,
+        clientSecretExpiresAt:
+            clientSecretExpiresAt === undefined
+                ? undefined
+                : clientSecretExpiresAt === 0
+                  ? null
+                  : new Date(clientSecretExpiresAt * 1000),
+    }
 }
