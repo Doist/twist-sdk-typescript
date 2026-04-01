@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.2.0...v2.3.0) (2026-04-01)
+
+### Features
+
+* add dynamic client registration (RFC 7591) ([#108](https://github.com/Doist/twist-sdk-typescript/issues/108)) ([d85306a](https://github.com/Doist/twist-sdk-typescript/commit/d85306a119a1e9a81151567180ff3f173263ba67))
+
 # Changelog
 
 ## [2.2.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.1.4...v2.2.0) (2026-03-27)
