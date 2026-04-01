@@ -3,10 +3,12 @@ import {
     getAuthorizationUrl,
     getAuthStateParameter,
     getAuthToken,
+    registerClient,
     revokeAuthToken,
     TwistScope,
 } from './authentication'
 import { server } from './testUtils/msw-setup'
+import { TwistRequestError } from './types/errors'
 
 describe('authentication', () => {
     describe('getAuthStateParameter', () => {
@@ -134,6 +136,91 @@ describe('authentication', () => {
             }
 
             await getAuthToken(args)
+        })
+    })
+
+    describe('registerClient', () => {
+        const defaultRegistrationRequest = {
+            redirectUris: ['https://example.com/callback'],
+            clientName: 'Test App',
+            scope: ['user:read', 'channels:read'] as const,
+        }
+
+        const successfulRegistrationResponse = {
+            client_id: 'twd_abc123',
+            client_secret: 'secret123',
+            client_name: 'Test App',
+            redirect_uris: ['https://example.com/callback'],
+            scope: 'user:read channels:read',
+            grant_types: ['authorization_code'],
+            response_types: ['code'],
+            token_endpoint_auth_method: 'client_secret_post',
+            client_id_issued_at: 1704067200,
+            client_secret_expires_at: 0,
+        }
+
+        it('should return registered client details', async () => {
+            server.use(
+                http.post('https://twist.com/oauth/register', () => {
+                    return HttpResponse.json(successfulRegistrationResponse)
+                }),
+            )
+
+            const result = await registerClient(defaultRegistrationRequest)
+
+            expect(result).toEqual({
+                clientId: 'twd_abc123',
+                clientSecret: 'secret123',
+                clientName: 'Test App',
+                redirectUris: ['https://example.com/callback'],
+                scope: ['user:read', 'channels:read'],
+                grantTypes: ['authorization_code'],
+                responseTypes: ['code'],
+                tokenEndpointAuthMethod: 'client_secret_post',
+                clientIdIssuedAt: new Date(1704067200 * 1000),
+                clientSecretExpiresAt: null,
+            })
+        })
+
+        it('should throw error on non-2xx response', async () => {
+            server.use(
+                http.post('https://twist.com/oauth/register', () => {
+                    return HttpResponse.json({ error: 'invalid_client_metadata' }, { status: 400 })
+                }),
+            )
+
+            await expect(registerClient(defaultRegistrationRequest)).rejects.toThrow(
+                TwistRequestError,
+            )
+        })
+
+        it('should throw error if clientId not present in response', async () => {
+            server.use(
+                http.post('https://twist.com/oauth/register', () => {
+                    return HttpResponse.json(
+                        { ...successfulRegistrationResponse, client_id: undefined },
+                        { status: 200 },
+                    )
+                }),
+            )
+
+            await expect(registerClient(defaultRegistrationRequest)).rejects.toThrow(
+                'Dynamic client registration failed.',
+            )
+        })
+
+        it('should use custom base URL if provided', async () => {
+            server.use(
+                http.post('https://staging.twist.com/oauth/register', () => {
+                    return HttpResponse.json(successfulRegistrationResponse)
+                }),
+            )
+
+            const result = await registerClient(defaultRegistrationRequest, {
+                baseUrl: 'https://staging.twist.com',
+            })
+
+            expect(result.clientId).toBe('twd_abc123')
         })
     })
 
