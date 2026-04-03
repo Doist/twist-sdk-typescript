@@ -43,6 +43,22 @@ describe('CommentsClient', () => {
 
             await client.getComments({ threadId: 789, olderThan: date })
         })
+
+        it('should support deprecated from param as newer_than_ts', async () => {
+            const date = new Date('2024-06-15T12:00:00Z')
+            const expectedTs = Math.floor(date.getTime() / 1000)
+
+            server.use(
+                http.get(apiUrl('api/v3/comments/get'), ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('newer_than_ts')).toBe(String(expectedTs))
+                    expect(url.searchParams.get('thread_id')).toBe('789')
+                    return HttpResponse.json([])
+                }),
+            )
+
+            await client.getComments({ threadId: 789, from: date })
+        })
     })
 
     describe('markPosition', () => {

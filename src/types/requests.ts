@@ -112,6 +112,8 @@ export type GetThreadsArgs = z.infer<typeof GetThreadsArgsSchema>
 
 export const GetCommentsArgsSchema = z.object({
     threadId: z.number(),
+    /** @deprecated Use `newerThan` instead. */
+    from: z.date().nullable().optional(),
     newerThan: z.date().nullable().optional(),
     olderThan: z.date().nullable().optional(),
     limit: z.number().nullable().optional(),
