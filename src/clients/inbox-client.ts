@@ -20,8 +20,10 @@ export class InboxClient extends BaseClient {
      *
      * @param args - The arguments for getting inbox.
      * @param args.workspaceId - The workspace ID.
-     * @param args.since - Optional date to get items since.
-     * @param args.until - Optional date to get items until.
+     * @param args.newerThan - Optional date to get items newer than.
+     * @param args.olderThan - Optional date to get items older than.
+     * @param args.since - @deprecated Use `newerThan` instead.
+     * @param args.until - @deprecated Use `olderThan` instead.
      * @param args.limit - Optional limit on number of items returned.
      * @param args.cursor - Optional cursor for pagination.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
@@ -31,7 +33,7 @@ export class InboxClient extends BaseClient {
      * ```typescript
      * const inbox = await api.inbox.getInbox({
      *   workspaceId: 123,
-     *   since: new Date('2024-01-01')
+     *   newerThan: new Date('2024-01-01')
      * })
      * ```
      */
@@ -45,8 +47,10 @@ export class InboxClient extends BaseClient {
             workspace_id: args.workspaceId,
         }
 
-        if (args.since) params.newer_than_ts = Math.floor(args.since.getTime() / 1000)
-        if (args.until) params.older_than_ts = Math.floor(args.until.getTime() / 1000)
+        const newerThan = args.newerThan ?? args.since
+        if (newerThan) params.newer_than_ts = Math.floor(newerThan.getTime() / 1000)
+        const olderThan = args.olderThan ?? args.until
+        if (olderThan) params.older_than_ts = Math.floor(olderThan.getTime() / 1000)
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
 
@@ -215,15 +219,17 @@ export class InboxClient extends BaseClient {
      * @param args - The arguments for archiving all.
      * @param args.workspaceId - The workspace ID.
      * @param args.channelIds - Optional array of channel IDs to filter by.
-     * @param args.since - Optional date to filter items since.
-     * @param args.until - Optional date to filter items until.
+     * @param args.newerThan - Optional date to filter items newer than.
+     * @param args.olderThan - Optional date to filter items older than.
+     * @param args.since - @deprecated Use `newerThan` instead.
+     * @param args.until - @deprecated Use `olderThan` instead.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example
      * ```typescript
      * await api.inbox.archiveAll({
      *   workspaceId: 123,
-     *   since: new Date('2024-01-01')
+     *   newerThan: new Date('2024-01-01')
      * })
      * ```
      */
@@ -238,8 +244,10 @@ export class InboxClient extends BaseClient {
         }
 
         if (args.channelIds) params.channel_ids = args.channelIds
-        if (args.since) params.since_ts_or_obj_idx = Math.floor(args.since.getTime() / 1000)
-        if (args.until) params.until_ts_or_obj_idx = Math.floor(args.until.getTime() / 1000)
+        const newerThan = args.newerThan ?? args.since
+        if (newerThan) params.since_ts_or_obj_idx = Math.floor(newerThan.getTime() / 1000)
+        const olderThan = args.olderThan ?? args.until
+        if (olderThan) params.until_ts_or_obj_idx = Math.floor(olderThan.getTime() / 1000)
 
         const method = 'POST'
         const url = `${ENDPOINT_INBOX}/archive_all`

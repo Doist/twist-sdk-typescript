@@ -106,6 +106,9 @@ export const GetThreadsArgsSchema = z.object({
     workspaceId: z.number(),
     channelId: z.number().nullable().optional(),
     archived: z.boolean().nullable().optional(),
+    newerThan: z.date().nullable().optional(),
+    olderThan: z.date().nullable().optional(),
+    limit: z.number().nullable().optional(),
 })
 
 export type GetThreadsArgs = z.infer<typeof GetThreadsArgsSchema>
@@ -214,7 +217,11 @@ export type UpdateConversationMessageArgs = {
 // Inbox
 export type GetInboxArgs = {
     workspaceId: number
+    newerThan?: Date
+    olderThan?: Date
+    /** @deprecated Use `newerThan` instead. */
     since?: Date
+    /** @deprecated Use `olderThan` instead. */
     until?: Date
     limit?: number
     cursor?: string
@@ -223,7 +230,11 @@ export type GetInboxArgs = {
 export type ArchiveAllArgs = {
     workspaceId: number
     channelIds?: number[]
+    newerThan?: Date
+    olderThan?: Date
+    /** @deprecated Use `newerThan` instead. */
     since?: Date
+    /** @deprecated Use `olderThan` instead. */
     until?: Date
 }
 
