@@ -118,9 +118,9 @@ export type GetThreadsArgs = Omit<
     newerThan?: Date | null
     olderThan?: Date | null
     /** @deprecated Use `newerThan` instead. */
-    newerThanTs?: number | null
+    newer_than_ts?: number | null
     /** @deprecated Use `olderThan` instead. */
-    olderThanTs?: number | null
+    older_than_ts?: number | null
 }
 
 export const GetCommentsArgsSchema = z.object({

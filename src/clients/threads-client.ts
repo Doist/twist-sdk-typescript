@@ -38,8 +38,8 @@ export class ThreadsClient extends BaseClient {
      * @param args.archived - Optional flag to include archived threads.
      * @param args.newerThan - Optional date to get threads newer than.
      * @param args.olderThan - Optional date to get threads older than.
-     * @param args.newerThanTs - @deprecated Use `newerThan` instead.
-     * @param args.olderThanTs - @deprecated Use `olderThan` instead.
+     * @param args.newer_than_ts - @deprecated Use `newerThan` instead.
+     * @param args.older_than_ts - @deprecated Use `olderThan` instead.
      * @param args.limit - Optional limit on number of threads returned.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of thread objects.
@@ -58,17 +58,17 @@ export class ThreadsClient extends BaseClient {
     ): Promise<Thread[]> | BatchRequestDescriptor<Thread[]> {
         const method = 'GET'
         const url = `${ENDPOINT_THREADS}/get`
-        const { newerThan, olderThan, newerThanTs, olderThanTs, ...rest } = args
+        const { newerThan, olderThan, newer_than_ts, older_than_ts, ...rest } = args
         const resolvedNewerThan = newerThan
             ? Math.floor(newerThan.getTime() / 1000)
-            : newerThanTs
+            : newer_than_ts
         const resolvedOlderThan = olderThan
             ? Math.floor(olderThan.getTime() / 1000)
-            : olderThanTs
+            : older_than_ts
         const params = {
             ...rest,
-            ...(resolvedNewerThan != null ? { newerThanTs: resolvedNewerThan } : {}),
-            ...(resolvedOlderThan != null ? { olderThanTs: resolvedOlderThan } : {}),
+            ...(resolvedNewerThan != null ? { newer_than_ts: resolvedNewerThan } : {}),
+            ...(resolvedOlderThan != null ? { older_than_ts: resolvedOlderThan } : {}),
         }
 
         if (options?.batch) {

@@ -62,7 +62,7 @@ describe('ThreadsClient', () => {
             await client.getThreads({ workspaceId: 1, olderThan: date })
         })
 
-        it('should support deprecated newerThanTs as newer_than_ts query parameter', async () => {
+        it('should support deprecated newer_than_ts as newer_than_ts query parameter', async () => {
             const expectedTs = 1718452800
 
             server.use(
@@ -74,10 +74,10 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.getThreads({ workspaceId: 1, newerThanTs: expectedTs })
+            await client.getThreads({ workspaceId: 1, newer_than_ts: expectedTs })
         })
 
-        it('should support deprecated olderThanTs as older_than_ts query parameter', async () => {
+        it('should support deprecated older_than_ts as older_than_ts query parameter', async () => {
             const expectedTs = 1718452800
 
             server.use(
@@ -89,7 +89,7 @@ describe('ThreadsClient', () => {
                 }),
             )
 
-            await client.getThreads({ workspaceId: 1, olderThanTs: expectedTs })
+            await client.getThreads({ workspaceId: 1, older_than_ts: expectedTs })
         })
     })
 
