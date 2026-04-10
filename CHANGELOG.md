@@ -1,3 +1,9 @@
+## [2.3.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.3.0...v2.3.1) (2026-04-10)
+
+### Bug Fixes
+
+* Use correct API parameter names for comment timestamp filtering ([#114](https://github.com/Doist/twist-sdk-typescript/issues/114)) ([70eb399](https://github.com/Doist/twist-sdk-typescript/commit/70eb399d1fa00d80fcb926ad95c898a6a509eb78))
+
 ## [2.3.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.2.0...v2.3.0) (2026-04-01)
 
 ### Features
