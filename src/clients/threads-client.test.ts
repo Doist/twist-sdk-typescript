@@ -61,6 +61,36 @@ describe('ThreadsClient', () => {
 
             await client.getThreads({ workspaceId: 1, olderThan: date })
         })
+
+        it('should support deprecated newerThanTs as newer_than_ts query parameter', async () => {
+            const expectedTs = 1718452800
+
+            server.use(
+                http.get(apiUrl('api/v3/threads/get'), ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('newer_than_ts')).toBe(String(expectedTs))
+                    expect(url.searchParams.get('workspace_id')).toBe('1')
+                    return HttpResponse.json([])
+                }),
+            )
+
+            await client.getThreads({ workspaceId: 1, newerThanTs: expectedTs })
+        })
+
+        it('should support deprecated olderThanTs as older_than_ts query parameter', async () => {
+            const expectedTs = 1718452800
+
+            server.use(
+                http.get(apiUrl('api/v3/threads/get'), ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('older_than_ts')).toBe(String(expectedTs))
+                    expect(url.searchParams.get('workspace_id')).toBe('1')
+                    return HttpResponse.json([])
+                }),
+            )
+
+            await client.getThreads({ workspaceId: 1, olderThanTs: expectedTs })
+        })
     })
 
     describe('pinThread', () => {

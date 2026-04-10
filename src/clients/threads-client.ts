@@ -38,6 +38,8 @@ export class ThreadsClient extends BaseClient {
      * @param args.archived - Optional flag to include archived threads.
      * @param args.newerThan - Optional date to get threads newer than.
      * @param args.olderThan - Optional date to get threads older than.
+     * @param args.newerThanTs - @deprecated Use `newerThan` instead.
+     * @param args.olderThanTs - @deprecated Use `olderThan` instead.
      * @param args.limit - Optional limit on number of threads returned.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of thread objects.
@@ -56,15 +58,18 @@ export class ThreadsClient extends BaseClient {
     ): Promise<Thread[]> | BatchRequestDescriptor<Thread[]> {
         const method = 'GET'
         const url = `${ENDPOINT_THREADS}/get`
-        const params: Record<string, unknown> = {
-            workspace_id: args.workspaceId,
+        const { newerThan, olderThan, newerThanTs, olderThanTs, ...rest } = args
+        const resolvedNewerThan = newerThan
+            ? Math.floor(newerThan.getTime() / 1000)
+            : newerThanTs
+        const resolvedOlderThan = olderThan
+            ? Math.floor(olderThan.getTime() / 1000)
+            : olderThanTs
+        const params = {
+            ...rest,
+            ...(resolvedNewerThan != null ? { newerThanTs: resolvedNewerThan } : {}),
+            ...(resolvedOlderThan != null ? { olderThanTs: resolvedOlderThan } : {}),
         }
-
-        if (args.channelId != null) params.channel_id = args.channelId
-        if (args.archived != null) params.archived = args.archived
-        if (args.newerThan) params.newer_than_ts = Math.floor(args.newerThan.getTime() / 1000)
-        if (args.olderThan) params.older_than_ts = Math.floor(args.olderThan.getTime() / 1000)
-        if (args.limit) params.limit = args.limit
 
         if (options?.batch) {
             return { method, url, params, schema: z.array(ThreadSchema) }

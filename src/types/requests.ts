@@ -111,7 +111,17 @@ export const GetThreadsArgsSchema = z.object({
     limit: z.number().nullable().optional(),
 })
 
-export type GetThreadsArgs = z.infer<typeof GetThreadsArgsSchema>
+export type GetThreadsArgs = Omit<
+    z.infer<typeof GetThreadsArgsSchema>,
+    'newerThan' | 'olderThan'
+> & {
+    newerThan?: Date | null
+    olderThan?: Date | null
+    /** @deprecated Use `newerThan` instead. */
+    newerThanTs?: number | null
+    /** @deprecated Use `olderThan` instead. */
+    olderThanTs?: number | null
+}
 
 export const GetCommentsArgsSchema = z.object({
     threadId: z.number(),
