@@ -113,10 +113,15 @@ export type GetThreadsArgs = z.infer<typeof GetThreadsArgsSchema>
 export const GetCommentsArgsSchema = z.object({
     threadId: z.number(),
     from: z.date().nullable().optional(),
+    newerThan: z.date().nullable().optional(),
+    olderThan: z.date().nullable().optional(),
     limit: z.number().nullable().optional(),
 })
 
-export type GetCommentsArgs = z.infer<typeof GetCommentsArgsSchema>
+export type GetCommentsArgs = Omit<z.infer<typeof GetCommentsArgsSchema>, 'from'> & {
+    /** @deprecated Use `newerThan` instead. */
+    from?: Date | null
+}
 
 export const GetConversationsArgsSchema = z.object({
     workspaceId: z.number(),

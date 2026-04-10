@@ -21,7 +21,9 @@ export class CommentsClient extends BaseClient {
      *
      * @param args - The arguments for getting comments.
      * @param args.threadId - The thread ID.
-     * @param args.from - Optional date to get comments from.
+     * @param args.from - @deprecated Use `newerThan` instead.
+     * @param args.newerThan - Optional date to get comments newer than.
+     * @param args.olderThan - Optional date to get comments older than.
      * @param args.limit - Optional limit on number of comments returned.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of comment objects.
@@ -30,7 +32,7 @@ export class CommentsClient extends BaseClient {
      * ```typescript
      * const comments = await api.comments.getComments({
      *   threadId: 789,
-     *   from: new Date('2024-01-01')
+     *   newerThan: new Date('2024-01-01')
      * })
      * comments.forEach(c => console.log(c.content))
      * ```
@@ -45,7 +47,9 @@ export class CommentsClient extends BaseClient {
             thread_id: args.threadId,
         }
 
-        if (args.from) params.from = Math.floor(args.from.getTime() / 1000)
+        const newerThan = args.newerThan ?? args.from
+        if (newerThan) params.newer_than_ts = Math.floor(newerThan.getTime() / 1000)
+        if (args.olderThan) params.older_than_ts = Math.floor(args.olderThan.getTime() / 1000)
         if (args.limit) params.limit = args.limit
 
         const method = 'GET'
