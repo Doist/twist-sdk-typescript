@@ -78,7 +78,7 @@ describe('InboxClient', () => {
     })
 
     describe('archiveAll', () => {
-        it('should send newerThan as since_ts_or_obj_idx parameter', async () => {
+        it('should send olderThan as older_than_ts parameter', async () => {
             const date = new Date('2024-06-15T12:00:00Z')
             const expectedTs = Math.floor(date.getTime() / 1000)
 
@@ -87,25 +87,7 @@ describe('InboxClient', () => {
                     const body = await request.json()
                     expect(body).toEqual({
                         workspace_id: 123,
-                        since_ts_or_obj_idx: expectedTs,
-                    })
-                    return HttpResponse.json(null)
-                }),
-            )
-
-            await client.archiveAll({ workspaceId: 123, newerThan: date })
-        })
-
-        it('should send olderThan as until_ts_or_obj_idx parameter', async () => {
-            const date = new Date('2024-06-15T12:00:00Z')
-            const expectedTs = Math.floor(date.getTime() / 1000)
-
-            server.use(
-                http.post(apiUrl('api/v3/inbox/archive_all'), async ({ request }) => {
-                    const body = await request.json()
-                    expect(body).toEqual({
-                        workspace_id: 123,
-                        until_ts_or_obj_idx: expectedTs,
+                        older_than_ts: expectedTs,
                     })
                     return HttpResponse.json(null)
                 }),
@@ -114,7 +96,7 @@ describe('InboxClient', () => {
             await client.archiveAll({ workspaceId: 123, olderThan: date })
         })
 
-        it('should support deprecated since param', async () => {
+        it('should support deprecated until param', async () => {
             const date = new Date('2024-06-15T12:00:00Z')
             const expectedTs = Math.floor(date.getTime() / 1000)
 
@@ -123,13 +105,13 @@ describe('InboxClient', () => {
                     const body = await request.json()
                     expect(body).toEqual({
                         workspace_id: 123,
-                        since_ts_or_obj_idx: expectedTs,
+                        older_than_ts: expectedTs,
                     })
                     return HttpResponse.json(null)
                 }),
             )
 
-            await client.archiveAll({ workspaceId: 123, since: date })
+            await client.archiveAll({ workspaceId: 123, until: date })
         })
     })
 })

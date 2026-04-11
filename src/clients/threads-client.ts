@@ -59,12 +59,8 @@ export class ThreadsClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_THREADS}/get`
         const { newerThan, olderThan, newer_than_ts, older_than_ts, ...rest } = args
-        const resolvedNewerThan = newerThan
-            ? Math.floor(newerThan.getTime() / 1000)
-            : newer_than_ts
-        const resolvedOlderThan = olderThan
-            ? Math.floor(olderThan.getTime() / 1000)
-            : older_than_ts
+        const resolvedNewerThan = newerThan ? Math.floor(newerThan.getTime() / 1000) : newer_than_ts
+        const resolvedOlderThan = olderThan ? Math.floor(olderThan.getTime() / 1000) : older_than_ts
         const params = {
             ...rest,
             ...(resolvedNewerThan != null ? { newer_than_ts: resolvedNewerThan } : {}),

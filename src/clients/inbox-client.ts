@@ -219,9 +219,7 @@ export class InboxClient extends BaseClient {
      * @param args - The arguments for archiving all.
      * @param args.workspaceId - The workspace ID.
      * @param args.channelIds - Optional array of channel IDs to filter by.
-     * @param args.newerThan - Optional date to filter items newer than.
      * @param args.olderThan - Optional date to filter items older than.
-     * @param args.since - @deprecated Use `newerThan` instead.
      * @param args.until - @deprecated Use `olderThan` instead.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
@@ -229,7 +227,7 @@ export class InboxClient extends BaseClient {
      * ```typescript
      * await api.inbox.archiveAll({
      *   workspaceId: 123,
-     *   newerThan: new Date('2024-01-01')
+     *   olderThan: new Date('2024-01-01')
      * })
      * ```
      */
@@ -244,10 +242,8 @@ export class InboxClient extends BaseClient {
         }
 
         if (args.channelIds) params.channel_ids = args.channelIds
-        const newerThan = args.newerThan ?? args.since
-        if (newerThan) params.since_ts_or_obj_idx = Math.floor(newerThan.getTime() / 1000)
         const olderThan = args.olderThan ?? args.until
-        if (olderThan) params.until_ts_or_obj_idx = Math.floor(olderThan.getTime() / 1000)
+        if (olderThan) params.older_than_ts = Math.floor(olderThan.getTime() / 1000)
 
         const method = 'POST'
         const url = `${ENDPOINT_INBOX}/archive_all`

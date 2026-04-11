@@ -240,10 +240,7 @@ export type GetInboxArgs = {
 export type ArchiveAllArgs = {
     workspaceId: number
     channelIds?: number[]
-    newerThan?: Date
     olderThan?: Date
-    /** @deprecated Use `newerThan` instead. */
-    since?: Date
     /** @deprecated Use `olderThan` instead. */
     until?: Date
 }
