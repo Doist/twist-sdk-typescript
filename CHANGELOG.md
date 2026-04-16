@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.3.1...v2.4.0) (2026-04-16)
+
+### Features
+
+* **inbox:** add archiveFilter param to getInbox ([#119](https://github.com/Doist/twist-sdk-typescript/issues/119)) ([bec28f8](https://github.com/Doist/twist-sdk-typescript/commit/bec28f824fd46e0438bebd4c033aa492f49d5168))
+
 ## [2.3.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.3.0...v2.3.1) (2026-04-10)
 
 ### Bug Fixes
