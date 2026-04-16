@@ -24,6 +24,7 @@ export class InboxClient extends BaseClient {
      * @param args.until - Optional date to get items until.
      * @param args.limit - Optional limit on number of items returned.
      * @param args.cursor - Optional cursor for pagination.
+     * @param args.archiveFilter - Optional filter: 'active' (default), 'archived', or 'all'.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns Inbox threads.
      *
@@ -32,6 +33,12 @@ export class InboxClient extends BaseClient {
      * const inbox = await api.inbox.getInbox({
      *   workspaceId: 123,
      *   since: new Date('2024-01-01')
+     * })
+     *
+     * // Include archived (done) items alongside active ones
+     * const allInbox = await api.inbox.getInbox({
+     *   workspaceId: 123,
+     *   archiveFilter: 'all'
      * })
      * ```
      */
@@ -49,6 +56,7 @@ export class InboxClient extends BaseClient {
         if (args.until) params.older_than_ts = Math.floor(args.until.getTime() / 1000)
         if (args.limit) params.limit = args.limit
         if (args.cursor) params.cursor = args.cursor
+        if (args.archiveFilter) params.archive_filter = args.archiveFilter
 
         const method = 'GET'
         const url = `${ENDPOINT_INBOX}/get`
