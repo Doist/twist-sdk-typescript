@@ -1,3 +1,9 @@
+## [2.4.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.4.0...v2.4.1) (2026-04-17)
+
+### Bug Fixes
+
+* Use correct API parameter names for thread and inbox timestamp filtering ([#117](https://github.com/Doist/twist-sdk-typescript/issues/117)) ([70c542d](https://github.com/Doist/twist-sdk-typescript/commit/70c542df921e366558c276540be79d5e7279997e))
+
 ## [2.4.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.3.1...v2.4.0) (2026-04-16)
 
 ### Features
