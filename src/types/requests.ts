@@ -225,6 +225,9 @@ export type UpdateConversationMessageArgs = {
 }
 
 // Inbox
+export const ARCHIVE_FILTER_VALUES = ['active', 'archived', 'all'] as const
+export type ArchiveFilter = (typeof ARCHIVE_FILTER_VALUES)[number]
+
 export type GetInboxArgs = {
     workspaceId: number
     newerThan?: Date
@@ -235,6 +238,7 @@ export type GetInboxArgs = {
     until?: Date
     limit?: number
     cursor?: string
+    archiveFilter?: ArchiveFilter
 }
 
 export type ArchiveAllArgs = {
