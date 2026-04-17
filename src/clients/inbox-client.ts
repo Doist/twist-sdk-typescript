@@ -221,6 +221,7 @@ export class InboxClient extends BaseClient {
      * @param args.channelIds - Optional array of channel IDs to filter by.
      * @param args.olderThan - Optional date to filter items older than.
      * @param args.until - @deprecated Use `olderThan` instead.
+     * @param args.since - @deprecated Not supported by the archive_all endpoint — this value is ignored.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      *
      * @example

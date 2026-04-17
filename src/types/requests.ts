@@ -243,6 +243,8 @@ export type ArchiveAllArgs = {
     olderThan?: Date
     /** @deprecated Use `olderThan` instead. */
     until?: Date
+    /** @deprecated Not supported by the archive_all endpoint — this value is ignored. */
+    since?: Date
 }
 
 // Reactions
