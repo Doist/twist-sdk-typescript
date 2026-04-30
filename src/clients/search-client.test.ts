@@ -46,6 +46,19 @@ describe('SearchClient', () => {
             await client.search({ workspaceId: 1, mentionSelf: true })
         })
 
+        it('forwards an explicit empty-string query rather than dropping it', async () => {
+            server.use(
+                http.get(apiUrl('api/v3/search'), ({ request }) => {
+                    const url = new URL(request.url)
+                    expect(url.searchParams.get('query')).toBe('')
+                    expect(url.searchParams.get('workspace_id')).toBe('1')
+                    return HttpResponse.json(emptyResponse)
+                }),
+            )
+
+            await client.search({ query: '', workspaceId: 1 })
+        })
+
         it('forwards both query and mentionSelf when both are provided', async () => {
             server.use(
                 http.get(apiUrl('api/v3/search'), ({ request }) => {

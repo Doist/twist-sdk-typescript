@@ -49,7 +49,7 @@ import { BaseClient, type ClientConfig } from './base-client'
             workspace_id: args.workspaceId,
         }
 
-        if (args.query) params.query = args.query
+        if (args.query !== undefined) params.query = args.query
         if (args.channelIds) params.channel_ids = args.channelIds
         if (args.authorIds) params.author_ids = args.authorIds
         if (args.mentionSelf !== undefined) params.mention_self = args.mentionSelf
