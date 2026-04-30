@@ -18,11 +18,11 @@ export class SearchClient extends BaseClient {
      * Searches across all threads and conversations in a workspace.
      *
      * @param args - The arguments for searching.
-     * @param args.query - The search query string.
+     * @param args.query - The search query string. Optional when `mentionSelf: true` is set; required otherwise.
      * @param args.workspaceId - The workspace ID to search in.
      * @param args.channelIds - Optional array of channel IDs to filter by.
      * @param args.authorIds - Optional array of author user IDs to filter by.
-     * @param args.mentionSelf - Optional flag to filter by mentions of the current user.
+     * @param args.mentionSelf - Optional flag to filter by mentions of the current user. When true, `query` may be omitted.
      * @param args.dateFrom - Optional start date for filtering (YYYY-MM-DD).
      * @param args.dateTo - Optional end date for filtering (YYYY-MM-DD).
      * @param args.limit - Optional limit on number of results returned.
@@ -46,10 +46,10 @@ import { BaseClient, type ClientConfig } from './base-client'
         options?: { batch?: boolean },
     ): Promise<SearchResponse> | BatchRequestDescriptor<SearchResponse> {
         const params: Record<string, unknown> = {
-            query: args.query,
             workspace_id: args.workspaceId,
         }
 
+        if (args.query) params.query = args.query
         if (args.channelIds) params.channel_ids = args.channelIds
         if (args.authorIds) params.author_ids = args.authorIds
         if (args.mentionSelf !== undefined) params.mention_self = args.mentionSelf
