@@ -176,17 +176,19 @@ export type UpdateUserArgs = {
 }
 
 // Search
-export type SearchArgs = {
-    query: string
+type SearchArgsCommon = {
     workspaceId: number
     channelIds?: number[]
     authorIds?: number[]
-    mentionSelf?: boolean
     dateFrom?: string
     dateTo?: string
     limit?: number
     cursor?: string
 }
+
+export type SearchArgs =
+    | (SearchArgsCommon & { query: string; mentionSelf?: boolean })
+    | (SearchArgsCommon & { query?: string; mentionSelf: true })
 
 export type SearchThreadArgs = {
     query: string
