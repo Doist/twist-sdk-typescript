@@ -1,3 +1,9 @@
+## [2.5.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.4.1...v2.5.0) (2026-04-30)
+
+### Features
+
+* **search:** allow query to be omitted when mentionSelf is true ([#120](https://github.com/Doist/twist-sdk-typescript/issues/120)) ([f2c2b65](https://github.com/Doist/twist-sdk-typescript/commit/f2c2b655ed25a21e23225fe28e40eb0b6eed9e43))
+
 ## [2.4.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.4.0...v2.4.1) (2026-04-17)
 
 ### Bug Fixes
