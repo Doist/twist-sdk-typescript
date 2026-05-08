@@ -1,14 +1,11 @@
 import { EnvHttpProxyAgent } from 'undici'
-import { getDefaultDispatcher, resetDefaultDispatcherForTests } from './http-dispatcher'
+import {
+    getDefaultDispatcher,
+    PROXY_ENVIRONMENT_VARIABLES,
+    resetDefaultDispatcherForTests,
+} from './http-dispatcher'
 
-const proxyEnvironmentKeys = [
-    'HTTP_PROXY',
-    'HTTPS_PROXY',
-    'NO_PROXY',
-    'http_proxy',
-    'https_proxy',
-    'no_proxy',
-] as const
+const proxyEnvironmentKeys = [...PROXY_ENVIRONMENT_VARIABLES, 'NO_PROXY', 'no_proxy'] as const
 
 type ProxyEnvironmentKey = (typeof proxyEnvironmentKeys)[number]
 
@@ -68,7 +65,7 @@ describe('httpDispatcher', () => {
         expect(dispatcher).toBeUndefined()
     })
 
-    it.each(['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'] as const)(
+    it.each(PROXY_ENVIRONMENT_VARIABLES)(
         'returns EnvHttpProxyAgent when %s is set',
         async (envVar) => {
             process.env[envVar] = 'http://localhost:8080'
@@ -78,6 +75,16 @@ describe('httpDispatcher', () => {
             expect(dispatcher).toBeInstanceOf(EnvHttpProxyAgent)
         },
     )
+
+    it('does not memoize the no-proxy result so later env changes take effect', async () => {
+        const firstResult = await getDefaultDispatcher()
+        expect(firstResult).toBeUndefined()
+
+        process.env.HTTPS_PROXY = 'http://localhost:8080'
+
+        const secondResult = await getDefaultDispatcher()
+        expect(secondResult).toBeInstanceOf(EnvHttpProxyAgent)
+    })
 
     it('reuses the same dispatcher instance across calls', async () => {
         process.env.HTTPS_PROXY = 'http://localhost:8080'

@@ -71,6 +71,22 @@ describe('fetchWithRetry transport selection', () => {
         )
     })
 
+    it('omits the dispatcher option when no default dispatcher is configured', async () => {
+        const { fetchWithRetry, getDefaultDispatcher } =
+            await importFetchWithRetryWithMockedDispatcher(undefined)
+
+        mockFetch.mockResolvedValueOnce(createJsonResponse({ id: 1 }))
+
+        await fetchWithRetry('https://api.test.com/users', { method: 'GET' })
+
+        expect(getDefaultDispatcher).toHaveBeenCalledTimes(1)
+        expect(mockFetch).toHaveBeenCalledTimes(1)
+
+        const fetchCall = mockFetch.mock.calls[0]
+        expect(fetchCall[0]).toBe('https://api.test.com/users')
+        expect(fetchCall[1]).not.toHaveProperty('dispatcher')
+    })
+
     it('does not consult the default dispatcher when customFetch is provided', async () => {
         const dispatcher = { id: 'default-dispatcher' } as unknown as Dispatcher
         const { fetchWithRetry, getDefaultDispatcher } =

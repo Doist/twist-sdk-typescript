@@ -18,7 +18,15 @@ export async function getDefaultDispatcher(): Promise<Dispatcher | undefined> {
     if (!defaultDispatcherPromise) {
         defaultDispatcherPromise = createDefaultDispatcher()
             .then((dispatcher) => {
-                defaultDispatcher = dispatcher
+                if (dispatcher) {
+                    defaultDispatcher = dispatcher
+                } else {
+                    // The "no proxy configured" result must not stick. If proxy
+                    // env vars get populated later in the process, the next
+                    // call needs to re-evaluate instead of being permanently
+                    // pinned to the no-dispatcher branch.
+                    defaultDispatcherPromise = undefined
+                }
                 return dispatcher
             })
             .catch((error) => {
@@ -40,15 +48,17 @@ function isNodeEnvironment(): boolean {
     return typeof process !== 'undefined' && typeof process.versions?.node === 'string'
 }
 
-const proxyEnvironmentVariables = [
+export const PROXY_ENVIRONMENT_VARIABLES = [
     'HTTP_PROXY',
     'HTTPS_PROXY',
     'http_proxy',
     'https_proxy',
 ] as const
 
+export type ProxyEnvironmentVariable = (typeof PROXY_ENVIRONMENT_VARIABLES)[number]
+
 function hasProxyEnvironmentVariable(): boolean {
-    return proxyEnvironmentVariables.some((key) => {
+    return PROXY_ENVIRONMENT_VARIABLES.some((key) => {
         const value = process.env[key]
         return typeof value === 'string' && value.length > 0
     })
