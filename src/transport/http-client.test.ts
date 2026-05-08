@@ -75,6 +75,7 @@ describe('httpClient', () => {
                 expect.objectContaining({
                     method: 'GET',
                     headers: {
+                        'Accept-Encoding': 'identity',
                         'Content-Type': 'application/json',
                         Authorization: 'Bearer token',
                     },
@@ -111,6 +112,7 @@ describe('httpClient', () => {
                 expect.objectContaining({
                     method: 'POST',
                     headers: {
+                        'Accept-Encoding': 'identity',
                         'Content-Type': 'application/json',
                         Authorization: 'Bearer token',
                     },

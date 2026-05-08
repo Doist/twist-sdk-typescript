@@ -1,4 +1,4 @@
-import { EnvHttpProxyAgent } from 'undici'
+import { Agent, EnvHttpProxyAgent } from 'undici'
 import {
     getDefaultDispatcher,
     PROXY_ENVIRONMENT_VARIABLES,
@@ -43,26 +43,29 @@ describe('httpDispatcher', () => {
         resetDefaultDispatcherForTests()
     })
 
-    it('returns undefined when no proxy env var is set', async () => {
+    it('returns a plain Agent when no proxy env var is set', async () => {
         const dispatcher = await getDefaultDispatcher()
 
-        expect(dispatcher).toBeUndefined()
+        expect(dispatcher).toBeInstanceOf(Agent)
+        expect(dispatcher).not.toBeInstanceOf(EnvHttpProxyAgent)
     })
 
-    it('returns undefined when only NO_PROXY is set', async () => {
+    it('returns a plain Agent when only NO_PROXY is set', async () => {
         process.env.NO_PROXY = 'api.twist.com'
 
         const dispatcher = await getDefaultDispatcher()
 
-        expect(dispatcher).toBeUndefined()
+        expect(dispatcher).toBeInstanceOf(Agent)
+        expect(dispatcher).not.toBeInstanceOf(EnvHttpProxyAgent)
     })
 
-    it('returns undefined when a proxy env var is empty', async () => {
+    it('returns a plain Agent when a proxy env var is empty', async () => {
         process.env.HTTPS_PROXY = ''
 
         const dispatcher = await getDefaultDispatcher()
 
-        expect(dispatcher).toBeUndefined()
+        expect(dispatcher).toBeInstanceOf(Agent)
+        expect(dispatcher).not.toBeInstanceOf(EnvHttpProxyAgent)
     })
 
     it.each(PROXY_ENVIRONMENT_VARIABLES)(
@@ -76,19 +79,7 @@ describe('httpDispatcher', () => {
         },
     )
 
-    it('does not memoize the no-proxy result so later env changes take effect', async () => {
-        const firstResult = await getDefaultDispatcher()
-        expect(firstResult).toBeUndefined()
-
-        process.env.HTTPS_PROXY = 'http://localhost:8080'
-
-        const secondResult = await getDefaultDispatcher()
-        expect(secondResult).toBeInstanceOf(EnvHttpProxyAgent)
-    })
-
     it('reuses the same dispatcher instance across calls', async () => {
-        process.env.HTTPS_PROXY = 'http://localhost:8080'
-
         const firstDispatcher = await getDefaultDispatcher()
         const secondDispatcher = await getDefaultDispatcher()
 
@@ -96,8 +87,6 @@ describe('httpDispatcher', () => {
     })
 
     it('creates a new dispatcher after reset', async () => {
-        process.env.HTTPS_PROXY = 'http://localhost:8080'
-
         const firstDispatcher = await getDefaultDispatcher()
 
         resetDefaultDispatcherForTests()
@@ -114,6 +103,7 @@ describe('httpDispatcher', () => {
         let shouldReject = true
 
         vi.doMock('undici', () => ({
+            Agent: class {},
             EnvHttpProxyAgent: class extends MockEnvHttpProxyAgent {
                 constructor() {
                     super()

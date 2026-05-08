@@ -71,7 +71,7 @@ describe('fetchWithRetry transport selection', () => {
         )
     })
 
-    it('omits the dispatcher option when no default dispatcher is configured', async () => {
+    it('falls back to bare fetch when no default dispatcher is available', async () => {
         const { fetchWithRetry, getDefaultDispatcher } =
             await importFetchWithRetryWithMockedDispatcher(undefined)
 

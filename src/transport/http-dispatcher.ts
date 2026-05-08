@@ -18,15 +18,7 @@ export async function getDefaultDispatcher(): Promise<Dispatcher | undefined> {
     if (!defaultDispatcherPromise) {
         defaultDispatcherPromise = createDefaultDispatcher()
             .then((dispatcher) => {
-                if (dispatcher) {
-                    defaultDispatcher = dispatcher
-                } else {
-                    // The "no proxy configured" result must not stick. If proxy
-                    // env vars get populated later in the process, the next
-                    // call needs to re-evaluate instead of being permanently
-                    // pinned to the no-dispatcher branch.
-                    defaultDispatcherPromise = undefined
-                }
+                defaultDispatcher = dispatcher
                 return dispatcher
             })
             .catch((error) => {
@@ -69,16 +61,18 @@ async function createDefaultDispatcher(): Promise<Dispatcher | undefined> {
         return undefined
     }
 
-    // Only attach a dispatcher when a proxy is actually configured. Passing any
-    // custom dispatcher to global `fetch` on Node 24+ disables automatic gzip
-    // decompression, so `response.text()` returns raw gzipped bytes and every
-    // JSON-parsing client breaks. Returning `undefined` lets native fetch handle
-    // decompression as expected. NO_PROXY alone is meaningless without a proxy.
-    if (!hasProxyEnvironmentVariable()) {
-        return undefined
-    }
+    const { Agent, EnvHttpProxyAgent } = await import('undici')
 
-    const { EnvHttpProxyAgent } = await import('undici')
-
-    return new EnvHttpProxyAgent(keepAliveOptions)
+    // Always supply a custom dispatcher so the keep-alive contract above is
+    // honoured for every request. The proxy-aware variant is only needed when
+    // proxy env vars are present; otherwise a plain `Agent` is enough and
+    // avoids EnvHttpProxyAgent's per-request env-var lookup overhead.
+    //
+    // Compression note: on Node 24+, passing any custom dispatcher to global
+    // `fetch` disables automatic gzip decompression. `http-client.ts` sends
+    // `Accept-Encoding: identity` to opt out of compression entirely so the
+    // body arrives plaintext regardless of which dispatcher we're using.
+    return hasProxyEnvironmentVariable()
+        ? new EnvHttpProxyAgent(keepAliveOptions)
+        : new Agent(keepAliveOptions)
 }

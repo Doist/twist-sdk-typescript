@@ -19,7 +19,14 @@ export function paramsSerializer(params: Record<string, unknown>): string {
     return qs.toString()
 }
 
+// `Accept-Encoding: identity` opts out of response compression. The SDK always
+// supplies a custom undici dispatcher (to honour proxy env vars and the 1ms
+// keep-alive contract). On Node 24+, passing any custom dispatcher to global
+// `fetch` strips the `content-encoding` header but does not decompress the
+// body, leaving consumers with raw gzipped bytes. Asking the server for an
+// uncompressed payload sidesteps that asymmetry across all Node versions.
 const defaultHeaders = {
+    'Accept-Encoding': 'identity',
     'Content-Type': 'application/json',
 }
 
