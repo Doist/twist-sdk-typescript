@@ -46,13 +46,42 @@ describe('httpDispatcher', () => {
         resetDefaultDispatcherForTests()
     })
 
-    it('returns EnvHttpProxyAgent in Node', async () => {
+    it('returns undefined when no proxy env var is set', async () => {
         const dispatcher = await getDefaultDispatcher()
 
-        expect(dispatcher).toBeInstanceOf(EnvHttpProxyAgent)
+        expect(dispatcher).toBeUndefined()
     })
 
+    it('returns undefined when only NO_PROXY is set', async () => {
+        process.env.NO_PROXY = 'api.twist.com'
+
+        const dispatcher = await getDefaultDispatcher()
+
+        expect(dispatcher).toBeUndefined()
+    })
+
+    it('returns undefined when a proxy env var is empty', async () => {
+        process.env.HTTPS_PROXY = ''
+
+        const dispatcher = await getDefaultDispatcher()
+
+        expect(dispatcher).toBeUndefined()
+    })
+
+    it.each(['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'] as const)(
+        'returns EnvHttpProxyAgent when %s is set',
+        async (envVar) => {
+            process.env[envVar] = 'http://localhost:8080'
+
+            const dispatcher = await getDefaultDispatcher()
+
+            expect(dispatcher).toBeInstanceOf(EnvHttpProxyAgent)
+        },
+    )
+
     it('reuses the same dispatcher instance across calls', async () => {
+        process.env.HTTPS_PROXY = 'http://localhost:8080'
+
         const firstDispatcher = await getDefaultDispatcher()
         const secondDispatcher = await getDefaultDispatcher()
 
@@ -60,6 +89,8 @@ describe('httpDispatcher', () => {
     })
 
     it('creates a new dispatcher after reset', async () => {
+        process.env.HTTPS_PROXY = 'http://localhost:8080'
+
         const firstDispatcher = await getDefaultDispatcher()
 
         resetDefaultDispatcherForTests()
@@ -70,6 +101,8 @@ describe('httpDispatcher', () => {
     })
 
     it('retries dispatcher initialization after a failure', async () => {
+        process.env.HTTPS_PROXY = 'http://localhost:8080'
+
         const MockEnvHttpProxyAgent = class {}
         let shouldReject = true
 
