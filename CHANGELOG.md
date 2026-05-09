@@ -1,3 +1,9 @@
+## [2.5.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.5.0...v2.5.1) (2026-05-09)
+
+### Bug Fixes
+
+* decompress gzipped responses on Node 24+ (undici 7) ([#128](https://github.com/Doist/twist-sdk-typescript/issues/128)) ([fe94867](https://github.com/Doist/twist-sdk-typescript/commit/fe94867fcec04c747c3ff93783ceb86990358827))
+
 ## [2.5.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.4.1...v2.5.0) (2026-04-30)
 
 ### Features
