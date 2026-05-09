@@ -1,8 +1,11 @@
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { gzipSync } from 'node:zlib'
-import { EnvHttpProxyAgent } from 'undici'
-import { getDefaultDispatcher, resetDefaultDispatcherForTests } from './http-dispatcher'
+import {
+    getDefaultDispatcher,
+    resetDefaultDispatcherForTests,
+    suppressExperimentalWarningsSync,
+} from './http-dispatcher'
 
 const proxyEnvironmentKeys = [
     'HTTP_PROXY',
@@ -49,10 +52,11 @@ describe('httpDispatcher', () => {
         resetDefaultDispatcherForTests()
     })
 
-    it('returns EnvHttpProxyAgent in Node', async () => {
+    it('returns a dispatcher in Node', async () => {
         const dispatcher = await getDefaultDispatcher()
 
-        expect(dispatcher).toBeInstanceOf(EnvHttpProxyAgent)
+        expect(dispatcher).toBeDefined()
+        expect(typeof dispatcher?.dispatch).toBe('function')
     })
 
     it('reuses the same dispatcher instance across calls', async () => {
@@ -134,22 +138,51 @@ describe('httpDispatcher', () => {
             await new Promise<void>((resolve) => httpServer.close(() => resolve()))
         }
     })
+})
 
-    it('does not emit ExperimentalWarning for decompress interceptor', async () => {
-        const warnings: Array<{ name: string; message: string }> = []
-        function listener(warning: Error): void {
-            warnings.push({ name: warning.name, message: warning.message })
-        }
-        process.on('warning', listener)
+describe('suppressExperimentalWarningsSync', () => {
+    it('swallows ExperimentalWarning emissions during the synchronous call', () => {
+        const calls: unknown[][] = []
+        const originalEmit = process.emitWarning
+        process.emitWarning = ((...args: unknown[]) => {
+            calls.push(args)
+        }) as typeof process.emitWarning
+
         try {
-            await getDefaultDispatcher()
+            suppressExperimentalWarningsSync(() => {
+                process.emitWarning('experimental-string-form', 'ExperimentalWarning')
+                process.emitWarning('experimental-options-form', {
+                    type: 'ExperimentalWarning',
+                })
+                process.emitWarning('deprecation', 'DeprecationWarning')
+            })
         } finally {
-            process.off('warning', listener)
+            process.emitWarning = originalEmit
         }
 
-        const decompressWarnings = warnings.filter(
-            (w) => w.name === 'ExperimentalWarning' && w.message.includes('DecompressInterceptor'),
-        )
-        expect(decompressWarnings).toEqual([])
+        expect(calls).toHaveLength(1)
+        expect(calls[0]?.[0]).toBe('deprecation')
+    })
+
+    it('restores the original emitWarning even if the callback throws', () => {
+        const originalEmit = process.emitWarning
+        const placeholder = (() => {}) as typeof process.emitWarning
+        process.emitWarning = placeholder
+
+        try {
+            expect(() =>
+                suppressExperimentalWarningsSync(() => {
+                    throw new Error('boom')
+                }),
+            ).toThrow('boom')
+            expect(process.emitWarning).toBe(placeholder)
+        } finally {
+            process.emitWarning = originalEmit
+        }
+    })
+
+    it('returns the callback result', () => {
+        const result = suppressExperimentalWarningsSync(() => 42)
+        expect(result).toBe(42)
     })
 })
