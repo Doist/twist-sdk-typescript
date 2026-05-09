@@ -1,3 +1,6 @@
+import { createServer, type Server } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { gzipSync } from 'node:zlib'
 import { EnvHttpProxyAgent } from 'undici'
 import { getDefaultDispatcher, resetDefaultDispatcherForTests } from './http-dispatcher'
 
@@ -75,6 +78,9 @@ describe('httpDispatcher', () => {
 
         vi.doMock('undici', () => ({
             EnvHttpProxyAgent: class extends MockEnvHttpProxyAgent {
+                compose() {
+                    return this
+                }
                 constructor() {
                     super()
 
@@ -84,6 +90,9 @@ describe('httpDispatcher', () => {
                     }
                 }
             },
+            interceptors: {
+                decompress: () => (dispatch: unknown) => dispatch,
+            },
         }))
 
         await expect(getDefaultDispatcher()).rejects.toThrow('init failed')
@@ -91,5 +100,56 @@ describe('httpDispatcher', () => {
         const dispatcher = await getDefaultDispatcher()
 
         expect(dispatcher).toBeInstanceOf(MockEnvHttpProxyAgent)
+    })
+
+    it('decompresses gzip-encoded response bodies', async () => {
+        const payload = { hello: 'world', nested: { value: 42 } }
+        const compressed = gzipSync(Buffer.from(JSON.stringify(payload)))
+
+        const httpServer: Server = await new Promise((resolve) => {
+            const s = createServer((_req, res) => {
+                res.writeHead(200, {
+                    'content-type': 'application/json',
+                    'content-encoding': 'gzip',
+                    'content-length': String(compressed.length),
+                })
+                res.end(compressed)
+            })
+            s.listen(0, '127.0.0.1', () => resolve(s))
+        })
+
+        try {
+            const { port } = httpServer.address() as AddressInfo
+            const dispatcher = await getDefaultDispatcher()
+            const response = await fetch(`http://127.0.0.1:${port}/`, {
+                // @ts-expect-error - dispatcher is a valid Node fetch option not in TS lib types
+                dispatcher,
+            })
+            const body = await response.text()
+
+            expect(response.status).toBe(200)
+            expect(body).toBe(JSON.stringify(payload))
+            expect(JSON.parse(body)).toEqual(payload)
+        } finally {
+            await new Promise<void>((resolve) => httpServer.close(() => resolve()))
+        }
+    })
+
+    it('does not emit ExperimentalWarning for decompress interceptor', async () => {
+        const warnings: Array<{ name: string; message: string }> = []
+        function listener(warning: Error): void {
+            warnings.push({ name: warning.name, message: warning.message })
+        }
+        process.on('warning', listener)
+        try {
+            await getDefaultDispatcher()
+        } finally {
+            process.off('warning', listener)
+        }
+
+        const decompressWarnings = warnings.filter(
+            (w) => w.name === 'ExperimentalWarning' && w.message.includes('DecompressInterceptor'),
+        )
+        expect(decompressWarnings).toEqual([])
     })
 })
