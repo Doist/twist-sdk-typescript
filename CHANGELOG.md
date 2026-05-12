@@ -1,3 +1,9 @@
+## [2.6.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.5.1...v2.6.0) (2026-05-12)
+
+### Features
+
+* **comments:** add groups, directMentions, notifyAudience ([#131](https://github.com/Doist/twist-sdk-typescript/issues/131)) ([1295b0e](https://github.com/Doist/twist-sdk-typescript/commit/1295b0ef4d5d1d3f77aefd1366f88ea2e207c3d6)), closes [#124](https://github.com/Doist/twist-sdk-typescript/issues/124) [#125](https://github.com/Doist/twist-sdk-typescript/issues/125)
+
 ## [2.5.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.5.0...v2.5.1) (2026-05-09)
 
 ### Bug Fixes
