@@ -24,3 +24,18 @@ export const WORKSPACE_PLANS = ['free', 'unlimited'] as const
  * - `'unlimited'` - Unlimited plan
  */
 export type WorkspacePlan = (typeof WORKSPACE_PLANS)[number]
+
+// Audiences that comment-creating endpoints can target alongside (or instead
+// of) individual `recipients` / custom `groups`.
+export const NOTIFY_AUDIENCES = ['channel', 'thread'] as const
+
+/**
+ * The audience to notify when posting a comment, in addition to any
+ * individual `recipients` or custom `groups`.
+ *
+ * @remarks
+ * Possible values:
+ * - `'channel'` - Notify everyone in the channel.
+ * - `'thread'` - Notify everyone who has interacted with the thread.
+ */
+export type NotifyAudience = (typeof NOTIFY_AUDIENCES)[number]

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { NOTIFY_AUDIENCES, type NotifyAudience } from './enums'
 
 export const CreateChannelArgsSchema = z.object({
     workspaceId: z.number(),
@@ -56,6 +57,9 @@ export const CreateCommentArgsSchema = z.object({
     attachments: z.unknown().nullable().optional(),
     actions: z.unknown().nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    notifyAudience: z.enum(NOTIFY_AUDIENCES).nullable().optional(),
 })
 
 export type CreateCommentArgs = z.infer<typeof CreateCommentArgsSchema>
@@ -306,6 +310,9 @@ export type CloseThreadArgs = {
     attachments?: unknown | null
     actions?: unknown | null
     recipients?: number[] | null
+    groups?: number[] | null
+    directMentions?: number[] | null
+    notifyAudience?: NotifyAudience | null
 }
 
 export type ReopenThreadArgs = {
@@ -315,6 +322,9 @@ export type ReopenThreadArgs = {
     attachments?: unknown | null
     actions?: unknown | null
     recipients?: number[] | null
+    groups?: number[] | null
+    directMentions?: number[] | null
+    notifyAudience?: NotifyAudience | null
 }
 
 export type MoveThreadToChannelArgs = {

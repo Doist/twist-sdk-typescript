@@ -108,7 +108,13 @@ export class CommentsClient extends BaseClient {
      * @param args - The arguments for creating a comment.
      * @param args.threadId - The thread ID.
      * @param args.content - The comment content.
-     * @param args.recipients - Optional array of user IDs to notify.
+     * @param args.recipients - Optional array of user IDs to notify directly.
+     * @param args.groups - Optional array of custom group IDs to notify.
+     * @param args.directMentions - Optional array of user IDs that were @-mentioned in
+     *   `content`.
+     * @param args.notifyAudience - Optional broader audience to notify in addition to
+     *   `recipients` and `groups`. `'channel'` notifies everyone in the channel;
+     *   `'thread'` notifies everyone who has interacted with the thread.
      * @param args.attachments - Optional array of attachment objects.
      * @param args.sendAsIntegration - Optional flag to send as integration.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
@@ -116,9 +122,12 @@ export class CommentsClient extends BaseClient {
      *
      * @example
      * ```typescript
+     * // Notify everyone who has interacted with the thread, plus two extra users.
      * const comment = await api.comments.createComment({
      *   threadId: 789,
-     *   content: 'Great idea! Let\'s proceed with this approach.'
+     *   content: 'Great idea! Let\'s proceed.',
+     *   notifyAudience: 'thread',
+     *   recipients: [12345, 67890],
      * })
      * ```
      */
