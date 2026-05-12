@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { NOTIFY_AUDIENCES } from './enums'
 
 export const CreateChannelArgsSchema = z.object({
     workspaceId: z.number(),
@@ -56,6 +57,9 @@ export const CreateCommentArgsSchema = z.object({
     attachments: z.unknown().nullable().optional(),
     actions: z.unknown().nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    notifyAudience: z.enum(NOTIFY_AUDIENCES).nullable().optional(),
 })
 
 export type CreateCommentArgs = z.infer<typeof CreateCommentArgsSchema>
@@ -299,23 +303,16 @@ export type RemoveChannelUsersArgs = {
 export const THREAD_ACTIONS = ['close', 'reopen'] as const
 export type ThreadAction = (typeof THREAD_ACTIONS)[number]
 
-export type CloseThreadArgs = {
-    id: number
-    content: string
-    tempId?: number | null
-    attachments?: unknown | null
-    actions?: unknown | null
-    recipients?: number[] | null
-}
+/**
+ * Shared shape for endpoints that post a comment as part of a thread action
+ * (close, reopen). Identical to {@link CreateCommentArgs} except the target
+ * is identified by `id` (the thread ID) instead of `threadId`.
+ */
+type ThreadActionCommentArgs = Omit<CreateCommentArgs, 'threadId'> & { id: number }
 
-export type ReopenThreadArgs = {
-    id: number
-    content: string
-    tempId?: number | null
-    attachments?: unknown | null
-    actions?: unknown | null
-    recipients?: number[] | null
-}
+export type CloseThreadArgs = ThreadActionCommentArgs
+
+export type ReopenThreadArgs = ThreadActionCommentArgs
 
 export type MoveThreadToChannelArgs = {
     id: number

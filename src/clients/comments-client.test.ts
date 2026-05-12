@@ -61,6 +61,172 @@ describe('CommentsClient', () => {
         })
     })
 
+    describe('createComment', () => {
+        const mockCommentApiResponse = {
+            id: 500,
+            content: 'Reply content',
+            creator: 1,
+            thread_id: 789,
+            workspace_id: 1,
+            channel_id: 1,
+            posted_ts: 1609459200,
+            system_message: null,
+        }
+
+        it('should send groups in POST body', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reply content',
+                        groups: [10, 20],
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.createComment({
+                threadId: 789,
+                content: 'Reply content',
+                groups: [10, 20],
+            })
+        })
+
+        it("should translate notifyAudience 'thread' to groups [2]", async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reply content',
+                        groups: [2],
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.createComment({
+                threadId: 789,
+                content: 'Reply content',
+                notifyAudience: 'thread',
+            })
+        })
+
+        it("should translate notifyAudience 'channel' to groups [1]", async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reply content',
+                        groups: [1],
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.createComment({
+                threadId: 789,
+                content: 'Reply content',
+                notifyAudience: 'channel',
+            })
+        })
+
+        it('should merge notifyAudience with custom groups and individual recipients', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reply content',
+                        groups: [7, 2],
+                        recipients: [101, 202],
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.createComment({
+                threadId: 789,
+                content: 'Reply content',
+                notifyAudience: 'thread',
+                groups: [7],
+                recipients: [101, 202],
+            })
+        })
+
+        it('should send directMentions as direct_mentions in POST body', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reply @user1 @user2',
+                        direct_mentions: [101, 202],
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.createComment({
+                threadId: 789,
+                content: 'Reply @user1 @user2',
+                directMentions: [101, 202],
+            })
+        })
+
+        it('should reject sentinel group IDs in `groups`', () => {
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    groups: [2],
+                }),
+            ).toThrow(/sentinel/i)
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    groups: [7, 1],
+                }),
+            ).toThrow(/sentinel/i)
+        })
+
+        it('should reject an invalid `notifyAudience` value at runtime', () => {
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    // Simulate a JS caller passing an unvalidated string.
+                    notifyAudience: 'workspace' as unknown as 'channel',
+                }),
+            ).toThrow(/notifyAudience/)
+        })
+
+        it('should return a batch descriptor with the translated payload', () => {
+            const descriptor = client.createComment(
+                {
+                    threadId: 789,
+                    content: 'Reply',
+                    notifyAudience: 'thread',
+                    groups: [7],
+                    recipients: [101],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Reply',
+                groups: [7, 2],
+                recipients: [101],
+            })
+        })
+    })
+
     describe('markPosition', () => {
         it('should mark read position in thread', async () => {
             server.use(

@@ -741,7 +741,13 @@ export class ThreadsClient extends BaseClient {
      * @param args.tempId - Optional temporary identifier.
      * @param args.attachments - Optional array of attachment objects.
      * @param args.actions - Optional array of action objects.
-     * @param args.recipients - Optional array of user IDs to notify.
+     * @param args.recipients - Optional array of user IDs to notify directly.
+     * @param args.groups - Optional array of custom group IDs to notify.
+     * @param args.directMentions - Optional array of user IDs that were @-mentioned in
+     *   `content`.
+     * @param args.notifyAudience - Optional broader audience to notify in addition to
+     *   `recipients` and `groups`. `'channel'` notifies everyone in the channel;
+     *   `'thread'` notifies everyone who has interacted with the thread.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created comment object.
      *
@@ -771,7 +777,13 @@ export class ThreadsClient extends BaseClient {
      * @param args.tempId - Optional temporary identifier.
      * @param args.attachments - Optional array of attachment objects.
      * @param args.actions - Optional array of action objects.
-     * @param args.recipients - Optional array of user IDs to notify.
+     * @param args.recipients - Optional array of user IDs to notify directly.
+     * @param args.groups - Optional array of custom group IDs to notify.
+     * @param args.directMentions - Optional array of user IDs that were @-mentioned in
+     *   `content`.
+     * @param args.notifyAudience - Optional broader audience to notify in addition to
+     *   `recipients` and `groups`. `'channel'` notifies everyone in the channel;
+     *   `'thread'` notifies everyone who has interacted with the thread.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created comment object.
      *

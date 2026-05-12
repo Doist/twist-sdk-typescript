@@ -298,6 +298,53 @@ describe('ThreadsClient', () => {
             expect(result.content).toBe('Closing this thread.')
             expect(result.threadId).toBe(789)
         })
+
+        it('should forward notifyAudience, groups, recipients, and directMentions', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Closing this thread.',
+                        groups: [5, 2],
+                        recipients: [101],
+                        direct_mentions: [101],
+                        thread_action: 'close',
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.closeThread({
+                id: 789,
+                content: 'Closing this thread.',
+                notifyAudience: 'thread',
+                groups: [5],
+                recipients: [101],
+                directMentions: [101],
+            })
+        })
+
+        it('should return a batch descriptor with translated payload and thread_action', () => {
+            const descriptor = client.closeThread(
+                {
+                    id: 789,
+                    content: 'Closing this thread.',
+                    notifyAudience: 'thread',
+                    groups: [5],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Closing this thread.',
+                groups: [5, 2],
+                threadAction: 'close',
+            })
+        })
     })
 
     describe('reopenThread', () => {
@@ -333,6 +380,53 @@ describe('ThreadsClient', () => {
             expect(result.id).toBe(501)
             expect(result.content).toBe('Reopening for further discussion.')
             expect(result.threadId).toBe(789)
+        })
+
+        it('should forward notifyAudience, groups, recipients, and directMentions', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        thread_id: 789,
+                        content: 'Reopening for further discussion.',
+                        groups: [5, 2],
+                        recipients: [101],
+                        direct_mentions: [101],
+                        thread_action: 'reopen',
+                    })
+                    return HttpResponse.json(mockCommentApiResponse)
+                }),
+            )
+
+            await client.reopenThread({
+                id: 789,
+                content: 'Reopening for further discussion.',
+                notifyAudience: 'thread',
+                groups: [5],
+                recipients: [101],
+                directMentions: [101],
+            })
+        })
+
+        it('should return a batch descriptor with translated payload and thread_action', () => {
+            const descriptor = client.reopenThread(
+                {
+                    id: 789,
+                    content: 'Reopening for further discussion.',
+                    notifyAudience: 'channel',
+                    groups: [5],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Reopening for further discussion.',
+                groups: [5, 1],
+                threadAction: 'reopen',
+            })
         })
     })
 })
