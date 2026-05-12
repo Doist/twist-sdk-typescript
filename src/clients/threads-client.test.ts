@@ -324,6 +324,27 @@ describe('ThreadsClient', () => {
                 directMentions: [101],
             })
         })
+
+        it('should return a batch descriptor with translated payload and thread_action', () => {
+            const descriptor = client.closeThread(
+                {
+                    id: 789,
+                    content: 'Closing this thread.',
+                    notifyAudience: 'thread',
+                    groups: [5],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Closing this thread.',
+                groups: [5, 2],
+                threadAction: 'close',
+            })
+        })
     })
 
     describe('reopenThread', () => {
@@ -384,6 +405,27 @@ describe('ThreadsClient', () => {
                 groups: [5],
                 recipients: [101],
                 directMentions: [101],
+            })
+        })
+
+        it('should return a batch descriptor with translated payload and thread_action', () => {
+            const descriptor = client.reopenThread(
+                {
+                    id: 789,
+                    content: 'Reopening for further discussion.',
+                    notifyAudience: 'channel',
+                    groups: [5],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Reopening for further discussion.',
+                groups: [5, 1],
+                threadAction: 'reopen',
             })
         })
     })

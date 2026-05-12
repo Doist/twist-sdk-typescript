@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { NOTIFY_AUDIENCES, type NotifyAudience } from './enums'
+import { NOTIFY_AUDIENCES } from './enums'
 
 export const CreateChannelArgsSchema = z.object({
     workspaceId: z.number(),
@@ -303,29 +303,16 @@ export type RemoveChannelUsersArgs = {
 export const THREAD_ACTIONS = ['close', 'reopen'] as const
 export type ThreadAction = (typeof THREAD_ACTIONS)[number]
 
-export type CloseThreadArgs = {
-    id: number
-    content: string
-    tempId?: number | null
-    attachments?: unknown | null
-    actions?: unknown | null
-    recipients?: number[] | null
-    groups?: number[] | null
-    directMentions?: number[] | null
-    notifyAudience?: NotifyAudience | null
-}
+/**
+ * Shared shape for endpoints that post a comment as part of a thread action
+ * (close, reopen). Identical to {@link CreateCommentArgs} except the target
+ * is identified by `id` (the thread ID) instead of `threadId`.
+ */
+type ThreadActionCommentArgs = Omit<CreateCommentArgs, 'threadId'> & { id: number }
 
-export type ReopenThreadArgs = {
-    id: number
-    content: string
-    tempId?: number | null
-    attachments?: unknown | null
-    actions?: unknown | null
-    recipients?: number[] | null
-    groups?: number[] | null
-    directMentions?: number[] | null
-    notifyAudience?: NotifyAudience | null
-}
+export type CloseThreadArgs = ThreadActionCommentArgs
+
+export type ReopenThreadArgs = ThreadActionCommentArgs
 
 export type MoveThreadToChannelArgs = {
     id: number

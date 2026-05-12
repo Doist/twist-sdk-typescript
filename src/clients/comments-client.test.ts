@@ -175,6 +175,56 @@ describe('CommentsClient', () => {
                 directMentions: [101, 202],
             })
         })
+
+        it('should reject sentinel group IDs in `groups`', () => {
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    groups: [2],
+                }),
+            ).toThrow(/sentinel/i)
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    groups: [7, 1],
+                }),
+            ).toThrow(/sentinel/i)
+        })
+
+        it('should reject an invalid `notifyAudience` value at runtime', () => {
+            expect(() =>
+                client.createComment({
+                    threadId: 789,
+                    content: 'Reply',
+                    // Simulate a JS caller passing an unvalidated string.
+                    notifyAudience: 'workspace' as unknown as 'channel',
+                }),
+            ).toThrow(/notifyAudience/)
+        })
+
+        it('should return a batch descriptor with the translated payload', () => {
+            const descriptor = client.createComment(
+                {
+                    threadId: 789,
+                    content: 'Reply',
+                    notifyAudience: 'thread',
+                    groups: [7],
+                    recipients: [101],
+                },
+                { batch: true },
+            )
+
+            expect(descriptor.method).toBe('POST')
+            expect(descriptor.url).toBe('comments/add')
+            expect(descriptor.params).toEqual({
+                threadId: 789,
+                content: 'Reply',
+                groups: [7, 2],
+                recipients: [101],
+            })
+        })
     })
 
     describe('markPosition', () => {
