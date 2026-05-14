@@ -121,7 +121,7 @@ export class ThreadsClient extends BaseClient {
      * @param args.title - The thread title.
      * @param args.content - The thread content.
      * @param args.recipients - Optional array of user IDs to notify.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link AttachmentInput} objects.
      * @param args.sendAsIntegration - Optional flag to send as integration.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created thread object.
@@ -168,7 +168,7 @@ export class ThreadsClient extends BaseClient {
      * @param args.title - Optional new thread title.
      * @param args.content - Optional new thread content.
      * @param args.recipients - Optional array of user IDs to notify.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link AttachmentInput} objects.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated thread object.
      */
@@ -739,7 +739,7 @@ export class ThreadsClient extends BaseClient {
      * @param args.id - The thread ID.
      * @param args.content - The comment content.
      * @param args.tempId - Optional temporary identifier.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link AttachmentInput} objects.
      * @param args.actions - Optional array of action objects.
      * @param args.recipients - Optional array of user IDs to notify directly.
      * @param args.groups - Optional array of custom group IDs to notify.
@@ -775,7 +775,7 @@ export class ThreadsClient extends BaseClient {
      * @param args.id - The thread ID.
      * @param args.content - The comment content.
      * @param args.tempId - Optional temporary identifier.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link AttachmentInput} objects.
      * @param args.actions - Optional array of action objects.
      * @param args.recipients - Optional array of user IDs to notify directly.
      * @param args.groups - Optional array of custom group IDs to notify.

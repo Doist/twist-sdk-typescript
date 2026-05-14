@@ -1,5 +1,15 @@
 import { z } from 'zod'
+import { AttachmentSchema } from './entities'
 import { NOTIFY_AUDIENCES } from './enums'
+
+// Attachment payload accepted by create/update endpoints. Same field set as
+// `AttachmentSchema` but only `attachmentId` and `urlType` are required.
+export const AttachmentInputSchema = AttachmentSchema.partial().extend({
+    attachmentId: z.string(),
+    urlType: z.string(),
+})
+
+export type AttachmentInput = z.infer<typeof AttachmentInputSchema>
 
 export const CreateChannelArgsSchema = z.object({
     workspaceId: z.number(),
@@ -54,7 +64,7 @@ export const CreateCommentArgsSchema = z.object({
     threadId: z.number(),
     content: z.string(),
     tempId: z.number().nullable().optional(),
-    attachments: z.unknown().nullable().optional(),
+    attachments: z.array(AttachmentInputSchema).nullable().optional(),
     actions: z.unknown().nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
@@ -84,7 +94,7 @@ export const CreateMessageArgsSchema = z
         conversationId: z.number().nullable().optional(),
         threadId: z.number().nullable().optional(),
         content: z.string(),
-        attachments: z.array(z.number()).nullable().optional(),
+        attachments: z.array(AttachmentInputSchema).nullable().optional(),
     })
     .refine(
         (data) => {
@@ -220,14 +230,14 @@ export type GetConversationMessagesArgs = {
 export type CreateConversationMessageArgs = {
     conversationId: number
     content: string
-    attachments?: unknown[]
+    attachments?: AttachmentInput[]
     actions?: unknown[]
 }
 
 export type UpdateConversationMessageArgs = {
     id: number
     content: string
-    attachments?: unknown[]
+    attachments?: AttachmentInput[]
 }
 
 // Inbox

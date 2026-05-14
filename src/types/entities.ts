@@ -5,6 +5,31 @@ import { USER_TYPES, WORKSPACE_PLANS } from './enums'
 // Reusable schema for system messages that can be either a string or an object
 export const SystemMessageSchema = z.union([z.string(), z.unknown()]).nullable().optional()
 
+// Attachment entity from API. Mirrors the canonical backend shape produced by
+// `unify_attachments` / `validate_file_attachment_json` in the Twist backend.
+// Only `attachmentId` and `urlType` are guaranteed; everything else depends on
+// the attachment kind (file vs image vs link preview vs unfurled GIF).
+export const AttachmentSchema = z.object({
+    attachmentId: z.string(),
+    urlType: z.string(),
+    title: z.string().nullable().optional(),
+    url: z.string().nullable().optional(),
+    fileName: z.string().nullable().optional(),
+    fileSize: z.number().int().nonnegative().nullable().optional(),
+    underlyingType: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    image: z.string().nullable().optional(),
+    imageWidth: z.number().int().nonnegative().nullable().optional(),
+    imageHeight: z.number().int().nonnegative().nullable().optional(),
+    duration: z.string().nullable().optional(),
+    uploadState: z.string().nullable().optional(),
+    video: z.string().nullable().optional(),
+    videoType: z.string().nullable().optional(),
+    videoAutoPlay: z.boolean().nullable().optional(),
+})
+
+export type Attachment = z.infer<typeof AttachmentSchema>
+
 // Base user schema with common fields shared between User and WorkspaceUser
 export const BaseUserSchema = z.object({
     id: z.number(),
@@ -119,7 +144,7 @@ export const ThreadSchema = z
         channelId: z.number(),
         workspaceId: z.number(),
         actions: z.array(z.unknown()).nullable().optional(),
-        attachments: z.array(z.unknown()).nullable().optional(),
+        attachments: z.array(AttachmentSchema).nullable().optional(),
         commentCount: z.number(),
         closed: z.boolean().nullable().optional(),
         directGroupMentions: z.array(z.number()).nullable().optional(),
@@ -156,7 +181,7 @@ export const ThreadSchema = z
                 channelId: z.number(),
                 posted: z.date(),
                 systemMessage: SystemMessageSchema,
-                attachments: z.array(z.unknown()).nullable().optional(),
+                attachments: z.array(AttachmentSchema).nullable().optional(),
                 reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
                 actions: z.array(z.unknown()).nullable().optional(),
                 objIndex: z.number(),
@@ -222,7 +247,7 @@ export const ConversationSchema = z
                 conversationId: z.number(),
                 posted: z.date(),
                 systemMessage: SystemMessageSchema,
-                attachments: z.array(z.unknown()).nullable().optional(),
+                attachments: z.array(AttachmentSchema).nullable().optional(),
                 reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
                 actions: z.array(z.unknown()).nullable().optional(),
                 objIndex: z.number().nullable().optional(),
@@ -257,7 +282,7 @@ export const CommentSchema = z
         directMentions: z.array(z.number()).nullable().optional(),
         directGroupMentions: z.array(z.number()).nullable().optional(),
         systemMessage: SystemMessageSchema,
-        attachments: z.array(z.unknown()).nullable().optional(),
+        attachments: z.array(AttachmentSchema).nullable().optional(),
         reactions: z.record(z.string(), z.unknown()).nullable().optional(),
         objIndex: z.number().nullable().optional(),
         // Extended fields that may appear in some API responses (like inbox)
@@ -305,7 +330,7 @@ export const ConversationMessageSchema = z
         conversationId: z.number(),
         posted: z.date(),
         systemMessage: SystemMessageSchema,
-        attachments: z.array(z.unknown()).nullable().optional(),
+        attachments: z.array(AttachmentSchema).nullable().optional(),
         reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
         actions: z.array(z.unknown()).nullable().optional(),
         objIndex: z.number().nullable().optional(),
@@ -338,7 +363,7 @@ export const InboxThreadSchema = z
         channelId: z.number(),
         workspaceId: z.number(),
         actions: z.array(z.unknown()).nullable().optional(),
-        attachments: z.array(z.unknown()).nullable().optional(),
+        attachments: z.array(AttachmentSchema).nullable().optional(),
         commentCount: z.number(),
         directGroupMentions: z.array(z.number()).nullable().optional(),
         directMentions: z.array(z.number()).nullable().optional(),
