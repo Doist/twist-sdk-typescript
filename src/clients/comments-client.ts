@@ -115,7 +115,7 @@ export class CommentsClient extends BaseClient {
      * @param args.notifyAudience - Optional broader audience to notify in addition to
      *   `recipients` and `groups`. `'channel'` notifies everyone in the channel;
      *   `'thread'` notifies everyone who has interacted with the thread.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link Attachment} objects.
      * @param args.sendAsIntegration - Optional flag to send as integration.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created comment object.
@@ -154,7 +154,6 @@ export class CommentsClient extends BaseClient {
      * @param args.id - The comment ID.
      * @param args.content - Optional new comment content.
      * @param args.recipients - Optional array of user IDs to notify.
-     * @param args.attachments - Optional array of attachment objects.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated comment object.
      */

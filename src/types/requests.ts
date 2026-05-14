@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { type Attachment, AttachmentSchema } from './entities'
 import { NOTIFY_AUDIENCES } from './enums'
 
 export const CreateChannelArgsSchema = z.object({
@@ -54,7 +55,7 @@ export const CreateCommentArgsSchema = z.object({
     threadId: z.number(),
     content: z.string(),
     tempId: z.number().nullable().optional(),
-    attachments: z.unknown().nullable().optional(),
+    attachments: z.array(AttachmentSchema).nullable().optional(),
     actions: z.unknown().nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
@@ -84,7 +85,7 @@ export const CreateMessageArgsSchema = z
         conversationId: z.number().nullable().optional(),
         threadId: z.number().nullable().optional(),
         content: z.string(),
-        attachments: z.array(z.number()).nullable().optional(),
+        attachments: z.array(AttachmentSchema).nullable().optional(),
     })
     .refine(
         (data) => {
@@ -220,14 +221,14 @@ export type GetConversationMessagesArgs = {
 export type CreateConversationMessageArgs = {
     conversationId: number
     content: string
-    attachments?: unknown[]
+    attachments?: Attachment[]
     actions?: unknown[]
 }
 
 export type UpdateConversationMessageArgs = {
     id: number
     content: string
-    attachments?: unknown[]
+    attachments?: Attachment[]
 }
 
 // Inbox

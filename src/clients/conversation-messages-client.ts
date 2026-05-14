@@ -117,7 +117,7 @@ export class ConversationMessagesClient extends BaseClient {
      * @param args - The arguments for creating a message.
      * @param args.conversationId - The conversation ID.
      * @param args.content - The message content.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link Attachment} objects.
      * @param args.actions - Optional array of action objects.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created message object.
@@ -174,7 +174,7 @@ export class ConversationMessagesClient extends BaseClient {
      * @param args - The arguments for updating a message.
      * @param args.id - The message ID.
      * @param args.content - The new message content.
-     * @param args.attachments - Optional array of attachment objects.
+     * @param args.attachments - Optional array of {@link Attachment} objects.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The updated message object.
      *
