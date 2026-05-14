@@ -9,24 +9,28 @@ export const SystemMessageSchema = z.union([z.string(), z.unknown()]).nullable()
 // `unify_attachments` / `validate_file_attachment_json` in the Twist backend.
 // Only `attachmentId` and `urlType` are guaranteed; everything else depends on
 // the attachment kind (file vs image vs link preview vs unfurled GIF).
-export const AttachmentSchema = z.object({
-    attachmentId: z.string(),
-    urlType: z.string(),
-    title: z.string().nullable().optional(),
-    url: z.string().nullable().optional(),
-    fileName: z.string().nullable().optional(),
-    fileSize: z.number().int().nonnegative().nullable().optional(),
-    underlyingType: z.string().nullable().optional(),
-    description: z.string().nullable().optional(),
-    image: z.string().nullable().optional(),
-    imageWidth: z.number().int().nonnegative().nullable().optional(),
-    imageHeight: z.number().int().nonnegative().nullable().optional(),
-    duration: z.string().nullable().optional(),
-    uploadState: z.string().nullable().optional(),
-    video: z.string().nullable().optional(),
-    videoType: z.string().nullable().optional(),
-    videoAutoPlay: z.boolean().nullable().optional(),
-})
+// Loose: unknown keys from the backend pass through rather than being stripped,
+// so newly-added or off-spec fields stay accessible to callers.
+export const AttachmentSchema = z
+    .object({
+        attachmentId: z.string(),
+        urlType: z.string(),
+        title: z.string().nullable().optional(),
+        url: z.string().nullable().optional(),
+        fileName: z.string().nullable().optional(),
+        fileSize: z.number().int().nonnegative().nullable().optional(),
+        underlyingType: z.string().nullable().optional(),
+        description: z.string().nullable().optional(),
+        image: z.string().nullable().optional(),
+        imageWidth: z.number().int().nonnegative().nullable().optional(),
+        imageHeight: z.number().int().nonnegative().nullable().optional(),
+        duration: z.string().nullable().optional(),
+        uploadState: z.string().nullable().optional(),
+        video: z.string().nullable().optional(),
+        videoType: z.string().nullable().optional(),
+        videoAutoPlay: z.boolean().nullable().optional(),
+    })
+    .loose()
 
 export type Attachment = z.infer<typeof AttachmentSchema>
 
