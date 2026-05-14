@@ -1,3 +1,9 @@
+## [2.7.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.6.0...v2.7.0) (2026-05-14)
+
+### Features
+
+* **attachments:** type Attachment entity and input shape ([#133](https://github.com/Doist/twist-sdk-typescript/issues/133)) ([266325f](https://github.com/Doist/twist-sdk-typescript/commit/266325f3468bb34eafa0fb9320014d81afb42d15))
+
 ## [2.6.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.5.1...v2.6.0) (2026-05-12)
 
 ### Features
