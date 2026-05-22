@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ENDPOINT_INBOX } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type InboxThread, InboxThreadSchema } from '../types/entities'
+import { createInboxThreadSchema, type InboxThread } from '../types/entities'
 import type { ArchiveAllArgs, GetInboxArgs } from '../types/requests'
 import { BaseClient } from './base-client'
 
@@ -15,6 +15,8 @@ type InboxCountResponse = {
  * Client for interacting with Twist inbox endpoints.
  */
 export class InboxClient extends BaseClient {
+    private readonly inboxThreadSchema = createInboxThreadSchema(this.getLinkBaseUrl())
+
     /**
      * Gets inbox items (threads).
      *
@@ -66,7 +68,7 @@ export class InboxClient extends BaseClient {
         const url = `${ENDPOINT_INBOX}/get`
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(InboxThreadSchema) }
+            return { method, url, params, schema: z.array(this.inboxThreadSchema) }
         }
 
         return request<InboxThread[]>({
@@ -76,7 +78,7 @@ export class InboxClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((thread) => InboxThreadSchema.parse(thread)))
+        }).then((response) => response.data.map((thread) => this.inboxThreadSchema.parse(thread)))
     }
 
     /**

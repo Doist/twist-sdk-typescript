@@ -50,4 +50,20 @@ export class BaseClient {
         // Use centralized helper function for default Twist API URL
         return getTwistBaseUri(apiVersion)
     }
+
+    /**
+     * Gets the base URL used to build entity web links (the `url` field on returned
+     * entities). Honors the configured `baseUrl` as-is, falling back to the production
+     * web app when none is set.
+     *
+     * @returns Link base URL without a trailing slash (entity paths already start with `/`)
+     */
+    protected getLinkBaseUrl(): string {
+        if (!this.baseUrl) {
+            return 'https://twist.com'
+        }
+        // Strip a trailing slash so links don't end up with a double slash, since
+        // entity paths from getTwistURL always begin with '/'.
+        return this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl
+    }
 }

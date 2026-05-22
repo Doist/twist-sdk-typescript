@@ -110,107 +110,126 @@ export const WorkspaceSchema = z.object({
 export type Workspace = z.infer<typeof WorkspaceSchema>
 
 // Channel entity from API
-export const ChannelSchema = z
-    .object({
-        id: z.number(),
-        name: z.string(),
-        description: z.string().nullable().optional(),
-        creator: z.number(),
-        userIds: z.array(z.number()).nullable().optional(),
-        color: z.number().nullable().optional(),
-        public: z.boolean(),
-        workspaceId: z.number(),
-        archived: z.boolean(),
-        created: z.date(),
-        useDefaultRecipients: z.boolean().nullable().optional(),
-        defaultGroups: z.array(z.number()).nullable().optional(),
-        defaultRecipients: z.array(z.number()).nullable().optional(),
-        isFavorited: z.boolean().nullable().optional(),
-        icon: z.number().nullable().optional(),
-        version: z.number(),
-        filters: z.record(z.string(), z.string()).nullable().optional(),
-    })
-    .transform((data) => ({
+const ChannelObjectSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    creator: z.number(),
+    userIds: z.array(z.number()).nullable().optional(),
+    color: z.number().nullable().optional(),
+    public: z.boolean(),
+    workspaceId: z.number(),
+    archived: z.boolean(),
+    created: z.date(),
+    useDefaultRecipients: z.boolean().nullable().optional(),
+    defaultGroups: z.array(z.number()).nullable().optional(),
+    defaultRecipients: z.array(z.number()).nullable().optional(),
+    isFavorited: z.boolean().nullable().optional(),
+    icon: z.number().nullable().optional(),
+    version: z.number(),
+    filters: z.record(z.string(), z.string()).nullable().optional(),
+})
+
+/**
+ * Builds a Channel schema whose `url` is rooted at the given link base URL.
+ * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createChannelSchema(linkBaseUrl?: string) {
+    return ChannelObjectSchema.transform((data) => ({
         ...data,
-        url: getFullTwistURL({ workspaceId: data.workspaceId, channelId: data.id }),
+        url: getFullTwistURL({ workspaceId: data.workspaceId, channelId: data.id }, linkBaseUrl),
     }))
+}
+
+export const ChannelSchema = createChannelSchema()
 
 export type Channel = z.infer<typeof ChannelSchema>
 
 // Thread entity from API
-export const ThreadSchema = z
-    .object({
-        id: z.number(),
-        title: z.string(),
-        content: z.string(),
-        creator: z.number(),
-        creatorName: z.string().nullable().optional(),
-        channelId: z.number(),
-        workspaceId: z.number(),
-        actions: z.array(z.unknown()).nullable().optional(),
-        attachments: z.array(AttachmentSchema).nullable().optional(),
-        commentCount: z.number(),
-        closed: z.boolean().nullable().optional(),
-        directGroupMentions: z.array(z.number()).nullable().optional(),
-        directMentions: z.array(z.number()).nullable().optional(),
-        groups: z.array(z.number()).nullable().optional(),
-        lastEdited: z.date().nullable().optional(),
-        lastObjIndex: z.number().nullable().optional(),
-        lastUpdated: z.date(),
-        mutedUntil: z.date().nullable().optional(),
-        participants: z.array(z.number()).nullable().optional(),
-        pinned: z.boolean(),
-        pinnedDate: z.date().nullable().optional(),
-        posted: z.date(),
-        reactions: z.record(z.string(), z.unknown()).nullable().optional(),
-        recipients: z.array(z.number()).nullable().optional(),
-        responders: z.array(z.number()).nullable().optional(),
-        snippet: z.string(),
-        snippetCreator: z.number(),
-        snippetMaskAvatarUrl: z.string().nullable().optional(),
-        snippetMaskPoster: z.string().nullable().optional(),
-        starred: z.boolean(),
-        systemMessage: SystemMessageSchema,
-        toEmails: z.array(z.string()).nullable().optional(),
-        isArchived: z.boolean(),
-        isSaved: z.boolean().nullable().optional(),
-        inInbox: z.boolean().nullable().optional(),
-        lastComment: z
-            .object({
-                id: z.number(),
-                content: z.string(),
-                creator: z.number(),
-                creatorName: z.string(),
-                threadId: z.number(),
-                channelId: z.number(),
-                posted: z.date(),
-                systemMessage: SystemMessageSchema,
-                attachments: z.array(AttachmentSchema).nullable().optional(),
-                reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
-                actions: z.array(z.unknown()).nullable().optional(),
-                objIndex: z.number(),
-                lastEdited: z.date().nullable().optional(),
-                deleted: z.boolean(),
-                deletedBy: z.number().nullable().optional(),
-                directGroupMentions: z.array(z.number()).nullable().optional(),
-                directMentions: z.array(z.number()).nullable().optional(),
-                groups: z.array(z.number()).nullable().optional(),
-                recipients: z.array(z.number()).nullable().optional(),
-                toEmails: z.array(z.string()).nullable().optional(),
-                version: z.number(),
-                workspaceId: z.number(),
-            })
-            .nullable()
-            .optional(),
-    })
-    .transform((data) => ({
+const ThreadObjectSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    content: z.string(),
+    creator: z.number(),
+    creatorName: z.string().nullable().optional(),
+    channelId: z.number(),
+    workspaceId: z.number(),
+    actions: z.array(z.unknown()).nullable().optional(),
+    attachments: z.array(AttachmentSchema).nullable().optional(),
+    commentCount: z.number(),
+    closed: z.boolean().nullable().optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    lastEdited: z.date().nullable().optional(),
+    lastObjIndex: z.number().nullable().optional(),
+    lastUpdated: z.date(),
+    mutedUntil: z.date().nullable().optional(),
+    participants: z.array(z.number()).nullable().optional(),
+    pinned: z.boolean(),
+    pinnedDate: z.date().nullable().optional(),
+    posted: z.date(),
+    reactions: z.record(z.string(), z.unknown()).nullable().optional(),
+    recipients: z.array(z.number()).nullable().optional(),
+    responders: z.array(z.number()).nullable().optional(),
+    snippet: z.string(),
+    snippetCreator: z.number(),
+    snippetMaskAvatarUrl: z.string().nullable().optional(),
+    snippetMaskPoster: z.string().nullable().optional(),
+    starred: z.boolean(),
+    systemMessage: SystemMessageSchema,
+    toEmails: z.array(z.string()).nullable().optional(),
+    isArchived: z.boolean(),
+    isSaved: z.boolean().nullable().optional(),
+    inInbox: z.boolean().nullable().optional(),
+    lastComment: z
+        .object({
+            id: z.number(),
+            content: z.string(),
+            creator: z.number(),
+            creatorName: z.string(),
+            threadId: z.number(),
+            channelId: z.number(),
+            posted: z.date(),
+            systemMessage: SystemMessageSchema,
+            attachments: z.array(AttachmentSchema).nullable().optional(),
+            reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+            actions: z.array(z.unknown()).nullable().optional(),
+            objIndex: z.number(),
+            lastEdited: z.date().nullable().optional(),
+            deleted: z.boolean(),
+            deletedBy: z.number().nullable().optional(),
+            directGroupMentions: z.array(z.number()).nullable().optional(),
+            directMentions: z.array(z.number()).nullable().optional(),
+            groups: z.array(z.number()).nullable().optional(),
+            recipients: z.array(z.number()).nullable().optional(),
+            toEmails: z.array(z.string()).nullable().optional(),
+            version: z.number(),
+            workspaceId: z.number(),
+        })
+        .nullable()
+        .optional(),
+})
+
+/**
+ * Builds a Thread schema whose `url` is rooted at the given link base URL.
+ * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createThreadSchema(linkBaseUrl?: string) {
+    return ThreadObjectSchema.transform((data) => ({
         ...data,
-        url: getFullTwistURL({
-            workspaceId: data.workspaceId,
-            channelId: data.channelId,
-            threadId: data.id,
-        }),
+        url: getFullTwistURL(
+            {
+                workspaceId: data.workspaceId,
+                channelId: data.channelId,
+                threadId: data.id,
+            },
+            linkBaseUrl,
+        ),
     }))
+}
+
+export const ThreadSchema = createThreadSchema()
 
 export type Thread = z.infer<typeof ThreadSchema>
 
@@ -227,88 +246,110 @@ export const GroupSchema = z.object({
 export type Group = z.infer<typeof GroupSchema>
 
 // Conversation entity from API
-export const ConversationSchema = z
-    .object({
-        id: z.number(),
-        workspaceId: z.number(),
-        userIds: z.array(z.number()),
-        messageCount: z.number().nullable().optional(),
-        lastObjIndex: z.number(),
-        snippet: z.string(),
-        snippetCreators: z.array(z.number()),
-        lastActive: z.date(),
-        mutedUntil: z.date().nullable().optional(),
-        archived: z.boolean(),
-        created: z.date(),
-        creator: z.number(),
-        title: z.string().nullable().optional(),
-        private: z.boolean().nullable().optional(),
-        lastMessage: z
-            .object({
-                id: z.number(),
-                content: z.string(),
-                creator: z.number(),
-                conversationId: z.number(),
-                posted: z.date(),
-                systemMessage: SystemMessageSchema,
-                attachments: z.array(AttachmentSchema).nullable().optional(),
-                reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
-                actions: z.array(z.unknown()).nullable().optional(),
-                objIndex: z.number().nullable().optional(),
-                lastEdited: z.date().nullable().optional(),
-                deleted: z.boolean().nullable().optional(),
-                directGroupMentions: z.array(z.number()).nullable().optional(),
-                directMentions: z.array(z.number()).nullable().optional(),
-                version: z.number().nullable().optional(),
-                workspaceId: z.number().nullable().optional(),
-            })
-            .nullable()
-            .optional(),
-    })
-    .transform((data) => ({
+const ConversationObjectSchema = z.object({
+    id: z.number(),
+    workspaceId: z.number(),
+    userIds: z.array(z.number()),
+    messageCount: z.number().nullable().optional(),
+    lastObjIndex: z.number(),
+    snippet: z.string(),
+    snippetCreators: z.array(z.number()),
+    lastActive: z.date(),
+    mutedUntil: z.date().nullable().optional(),
+    archived: z.boolean(),
+    created: z.date(),
+    creator: z.number(),
+    title: z.string().nullable().optional(),
+    private: z.boolean().nullable().optional(),
+    lastMessage: z
+        .object({
+            id: z.number(),
+            content: z.string(),
+            creator: z.number(),
+            conversationId: z.number(),
+            posted: z.date(),
+            systemMessage: SystemMessageSchema,
+            attachments: z.array(AttachmentSchema).nullable().optional(),
+            reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+            actions: z.array(z.unknown()).nullable().optional(),
+            objIndex: z.number().nullable().optional(),
+            lastEdited: z.date().nullable().optional(),
+            deleted: z.boolean().nullable().optional(),
+            directGroupMentions: z.array(z.number()).nullable().optional(),
+            directMentions: z.array(z.number()).nullable().optional(),
+            version: z.number().nullable().optional(),
+            workspaceId: z.number().nullable().optional(),
+        })
+        .nullable()
+        .optional(),
+})
+
+/**
+ * Builds a Conversation schema whose `url` is rooted at the given link base URL.
+ * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createConversationSchema(linkBaseUrl?: string) {
+    return ConversationObjectSchema.transform((data) => ({
         ...data,
-        url: getFullTwistURL({ workspaceId: data.workspaceId, conversationId: data.id }),
+        url: getFullTwistURL(
+            { workspaceId: data.workspaceId, conversationId: data.id },
+            linkBaseUrl,
+        ),
     }))
+}
+
+export const ConversationSchema = createConversationSchema()
 
 export type Conversation = z.infer<typeof ConversationSchema>
 
 // Comment entity from API
-export const CommentSchema = z
-    .object({
-        id: z.number(),
-        content: z.string(),
-        creator: z.number(),
-        threadId: z.number(),
-        workspaceId: z.number(),
-        conversationId: z.number().nullable().optional(),
-        posted: z.date(),
-        lastEdited: z.date().nullable().optional(),
-        directMentions: z.array(z.number()).nullable().optional(),
-        directGroupMentions: z.array(z.number()).nullable().optional(),
-        systemMessage: SystemMessageSchema,
-        attachments: z.array(AttachmentSchema).nullable().optional(),
-        reactions: z.record(z.string(), z.unknown()).nullable().optional(),
-        objIndex: z.number().nullable().optional(),
-        // Extended fields that may appear in some API responses (like inbox)
-        creatorName: z.string().nullable().optional(),
-        channelId: z.number(),
-        recipients: z.array(z.number()).nullable().optional(),
-        groups: z.array(z.number()).nullable().optional(),
-        toEmails: z.array(z.string()).nullable().optional(),
-        deleted: z.boolean().nullable().optional(),
-        deletedBy: z.number().nullable().optional(),
-        version: z.number().nullable().optional(),
-        actions: z.array(z.unknown()).nullable().optional(),
-    })
-    .transform((data) => ({
+const CommentObjectSchema = z.object({
+    id: z.number(),
+    content: z.string(),
+    creator: z.number(),
+    threadId: z.number(),
+    workspaceId: z.number(),
+    conversationId: z.number().nullable().optional(),
+    posted: z.date(),
+    lastEdited: z.date().nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    systemMessage: SystemMessageSchema,
+    attachments: z.array(AttachmentSchema).nullable().optional(),
+    reactions: z.record(z.string(), z.unknown()).nullable().optional(),
+    objIndex: z.number().nullable().optional(),
+    // Extended fields that may appear in some API responses (like inbox)
+    creatorName: z.string().nullable().optional(),
+    channelId: z.number(),
+    recipients: z.array(z.number()).nullable().optional(),
+    groups: z.array(z.number()).nullable().optional(),
+    toEmails: z.array(z.string()).nullable().optional(),
+    deleted: z.boolean().nullable().optional(),
+    deletedBy: z.number().nullable().optional(),
+    version: z.number().nullable().optional(),
+    actions: z.array(z.unknown()).nullable().optional(),
+})
+
+/**
+ * Builds a Comment schema whose `url` is rooted at the given link base URL.
+ * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createCommentSchema(linkBaseUrl?: string) {
+    return CommentObjectSchema.transform((data) => ({
         ...data,
-        url: getFullTwistURL({
-            workspaceId: data.workspaceId,
-            channelId: data.channelId,
-            threadId: data.threadId,
-            commentId: data.id,
-        }),
+        url: getFullTwistURL(
+            {
+                workspaceId: data.workspaceId,
+                channelId: data.channelId,
+                threadId: data.threadId,
+                commentId: data.id,
+            },
+            linkBaseUrl,
+        ),
     }))
+}
+
+export const CommentSchema = createCommentSchema()
 
 export type Comment = z.infer<typeof CommentSchema>
 
@@ -326,39 +367,50 @@ export const WorkspaceUserSchema = BaseUserSchema.extend({
 export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
 
 // ConversationMessage entity from API
-export const ConversationMessageSchema = z
-    .object({
-        id: z.number(),
-        content: z.string(),
-        creator: z.number(),
-        conversationId: z.number(),
-        posted: z.date(),
-        systemMessage: SystemMessageSchema,
-        attachments: z.array(AttachmentSchema).nullable().optional(),
-        reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
-        actions: z.array(z.unknown()).nullable().optional(),
-        objIndex: z.number().nullable().optional(),
-        lastEdited: z.date().nullable().optional(),
-        isDeleted: z.boolean().nullable().optional(),
-        directGroupMentions: z.array(z.number()).nullable().optional(),
-        directMentions: z.array(z.number()).nullable().optional(),
-        version: z.number().nullable().optional(),
-        workspaceId: z.number(),
-    })
-    .transform((data) => ({
+const ConversationMessageObjectSchema = z.object({
+    id: z.number(),
+    content: z.string(),
+    creator: z.number(),
+    conversationId: z.number(),
+    posted: z.date(),
+    systemMessage: SystemMessageSchema,
+    attachments: z.array(AttachmentSchema).nullable().optional(),
+    reactions: z.record(z.string(), z.array(z.number())).nullable().optional(),
+    actions: z.array(z.unknown()).nullable().optional(),
+    objIndex: z.number().nullable().optional(),
+    lastEdited: z.date().nullable().optional(),
+    isDeleted: z.boolean().nullable().optional(),
+    directGroupMentions: z.array(z.number()).nullable().optional(),
+    directMentions: z.array(z.number()).nullable().optional(),
+    version: z.number().nullable().optional(),
+    workspaceId: z.number(),
+})
+
+/**
+ * Builds a ConversationMessage schema whose `url` is rooted at the given link base URL.
+ * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createConversationMessageSchema(linkBaseUrl?: string) {
+    return ConversationMessageObjectSchema.transform((data) => ({
         ...data,
-        url: getFullTwistURL({
-            workspaceId: data.workspaceId,
-            conversationId: data.conversationId,
-            messageId: data.id,
-        }),
+        url: getFullTwistURL(
+            {
+                workspaceId: data.workspaceId,
+                conversationId: data.conversationId,
+                messageId: data.id,
+            },
+            linkBaseUrl,
+        ),
     }))
+}
+
+export const ConversationMessageSchema = createConversationMessageSchema()
 
 export type ConversationMessage = z.infer<typeof ConversationMessageSchema>
 
 // InboxThread entity from API - returns full Thread objects with additional inbox metadata
-export const InboxThreadSchema = z
-    .object({
+function createInboxThreadObjectSchema(linkBaseUrl?: string) {
+    return z.object({
         id: z.number(),
         title: z.string(),
         content: z.string(),
@@ -393,18 +445,31 @@ export const InboxThreadSchema = z
         isSaved: z.boolean().nullable().optional(),
         closed: z.boolean(),
         responders: z.array(z.number()).nullable().optional(),
-        lastComment: CommentSchema.nullable().optional(),
+        lastComment: createCommentSchema(linkBaseUrl).nullable().optional(),
         toEmails: z.array(z.string()).nullable().optional(),
         version: z.number().nullable().optional(),
     })
-    .transform((data) => ({
+}
+
+/**
+ * Builds an InboxThread schema whose `url` (and nested comment `url`) is rooted at the
+ * given link base URL. When `linkBaseUrl` is omitted, links default to `https://twist.com`.
+ */
+export function createInboxThreadSchema(linkBaseUrl?: string) {
+    return createInboxThreadObjectSchema(linkBaseUrl).transform((data) => ({
         ...data,
-        url: getFullTwistURL({
-            workspaceId: data.workspaceId,
-            channelId: data.channelId,
-            threadId: data.id,
-        }),
+        url: getFullTwistURL(
+            {
+                workspaceId: data.workspaceId,
+                channelId: data.channelId,
+                threadId: data.id,
+            },
+            linkBaseUrl,
+        ),
     }))
+}
+
+export const InboxThreadSchema = createInboxThreadSchema()
 
 export type InboxThread = z.infer<typeof InboxThreadSchema>
 
