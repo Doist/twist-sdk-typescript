@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { request } from '../transport/http-client'
 import { BatchRequestDescriptor } from '../types/batch'
 import { type WorkspaceUser, WorkspaceUserSchema } from '../types/entities'
@@ -18,9 +19,14 @@ export class WorkspaceUsersClient extends BaseClient {
     /**
      * Returns a list of workspace user objects for the given workspace id.
      *
+     * Removed users are excluded by default; set `args.includeRemoved` to `true` to include them.
+     * The Twist API always returns removed users, so the filtering happens client-side (in both the
+     * awaited and batch modes).
+     *
      * @param args - The arguments for getting workspace users.
      * @param args.workspaceId - The workspace ID.
      * @param args.archived - Optional flag to filter archived users.
+     * @param args.includeRemoved - Include users removed from the workspace. Defaults to `false`.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns An array of workspace user objects.
      *
@@ -46,8 +52,19 @@ export class WorkspaceUsersClient extends BaseClient {
         const url = 'workspace_users/get'
         const params = { id: args.workspaceId, archived: args.archived }
 
+        const includeRemoved = args.includeRemoved ?? false
+        function filterRemoved(users: WorkspaceUser[]): WorkspaceUser[] {
+            return includeRemoved ? users : users.filter((user) => !user.removed)
+        }
+
         if (options?.batch) {
-            return { method, url, params }
+            return {
+                method,
+                url,
+                params,
+                schema: z.array(WorkspaceUserSchema),
+                transform: (data) => filterRemoved(data as WorkspaceUser[]),
+            }
         }
 
         return request<WorkspaceUser[]>({
@@ -57,7 +74,9 @@ export class WorkspaceUsersClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((user) => WorkspaceUserSchema.parse(user)))
+        }).then((response) =>
+            filterRemoved(response.data.map((user) => WorkspaceUserSchema.parse(user))),
+        )
     }
 
     /**

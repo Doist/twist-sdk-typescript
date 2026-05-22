@@ -153,8 +153,13 @@ export class BatchBuilder extends BaseClient {
 
             // Validate with schema if provided
             let finalData = transformed
-            if (descriptor.schema && apiResponse.code >= 200 && apiResponse.code < 300) {
-                finalData = descriptor.schema.parse(transformed)
+            if (apiResponse.code >= 200 && apiResponse.code < 300) {
+                if (descriptor.schema) {
+                    finalData = descriptor.schema.parse(transformed)
+                }
+                if (descriptor.transform) {
+                    finalData = descriptor.transform(finalData)
+                }
             }
 
             // Parse headers string into object

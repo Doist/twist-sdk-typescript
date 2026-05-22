@@ -9,6 +9,8 @@ export type BatchRequestDescriptor<T> = {
     url: string
     params?: Record<string, unknown>
     schema?: z.ZodSchema<T>
+    /** Optional post-processing applied to the parsed data on a successful response. */
+    transform?: (data: unknown) => T
 }
 
 /**

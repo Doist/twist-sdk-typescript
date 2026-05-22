@@ -403,6 +403,11 @@ export type RemoveGroupUsersArgs = {
 export type GetWorkspaceUsersArgs = {
     workspaceId: number
     archived?: boolean
+    /**
+     * Include users who have been removed from the workspace. Defaults to `false`.
+     * The Twist API always returns removed users, so the SDK filters them client-side.
+     */
+    includeRemoved?: boolean
 }
 
 export type GetUserByIdArgs = {
