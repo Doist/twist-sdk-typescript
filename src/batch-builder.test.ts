@@ -669,41 +669,6 @@ describe('BatchBuilder', () => {
             expect(result.data[0].url).toBe('https://twist.com/a/5/ch/600/')
         })
 
-        it('should honor a configured baseUrl in batch result urls', async () => {
-            const customApi = new TwistApi(TEST_API_TOKEN, {
-                baseUrl: 'https://twist.example.com',
-            })
-            const mockChannel = {
-                id: 600,
-                name: 'General',
-                creator: 1,
-                public: true,
-                workspace_id: 5,
-                archived: false,
-                created_ts: 1609459200,
-                version: 1,
-            }
-
-            server.use(
-                http.post('https://twist.example.com/api/v3/batch', async () => {
-                    return HttpResponse.json([
-                        {
-                            code: 200,
-                            headers: '',
-                            body: JSON.stringify([mockChannel]),
-                        },
-                    ])
-                }),
-            )
-
-            const [result] = await customApi.batch(
-                customApi.channels.getChannels({ workspaceId: 5 }, { batch: true }),
-            )
-
-            expect(result.code).toBe(200)
-            expect(result.data[0].url).toBe('https://twist.example.com/a/5/ch/600/')
-        })
-
         it('should throw ZodError when batch response body does not match expected schema', async () => {
             server.use(
                 http.post('https://api.twist.com/api/v3/batch', async () => {

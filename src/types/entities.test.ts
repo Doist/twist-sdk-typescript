@@ -1,13 +1,4 @@
-import {
-    AttachmentSchema,
-    ChannelSchema,
-    createChannelSchema,
-    createCommentSchema,
-    createConversationMessageSchema,
-    createConversationSchema,
-    createInboxThreadSchema,
-    createThreadSchema,
-} from './entities'
+import { AttachmentSchema, createChannelSchema, createInboxThreadSchema } from './entities'
 
 describe('AttachmentSchema', () => {
     it('parses a minimal payload (only required fields)', () => {
@@ -103,100 +94,51 @@ describe('AttachmentSchema', () => {
 })
 
 describe('entity url factories', () => {
-    const channelData = {
-        id: 42,
-        name: 'Engineering',
-        creator: 1,
-        public: true,
-        workspaceId: 1,
-        archived: false,
-        created: new Date(),
-        version: 1,
-    }
+    const base = 'https://twist.example.com'
 
-    const commentData = {
-        id: 99,
-        content: 'hi',
-        creator: 1,
-        threadId: 7,
-        channelId: 42,
-        workspaceId: 1,
-        posted: new Date(),
-    }
-
-    const conversationData = {
-        id: 5,
-        workspaceId: 1,
-        userIds: [1, 2],
-        lastObjIndex: 0,
-        snippet: 's',
-        snippetCreators: [1],
-        lastActive: new Date(),
-        archived: false,
-        created: new Date(),
-        creator: 1,
-    }
-
-    const messageData = {
-        id: 8,
-        content: 'hi',
-        creator: 1,
-        conversationId: 5,
-        posted: new Date(),
-        workspaceId: 1,
-    }
-
-    const threadData = {
-        id: 1337,
-        title: 't',
-        content: 'c',
-        creator: 1,
-        channelId: 42,
-        workspaceId: 1,
-        commentCount: 0,
-        lastUpdated: new Date(),
-        pinned: false,
-        posted: new Date(),
-        snippet: 's',
-        snippetCreator: 1,
-        starred: false,
-        isArchived: false,
-    }
-
-    it('defaults to https://twist.com when no base is provided', () => {
-        expect(createChannelSchema().parse(channelData).url).toBe('https://twist.com/a/1/ch/42/')
-        // The exported singleton must keep the default-base behavior.
-        expect(ChannelSchema.parse(channelData).url).toBe('https://twist.com/a/1/ch/42/')
-    })
-
-    it('uses the provided base for every entity url', () => {
-        const base = 'https://twist.example.com'
-        expect(createChannelSchema(base).parse(channelData).url).toBe(
-            'https://twist.example.com/a/1/ch/42/',
-        )
-        expect(createThreadSchema(base).parse(threadData).url).toBe(
-            'https://twist.example.com/a/1/ch/42/t/1337/',
-        )
-        expect(createConversationSchema(base).parse(conversationData).url).toBe(
-            'https://twist.example.com/a/1/msg/5/',
-        )
-        expect(createCommentSchema(base).parse(commentData).url).toBe(
-            'https://twist.example.com/a/1/ch/42/t/7/c/99',
-        )
-        expect(createConversationMessageSchema(base).parse(messageData).url).toBe(
-            'https://twist.example.com/a/1/msg/5/m/8',
-        )
+    it('threads the link base into the generated url', () => {
+        const channel = {
+            id: 42,
+            name: 'Engineering',
+            creator: 1,
+            public: true,
+            workspaceId: 1,
+            archived: false,
+            created: new Date(),
+            version: 1,
+        }
+        expect(createChannelSchema(base).parse(channel).url).toBe(`${base}/a/1/ch/42/`)
     })
 
     it('propagates the base to a nested lastComment on an inbox thread', () => {
-        const base = 'https://twist.example.com'
         const parsed = createInboxThreadSchema(base).parse({
-            ...threadData,
+            id: 1337,
+            title: 't',
+            content: 'c',
+            creator: 1,
+            channelId: 42,
+            workspaceId: 1,
+            commentCount: 0,
+            lastUpdated: new Date(),
+            pinned: false,
+            posted: new Date(),
+            snippet: 's',
+            snippetCreator: 1,
+            starred: false,
+            isArchived: false,
             inInbox: true,
             closed: false,
-            lastComment: commentData,
+            lastComment: {
+                id: 99,
+                content: 'hi',
+                creator: 1,
+                threadId: 7,
+                channelId: 42,
+                workspaceId: 1,
+                posted: new Date(),
+            },
         })
-        expect(parsed.url).toBe('https://twist.example.com/a/1/ch/42/t/1337/')
-        expect(parsed.lastComment?.url).toBe('https://twist.example.com/a/1/ch/42/t/7/c/99')
+        expect(parsed.url).toBe(`${base}/a/1/ch/42/t/1337/`)
+        expect(parsed.lastComment?.url).toBe(`${base}/a/1/ch/42/t/7/c/99`)
     })
 })

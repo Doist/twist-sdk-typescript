@@ -130,10 +130,6 @@ const ChannelObjectSchema = z.object({
     filters: z.record(z.string(), z.string()).nullable().optional(),
 })
 
-/**
- * Builds a Channel schema whose `url` is rooted at the given link base URL.
- * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createChannelSchema(linkBaseUrl?: string) {
     return ChannelObjectSchema.transform((data) => ({
         ...data,
@@ -211,10 +207,6 @@ const ThreadObjectSchema = z.object({
         .optional(),
 })
 
-/**
- * Builds a Thread schema whose `url` is rooted at the given link base URL.
- * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createThreadSchema(linkBaseUrl?: string) {
     return ThreadObjectSchema.transform((data) => ({
         ...data,
@@ -284,10 +276,6 @@ const ConversationObjectSchema = z.object({
         .optional(),
 })
 
-/**
- * Builds a Conversation schema whose `url` is rooted at the given link base URL.
- * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createConversationSchema(linkBaseUrl?: string) {
     return ConversationObjectSchema.transform((data) => ({
         ...data,
@@ -330,10 +318,6 @@ const CommentObjectSchema = z.object({
     actions: z.array(z.unknown()).nullable().optional(),
 })
 
-/**
- * Builds a Comment schema whose `url` is rooted at the given link base URL.
- * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createCommentSchema(linkBaseUrl?: string) {
     return CommentObjectSchema.transform((data) => ({
         ...data,
@@ -386,10 +370,6 @@ const ConversationMessageObjectSchema = z.object({
     workspaceId: z.number(),
 })
 
-/**
- * Builds a ConversationMessage schema whose `url` is rooted at the given link base URL.
- * When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createConversationMessageSchema(linkBaseUrl?: string) {
     return ConversationMessageObjectSchema.transform((data) => ({
         ...data,
@@ -451,10 +431,6 @@ function createInboxThreadObjectSchema(linkBaseUrl?: string) {
     })
 }
 
-/**
- * Builds an InboxThread schema whose `url` (and nested comment `url`) is rooted at the
- * given link base URL. When `linkBaseUrl` is omitted, links default to `https://twist.com`.
- */
 export function createInboxThreadSchema(linkBaseUrl?: string) {
     return createInboxThreadObjectSchema(linkBaseUrl).transform((data) => ({
         ...data,

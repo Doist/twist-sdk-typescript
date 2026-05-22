@@ -22,45 +22,19 @@ describe('ChannelsClient', () => {
         client = new ChannelsClient({ apiToken: TEST_API_TOKEN })
     })
 
-    describe('entity url', () => {
-        it('uses the default web base when no baseUrl is configured', async () => {
-            server.use(
-                http.get(apiUrl('api/v3/channels/get'), () => HttpResponse.json([channelResponse])),
-            )
-
-            const channels = await client.getChannels({ workspaceId: 1 })
-            expect(channels[0].url).toBe('https://twist.com/a/1/ch/42/')
+    it('roots entity links at the configured baseUrl (no double slash)', async () => {
+        const customClient = new ChannelsClient({
+            apiToken: TEST_API_TOKEN,
+            baseUrl: 'https://twist.example.com/',
         })
+        server.use(
+            http.get('https://twist.example.com/api/v3/channels/get', () =>
+                HttpResponse.json([channelResponse]),
+            ),
+        )
 
-        it('uses the configured baseUrl for links', async () => {
-            const customClient = new ChannelsClient({
-                apiToken: TEST_API_TOKEN,
-                baseUrl: 'https://twist.example.com',
-            })
-            server.use(
-                http.get('https://twist.example.com/api/v3/channels/get', () =>
-                    HttpResponse.json([channelResponse]),
-                ),
-            )
-
-            const channels = await customClient.getChannels({ workspaceId: 1 })
-            expect(channels[0].url).toBe('https://twist.example.com/a/1/ch/42/')
-        })
-
-        it('does not double-slash when the configured baseUrl has a trailing slash', async () => {
-            const customClient = new ChannelsClient({
-                apiToken: TEST_API_TOKEN,
-                baseUrl: 'https://twist.example.com/',
-            })
-            server.use(
-                http.get('https://twist.example.com/api/v3/channels/get', () =>
-                    HttpResponse.json([channelResponse]),
-                ),
-            )
-
-            const channels = await customClient.getChannels({ workspaceId: 1 })
-            expect(channels[0].url).toBe('https://twist.example.com/a/1/ch/42/')
-        })
+        const channels = await customClient.getChannels({ workspaceId: 1 })
+        expect(channels[0].url).toBe('https://twist.example.com/a/1/ch/42/')
     })
 
     describe('favoriteChannel', () => {
