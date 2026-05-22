@@ -51,10 +51,12 @@ export class BaseClient {
         return getTwistBaseUri(apiVersion)
     }
 
-    /** Base URL for entity web links: the configured `baseUrl`, or the production web app. */
-    protected getLinkBaseUrl(): string {
+    /**
+     * Base URL for entity web links, or `undefined` to use getFullTwistURL's default web app.
+     */
+    protected getLinkBaseUrl(): string | undefined {
         if (!this.baseUrl) {
-            return 'https://twist.com'
+            return undefined
         }
         // Strip a trailing slash so links don't double up, since entity paths start with '/'.
         return this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl

@@ -110,7 +110,7 @@ export const WorkspaceSchema = z.object({
 export type Workspace = z.infer<typeof WorkspaceSchema>
 
 // Channel entity from API
-const ChannelObjectSchema = z.object({
+export const ChannelObjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     description: z.string().nullable().optional(),
@@ -142,7 +142,7 @@ export const ChannelSchema = createChannelSchema()
 export type Channel = z.infer<typeof ChannelSchema>
 
 // Thread entity from API
-const ThreadObjectSchema = z.object({
+export const ThreadObjectSchema = z.object({
     id: z.number(),
     title: z.string(),
     content: z.string(),
@@ -238,7 +238,7 @@ export const GroupSchema = z.object({
 export type Group = z.infer<typeof GroupSchema>
 
 // Conversation entity from API
-const ConversationObjectSchema = z.object({
+export const ConversationObjectSchema = z.object({
     id: z.number(),
     workspaceId: z.number(),
     userIds: z.array(z.number()),
@@ -291,7 +291,7 @@ export const ConversationSchema = createConversationSchema()
 export type Conversation = z.infer<typeof ConversationSchema>
 
 // Comment entity from API
-const CommentObjectSchema = z.object({
+export const CommentObjectSchema = z.object({
     id: z.number(),
     content: z.string(),
     creator: z.number(),
@@ -351,7 +351,7 @@ export const WorkspaceUserSchema = BaseUserSchema.extend({
 export type WorkspaceUser = z.infer<typeof WorkspaceUserSchema>
 
 // ConversationMessage entity from API
-const ConversationMessageObjectSchema = z.object({
+export const ConversationMessageObjectSchema = z.object({
     id: z.number(),
     content: z.string(),
     creator: z.number(),

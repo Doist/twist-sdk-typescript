@@ -149,7 +149,7 @@ export class CommentsClient extends BaseClient {
                 baseUri: this.getBaseUri(),
                 apiToken: this.apiToken,
                 customFetch: this.customFetch,
-                linkBaseUrl: this.getLinkBaseUrl(),
+                schema: this.commentSchema,
             },
             args,
             options,

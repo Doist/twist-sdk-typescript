@@ -4,6 +4,7 @@ import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import {
     type Comment,
+    createCommentSchema,
     createThreadSchema,
     type Thread,
     type UnreadThread,
@@ -30,6 +31,7 @@ import { BaseClient } from './base-client'
  */
 export class ThreadsClient extends BaseClient {
     private readonly threadSchema = createThreadSchema(this.getLinkBaseUrl())
+    private readonly commentSchema = createCommentSchema(this.getLinkBaseUrl())
 
     /**
      * Gets all threads in a channel.
@@ -815,7 +817,7 @@ export class ThreadsClient extends BaseClient {
                 baseUri: this.getBaseUri(),
                 apiToken: this.apiToken,
                 customFetch: this.customFetch,
-                linkBaseUrl: this.getLinkBaseUrl(),
+                schema: this.commentSchema,
             },
             { threadId: id, ...rest },
             { ...options, threadAction },

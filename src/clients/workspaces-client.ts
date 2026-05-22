@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ENDPOINT_WORKSPACES } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
@@ -271,7 +272,7 @@ export class WorkspacesClient extends BaseClient {
         const params = { id }
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(this.channelSchema) }
         }
 
         return request<Channel[]>({

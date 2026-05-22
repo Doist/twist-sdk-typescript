@@ -73,6 +73,24 @@ describe('CommentsClient', () => {
             system_message: null,
         }
 
+        it('roots the returned comment url at the configured baseUrl', async () => {
+            const customClient = new CommentsClient({
+                apiToken: TEST_API_TOKEN,
+                baseUrl: 'https://twist.example.com',
+            })
+            server.use(
+                http.post('https://twist.example.com/api/v3/comments/add', () =>
+                    HttpResponse.json(mockCommentApiResponse),
+                ),
+            )
+
+            const comment = await customClient.createComment({
+                threadId: 789,
+                content: 'Reply content',
+            })
+            expect(comment.url).toBe('https://twist.example.com/a/1/ch/1/t/789/c/500')
+        })
+
         it('should send groups in POST body', async () => {
             server.use(
                 http.post(apiUrl('api/v3/comments/add'), async ({ request }) => {
