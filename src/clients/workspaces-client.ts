@@ -1,13 +1,16 @@
+import { z } from 'zod'
 import { ENDPOINT_WORKSPACES } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { Channel, ChannelSchema, Workspace, WorkspaceSchema } from '../types/entities'
+import { Channel, createChannelSchema, Workspace, WorkspaceSchema } from '../types/entities'
 import { BaseClient } from './base-client'
 
 /**
  * Client for interacting with Twist workspace endpoints.
  */
 export class WorkspacesClient extends BaseClient {
+    private readonly channelSchema = createChannelSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all the user's workspaces.
      *
@@ -269,7 +272,7 @@ export class WorkspacesClient extends BaseClient {
         const params = { id }
 
         if (options?.batch) {
-            return { method, url, params }
+            return { method, url, params, schema: z.array(this.channelSchema) }
         }
 
         return request<Channel[]>({
@@ -279,6 +282,6 @@ export class WorkspacesClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((channel) => ChannelSchema.parse(channel)))
+        }).then((response) => response.data.map((channel) => this.channelSchema.parse(channel)))
     }
 }

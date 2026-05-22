@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ENDPOINT_CONVERSATION_MESSAGES } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type ConversationMessage, ConversationMessageSchema } from '../types/entities'
+import { type ConversationMessage, createConversationMessageSchema } from '../types/entities'
 import type {
     CreateConversationMessageArgs,
     GetConversationMessagesArgs,
@@ -14,6 +14,8 @@ import { BaseClient } from './base-client'
  * Client for interacting with Twist conversation message endpoints.
  */
 export class ConversationMessagesClient extends BaseClient {
+    private readonly messageSchema = createConversationMessageSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all messages in a conversation.
      *
@@ -59,7 +61,7 @@ export class ConversationMessagesClient extends BaseClient {
         const url = `${ENDPOINT_CONVERSATION_MESSAGES}/get`
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(ConversationMessageSchema) }
+            return { method, url, params, schema: z.array(this.messageSchema) }
         }
 
         return request<ConversationMessage[]>({
@@ -69,9 +71,7 @@ export class ConversationMessagesClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) =>
-            response.data.map((message) => ConversationMessageSchema.parse(message)),
-        )
+        }).then((response) => response.data.map((message) => this.messageSchema.parse(message)))
     }
 
     /**
@@ -95,7 +95,7 @@ export class ConversationMessagesClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_CONVERSATION_MESSAGES}/getone`
         const params = { id }
-        const schema = ConversationMessageSchema
+        const schema = this.messageSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -152,7 +152,7 @@ export class ConversationMessagesClient extends BaseClient {
 
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATION_MESSAGES}/add`
-        const schema = ConversationMessageSchema
+        const schema = this.messageSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -207,7 +207,7 @@ export class ConversationMessagesClient extends BaseClient {
 
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATION_MESSAGES}/update`
-        const schema = ConversationMessageSchema
+        const schema = this.messageSchema
 
         if (options?.batch) {
             return { method, url, params, schema }

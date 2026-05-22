@@ -4,8 +4,9 @@ import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import {
     type Comment,
+    createCommentSchema,
+    createThreadSchema,
     type Thread,
-    ThreadSchema,
     type UnreadThread,
     UnreadThreadSchema,
 } from '../types/entities'
@@ -29,6 +30,9 @@ import { BaseClient } from './base-client'
  * Client for interacting with Twist thread endpoints.
  */
 export class ThreadsClient extends BaseClient {
+    private readonly threadSchema = createThreadSchema(this.getLinkBaseUrl())
+    private readonly commentSchema = createCommentSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all threads in a channel.
      *
@@ -68,7 +72,7 @@ export class ThreadsClient extends BaseClient {
         }
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(ThreadSchema) }
+            return { method, url, params, schema: z.array(this.threadSchema) }
         }
 
         return request<Thread[]>({
@@ -78,7 +82,7 @@ export class ThreadsClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((thread) => ThreadSchema.parse(thread)))
+        }).then((response) => response.data.map((thread) => this.threadSchema.parse(thread)))
     }
 
     /**
@@ -97,7 +101,7 @@ export class ThreadsClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_THREADS}/getone`
         const params = { id }
-        const schema = ThreadSchema
+        const schema = this.threadSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -143,7 +147,7 @@ export class ThreadsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/add`
         const params = args
-        const schema = ThreadSchema
+        const schema = this.threadSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -179,7 +183,7 @@ export class ThreadsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/update`
         const params = args
-        const schema = ThreadSchema
+        const schema = this.threadSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -681,7 +685,7 @@ export class ThreadsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/mute`
         const params = { id: args.id, minutes: args.minutes }
-        const schema = ThreadSchema
+        const schema = this.threadSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -714,7 +718,7 @@ export class ThreadsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_THREADS}/unmute`
         const params = { id }
-        const schema = ThreadSchema
+        const schema = this.threadSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -809,7 +813,12 @@ export class ThreadsClient extends BaseClient {
     ): Promise<Comment> | BatchRequestDescriptor<Comment> {
         const { id, ...rest } = args
         return addCommentRequest(
-            { baseUri: this.getBaseUri(), apiToken: this.apiToken, customFetch: this.customFetch },
+            {
+                baseUri: this.getBaseUri(),
+                apiToken: this.apiToken,
+                customFetch: this.customFetch,
+                schema: this.commentSchema,
+            },
             { threadId: id, ...rest },
             { ...options, threadAction },
         )

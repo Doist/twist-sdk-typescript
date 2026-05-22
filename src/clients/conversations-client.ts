@@ -4,7 +4,7 @@ import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
 import {
     type Conversation,
-    ConversationSchema,
+    createConversationSchema,
     type UnreadConversation,
     UnreadConversationSchema,
 } from '../types/entities'
@@ -24,6 +24,8 @@ import { BaseClient } from './base-client'
  * Client for interacting with Twist conversation endpoints.
  */
 export class ConversationsClient extends BaseClient {
+    private readonly conversationSchema = createConversationSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all conversations for a workspace.
      *
@@ -56,7 +58,7 @@ export class ConversationsClient extends BaseClient {
         const params = args
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(ConversationSchema) }
+            return { method, url, params, schema: z.array(this.conversationSchema) }
         }
 
         return request<Conversation[]>({
@@ -67,7 +69,7 @@ export class ConversationsClient extends BaseClient {
             payload: params,
             customFetch: this.customFetch,
         }).then((response) =>
-            response.data.map((conversation) => ConversationSchema.parse(conversation)),
+            response.data.map((conversation) => this.conversationSchema.parse(conversation)),
         )
     }
 
@@ -87,7 +89,7 @@ export class ConversationsClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_CONVERSATIONS}/getone`
         const params = { id }
-        const schema = ConversationSchema
+        const schema = this.conversationSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -135,7 +137,7 @@ export class ConversationsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/get_or_create`
         const params = args
-        const schema = ConversationSchema
+        const schema = this.conversationSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -183,7 +185,7 @@ export class ConversationsClient extends BaseClient {
 
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/update`
-        const schema = ConversationSchema
+        const schema = this.conversationSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -545,7 +547,7 @@ export class ConversationsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/mute`
         const params = { id: args.id, minutes: args.minutes }
-        const schema = ConversationSchema
+        const schema = this.conversationSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -577,7 +579,7 @@ export class ConversationsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_CONVERSATIONS}/unmute`
         const params = { id }
-        const schema = ConversationSchema
+        const schema = this.conversationSchema
 
         if (options?.batch) {
             return { method, url, params, schema }

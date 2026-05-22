@@ -1,4 +1,4 @@
-import { AttachmentSchema } from './entities'
+import { AttachmentSchema, createChannelSchema, createInboxThreadSchema } from './entities'
 
 describe('AttachmentSchema', () => {
     it('parses a minimal payload (only required fields)', () => {
@@ -90,5 +90,55 @@ describe('AttachmentSchema', () => {
                 fileSize: -1,
             }),
         ).toThrow()
+    })
+})
+
+describe('entity url factories', () => {
+    const base = 'https://twist.example.com'
+
+    it('threads the link base into the generated url', () => {
+        const channel = {
+            id: 42,
+            name: 'Engineering',
+            creator: 1,
+            public: true,
+            workspaceId: 1,
+            archived: false,
+            created: new Date(),
+            version: 1,
+        }
+        expect(createChannelSchema(base).parse(channel).url).toBe(`${base}/a/1/ch/42/`)
+    })
+
+    it('propagates the base to a nested lastComment on an inbox thread', () => {
+        const parsed = createInboxThreadSchema(base).parse({
+            id: 1337,
+            title: 't',
+            content: 'c',
+            creator: 1,
+            channelId: 42,
+            workspaceId: 1,
+            commentCount: 0,
+            lastUpdated: new Date(),
+            pinned: false,
+            posted: new Date(),
+            snippet: 's',
+            snippetCreator: 1,
+            starred: false,
+            isArchived: false,
+            inInbox: true,
+            closed: false,
+            lastComment: {
+                id: 99,
+                content: 'hi',
+                creator: 1,
+                threadId: 7,
+                channelId: 42,
+                workspaceId: 1,
+                posted: new Date(),
+            },
+        })
+        expect(parsed.url).toBe(`${base}/a/1/ch/42/t/1337/`)
+        expect(parsed.lastComment?.url).toBe(`${base}/a/1/ch/42/t/7/c/99`)
     })
 })

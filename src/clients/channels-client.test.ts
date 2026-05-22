@@ -4,11 +4,37 @@ import { server } from '../testUtils/msw-setup'
 import { TEST_API_TOKEN } from '../testUtils/test-defaults'
 import { ChannelsClient } from './channels-client'
 
+const channelResponse = {
+    id: 42,
+    name: 'Engineering',
+    creator: 1,
+    public: true,
+    workspace_id: 1,
+    archived: false,
+    created_ts: 1700000000,
+    version: 1,
+}
+
 describe('ChannelsClient', () => {
     let client: ChannelsClient
 
     beforeEach(() => {
         client = new ChannelsClient({ apiToken: TEST_API_TOKEN })
+    })
+
+    it('roots entity links at the configured baseUrl (no double slash)', async () => {
+        const customClient = new ChannelsClient({
+            apiToken: TEST_API_TOKEN,
+            baseUrl: 'https://twist.example.com/',
+        })
+        server.use(
+            http.get('https://twist.example.com/api/v3/channels/get', () =>
+                HttpResponse.json([channelResponse]),
+            ),
+        )
+
+        const channels = await customClient.getChannels({ workspaceId: 1 })
+        expect(channels[0].url).toBe('https://twist.example.com/a/1/ch/42/')
     })
 
     describe('favoriteChannel', () => {

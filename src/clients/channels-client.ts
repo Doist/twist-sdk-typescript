@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ENDPOINT_CHANNELS } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type Channel, ChannelSchema } from '../types/entities'
+import { type Channel, createChannelSchema } from '../types/entities'
 import {
     type AddChannelUserArgs,
     type AddChannelUsersArgs,
@@ -18,6 +18,8 @@ import { BaseClient } from './base-client'
  * Client for interacting with Twist channel endpoints.
  */
 export class ChannelsClient extends BaseClient {
+    private readonly channelSchema = createChannelSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all channels for a given workspace.
      *
@@ -44,7 +46,7 @@ export class ChannelsClient extends BaseClient {
         const params = args
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(ChannelSchema) }
+            return { method, url, params, schema: z.array(this.channelSchema) }
         }
 
         return request<Channel[]>({
@@ -54,7 +56,7 @@ export class ChannelsClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((channel) => ChannelSchema.parse(channel)))
+        }).then((response) => response.data.map((channel) => this.channelSchema.parse(channel)))
     }
 
     /**
@@ -73,7 +75,7 @@ export class ChannelsClient extends BaseClient {
         const method = 'GET'
         const url = `${ENDPOINT_CHANNELS}/getone`
         const params = { id }
-        const schema = ChannelSchema
+        const schema = this.channelSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -123,7 +125,7 @@ export class ChannelsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/add`
         const params = args
-        const schema = ChannelSchema
+        const schema = this.channelSchema
 
         if (options?.batch) {
             return { method, url, params, schema }
@@ -163,7 +165,7 @@ export class ChannelsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_CHANNELS}/update`
         const params = args
-        const schema = ChannelSchema
+        const schema = this.channelSchema
 
         if (options?.batch) {
             return { method, url, params, schema }

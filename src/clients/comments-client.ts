@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type Comment, CommentSchema } from '../types/entities'
+import { type Comment, createCommentSchema } from '../types/entities'
 import {
     type CreateCommentArgs,
     type GetCommentsArgs,
@@ -16,6 +16,8 @@ import { BaseClient } from './base-client'
  * Client for interacting with Twist comment endpoints.
  */
 export class CommentsClient extends BaseClient {
+    private readonly commentSchema = createCommentSchema(this.getLinkBaseUrl())
+
     /**
      * Gets all comments for a thread.
      *
@@ -56,7 +58,7 @@ export class CommentsClient extends BaseClient {
         const url = `${ENDPOINT_COMMENTS}/get`
 
         if (options?.batch) {
-            return { method, url, params, schema: z.array(CommentSchema) }
+            return { method, url, params, schema: z.array(this.commentSchema) }
         }
 
         return request<Comment[]>({
@@ -66,7 +68,7 @@ export class CommentsClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) => response.data.map((comment) => CommentSchema.parse(comment)))
+        }).then((response) => response.data.map((comment) => this.commentSchema.parse(comment)))
     }
 
     /**
@@ -86,7 +88,9 @@ export class CommentsClient extends BaseClient {
         const url = `${ENDPOINT_COMMENTS}/getone`
         const params = { id }
         // The API wraps the response in {"comment": {...}}, so we need to unwrap it
-        const wrappedSchema = z.object({ comment: CommentSchema }).transform((data) => data.comment)
+        const wrappedSchema = z
+            .object({ comment: this.commentSchema })
+            .transform((data) => data.comment)
 
         if (options?.batch) {
             return { method, url, params, schema: wrappedSchema }
@@ -141,7 +145,12 @@ export class CommentsClient extends BaseClient {
         options?: { batch?: boolean },
     ): Promise<Comment> | BatchRequestDescriptor<Comment> {
         return addCommentRequest(
-            { baseUri: this.getBaseUri(), apiToken: this.apiToken, customFetch: this.customFetch },
+            {
+                baseUri: this.getBaseUri(),
+                apiToken: this.apiToken,
+                customFetch: this.customFetch,
+                schema: this.commentSchema,
+            },
             args,
             options,
         )
@@ -169,7 +178,7 @@ export class CommentsClient extends BaseClient {
         const method = 'POST'
         const url = `${ENDPOINT_COMMENTS}/update`
         const params = args
-        const schema = CommentSchema
+        const schema = this.commentSchema
 
         if (options?.batch) {
             return { method, url, params, schema }

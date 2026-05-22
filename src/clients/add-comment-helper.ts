@@ -1,7 +1,7 @@
 import { ENDPOINT_COMMENTS } from '../consts/endpoints'
 import { request } from '../transport/http-client'
 import type { BatchRequestDescriptor } from '../types/batch'
-import { type Comment, CommentSchema } from '../types/entities'
+import { type Comment, type createCommentSchema } from '../types/entities'
 import { NOTIFY_AUDIENCE_GROUP_IDS, NOTIFY_AUDIENCES, type NotifyAudience } from '../types/enums'
 import type { CustomFetch } from '../types/http'
 import type { CreateCommentArgs, ThreadAction } from '../types/requests'
@@ -10,6 +10,8 @@ type ClientContext = {
     baseUri: string
     apiToken: string
     customFetch?: CustomFetch
+    /** Per-client Comment schema, base-bound for the returned comment's web `url`. */
+    schema: ReturnType<typeof createCommentSchema>
 }
 
 const SENTINEL_GROUP_IDS: ReadonlySet<number> = new Set(Object.values(NOTIFY_AUDIENCE_GROUP_IDS))
@@ -52,7 +54,7 @@ export function addCommentRequest(
     const payload = options?.threadAction
         ? { ...normalized, threadAction: options.threadAction }
         : normalized
-    const schema = CommentSchema
+    const schema = context.schema
 
     if (options?.batch) {
         return { method, url, params: payload, schema }
