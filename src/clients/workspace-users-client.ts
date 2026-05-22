@@ -56,15 +56,10 @@ export class WorkspaceUsersClient extends BaseClient {
         function filterRemoved(users: WorkspaceUser[]): WorkspaceUser[] {
             return includeRemoved ? users : users.filter((user) => !user.removed)
         }
+        const responseSchema = z.array(WorkspaceUserSchema).transform(filterRemoved)
 
         if (options?.batch) {
-            return {
-                method,
-                url,
-                params,
-                schema: z.array(WorkspaceUserSchema),
-                transform: (data) => filterRemoved(data as WorkspaceUser[]),
-            }
+            return { method, url, params, schema: responseSchema }
         }
 
         return request<WorkspaceUser[]>({
@@ -74,9 +69,7 @@ export class WorkspaceUsersClient extends BaseClient {
             apiToken: this.apiToken,
             payload: params,
             customFetch: this.customFetch,
-        }).then((response) =>
-            filterRemoved(response.data.map((user) => WorkspaceUserSchema.parse(user))),
-        )
+        }).then((response) => responseSchema.parse(response.data))
     }
 
     /**

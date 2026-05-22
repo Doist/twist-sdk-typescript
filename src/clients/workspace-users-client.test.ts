@@ -59,23 +59,13 @@ describe('WorkspaceUsersClient', () => {
     describe('getWorkspaceUsers (batch)', () => {
         let api: TwistApi
 
-        const activeUser = {
-            id: 1,
-            name: 'Active User',
-            email: 'active@example.com',
-            user_type: 'USER',
-            short_name: 'AU',
-            timezone: 'UTC',
-            removed: false,
-            bot: false,
-            version: 1,
-        }
-        const removedUser = {
-            ...activeUser,
-            id: 2,
-            name: 'Removed',
-            short_name: 'RM',
-            removed: true,
+        function assertNoRemovedFilterParam(body: string): void {
+            const requests = JSON.parse(new URLSearchParams(body).get('requests') || '[]')
+            const requestUrl = new URL(requests[0].url)
+            expect(requestUrl.pathname).toContain('workspace_users/get')
+            expect(requestUrl.searchParams.get('id')).toBe('123')
+            expect(requestUrl.searchParams.has('include_removed')).toBe(false)
+            expect(requestUrl.searchParams.has('with_removed')).toBe(false)
         }
 
         beforeEach(() => {
@@ -84,12 +74,14 @@ describe('WorkspaceUsersClient', () => {
 
         it('excludes removed users by default', async () => {
             server.use(
-                http.post('https://api.twist.com/api/v3/batch', async ({ request }) => {
-                    const body = await request.text()
-                    const requests = JSON.parse(new URLSearchParams(body).get('requests') || '[]')
-                    expect(requests[0].url).toContain('workspace_users/get')
+                http.post(apiUrl('api/v3/batch'), async ({ request }) => {
+                    assertNoRemovedFilterParam(await request.text())
                     return HttpResponse.json([
-                        { code: 200, headers: '', body: JSON.stringify([activeUser, removedUser]) },
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockWorkspaceUser, removedWorkspaceUser]),
+                        },
                     ])
                 }),
             )
@@ -100,16 +92,21 @@ describe('WorkspaceUsersClient', () => {
 
             expect(result.code).toBe(200)
             expect(result.data).toHaveLength(1)
-            expect(result.data[0].id).toBe(1)
+            expect(result.data[0].id).toBe(mockWorkspaceUser.id)
         })
 
         it('includes removed users when includeRemoved is true', async () => {
             server.use(
-                http.post('https://api.twist.com/api/v3/batch', async () =>
-                    HttpResponse.json([
-                        { code: 200, headers: '', body: JSON.stringify([activeUser, removedUser]) },
-                    ]),
-                ),
+                http.post(apiUrl('api/v3/batch'), async ({ request }) => {
+                    assertNoRemovedFilterParam(await request.text())
+                    return HttpResponse.json([
+                        {
+                            code: 200,
+                            headers: '',
+                            body: JSON.stringify([mockWorkspaceUser, removedWorkspaceUser]),
+                        },
+                    ])
+                }),
             )
 
             const [result] = await api.batch(
