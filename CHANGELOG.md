@@ -1,3 +1,9 @@
+## [2.8.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.7.1...v2.8.0) (2026-05-22)
+
+### Features
+
+* **workspace-users:** exclude removed users by default ([#138](https://github.com/Doist/twist-sdk-typescript/issues/138)) ([6e4b93f](https://github.com/Doist/twist-sdk-typescript/commit/6e4b93f7a2af1eec884d13c43af948255837284e)), closes [twist-cli#245](https://github.com/Doist/twist-cli/issues/245)
+
 ## [2.7.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.7.0...v2.7.1) (2026-05-22)
 
 ### Bug Fixes
