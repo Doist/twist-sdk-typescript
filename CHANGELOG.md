@@ -1,3 +1,9 @@
+## [2.8.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.8.0...v2.8.1) (2026-05-22)
+
+### Bug Fixes
+
+* pin attw + override fflate to fix integrity-checks ([#139](https://github.com/Doist/twist-sdk-typescript/issues/139)) ([b1ae52c](https://github.com/Doist/twist-sdk-typescript/commit/b1ae52c5fb71a4f4f370e0879cb1baf81c138fb9))
+
 ## [2.8.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.7.1...v2.8.0) (2026-05-22)
 
 ### Features
