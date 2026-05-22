@@ -1,3 +1,9 @@
+## [2.7.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.7.0...v2.7.1) (2026-05-22)
+
+### Bug Fixes
+
+* **entities:** honor configured baseUrl in entity links ([#137](https://github.com/Doist/twist-sdk-typescript/issues/137)) ([a346a14](https://github.com/Doist/twist-sdk-typescript/commit/a346a142c9ec3a34ccb4d68b1bed0d5061733913))
+
 ## [2.7.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.6.0...v2.7.0) (2026-05-14)
 
 ### Features
