@@ -429,4 +429,70 @@ describe('ThreadsClient', () => {
             })
         })
     })
+
+    describe('createThread', () => {
+        it('should send attachments as a snake_cased array in POST body', async () => {
+            server.use(
+                http.post(apiUrl('api/v3/threads/add'), async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>
+                    expect(body).toEqual({
+                        channel_id: 1,
+                        title: 'Release notes',
+                        content: 'See attached',
+                        attachments: [
+                            {
+                                attachment_id: 'abc123',
+                                url_type: 'file',
+                                file_name: 'spec.pdf',
+                                file_size: 12345,
+                                underlying_type: 'application/pdf',
+                                upload_state: 'uploaded',
+                                url: 'https://files.twist.com/abc/spec.pdf',
+                            },
+                        ],
+                    })
+                    return HttpResponse.json(mockThreadApiResponse)
+                }),
+            )
+
+            await client.createThread({
+                channelId: 1,
+                title: 'Release notes',
+                content: 'See attached',
+                attachments: [
+                    {
+                        attachmentId: 'abc123',
+                        urlType: 'file',
+                        fileName: 'spec.pdf',
+                        fileSize: 12345,
+                        underlyingType: 'application/pdf',
+                        uploadState: 'uploaded',
+                        url: 'https://files.twist.com/abc/spec.pdf',
+                    },
+                ],
+            })
+        })
+
+        it('rejects attachments in batch mode (batch serialization cannot encode them)', () => {
+            expect(() =>
+                client.createThread(
+                    {
+                        channelId: 1,
+                        title: 'Release notes',
+                        content: 'See attached',
+                        attachments: [{ attachmentId: 'abc123', urlType: 'file' }],
+                    },
+                    { batch: true },
+                ),
+            ).toThrow(/attachments.*batch mode/)
+        })
+
+        it('still returns a batch descriptor when no attachments are present', () => {
+            const descriptor = client.createThread(
+                { channelId: 1, title: 'No files', content: 'Body' },
+                { batch: true },
+            )
+            expect(descriptor).toMatchObject({ method: 'POST', url: 'threads/add' })
+        })
+    })
 })
