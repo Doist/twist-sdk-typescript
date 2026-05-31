@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { UploadFile } from '../utils/multipart-upload'
 import { type Attachment, AttachmentSchema } from './entities'
 import { NOTIFY_AUDIENCES } from './enums'
 
@@ -428,4 +429,22 @@ export type GetUserInfoArgs = {
 export type GetUserLocalTimeArgs = {
     workspaceId: number
     userId: number
+}
+
+// Attachments
+export type UploadAttachmentArgs = {
+    /**
+     * The file to upload. Accepts a `Blob`/`File` (browser), a `Buffer` or Node.js
+     * `ReadableStream`, or a path to a file on the local filesystem.
+     */
+    file: UploadFile
+    /**
+     * File name. Required when `file` is a `Buffer` or stream; inferred from the path
+     * (for string inputs) or the `File.name` otherwise.
+     */
+    fileName?: string
+    /** MIME type. Defaults to the `Blob`'s type or one inferred from the file extension. */
+    contentType?: string
+    /** Attachment ID to use. A random UUID is generated when omitted. */
+    attachmentId?: string
 }
