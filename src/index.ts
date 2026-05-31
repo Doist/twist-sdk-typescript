@@ -1,5 +1,6 @@
 export * from './authentication'
 export { BatchBuilder } from './batch-builder'
+export { AttachmentsClient } from './clients/attachments-client'
 export { ConversationMessagesClient } from './clients/conversation-messages-client'
 export { InboxClient } from './clients/inbox-client'
 export { ReactionsClient } from './clients/reactions-client'
