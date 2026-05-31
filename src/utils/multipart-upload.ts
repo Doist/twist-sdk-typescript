@@ -4,12 +4,15 @@ import type { CustomFetch } from '../types/http'
 /**
  * File content accepted by the upload helpers.
  *
- * - `Blob`/`File` — browser (or any runtime with a global `Blob`).
- * - `Buffer` — Node.js in-memory bytes (requires `fileName`).
- * - `ReadableStream` — Node.js stream; buffered fully before upload (requires `fileName`).
- * - `string` — path to a file on the local filesystem (`fileName` inferred from the path).
+ * - `Blob`/`File` — browser, or any runtime with a global `Blob` (Node 18+).
+ * - `Uint8Array` — raw bytes (requires `fileName`). A Node `Buffer` is a `Uint8Array`,
+ *   so reading a file with `fs` and passing the result works without conversion.
+ *
+ * Both are universal types, so the published `.d.ts` stays free of Node-only globals
+ * (`Buffer`, `NodeJS.*`) and the helper pulls in no Node built-ins — keeping the browser
+ * bundle clean.
  */
-export type UploadFile = Buffer | NodeJS.ReadableStream | string | Blob
+export type UploadFile = Blob | Uint8Array
 
 type UploadMultipartFileArgs = {
     /** Base API URI with trailing slash, e.g. `https://api.twist.com/api/v3/`. */
@@ -20,7 +23,7 @@ type UploadMultipartFileArgs = {
     endpoint: string
     /** File content to upload. */
     file: UploadFile
-    /** File name. Required for `Buffer`/stream inputs; inferred for paths and `File`s. */
+    /** File name. Required for raw `Uint8Array` bytes; inferred from a `File`. */
     fileName?: string
     /** MIME type. Defaults to the `Blob`'s type or one inferred from the file extension. */
     contentType?: string
@@ -57,64 +60,39 @@ export function getContentTypeFromFileName(fileName: string): string {
     }
 }
 
-function isReadableStream(value: unknown): value is NodeJS.ReadableStream {
-    return (
-        typeof value === 'object' &&
-        value !== null &&
-        typeof (value as { pipe?: unknown }).pipe === 'function'
-    )
-}
-
 /**
- * Normalise any supported {@link UploadFile} into a `Blob` plus a resolved file name and
+ * Normalise a supported {@link UploadFile} into a `Blob` plus a resolved file name and
  * content type, so uploads use the cross-platform global `FormData`/`Blob` body that
- * `undici` and browsers both accept natively (no `duplex`/stream-body quirks).
+ * `undici` and browsers both accept natively.
  */
-async function toBlob(
+function toBlob(
     file: UploadFile,
     fileName: string | undefined,
     contentType: string | undefined,
-): Promise<{ blob: Blob; fileName: string; contentType: string }> {
+): { blob: Blob; fileName: string; contentType: string } {
     if (file instanceof Blob) {
-        const resolvedName = fileName || (file instanceof File ? file.name : undefined) || 'upload'
-        const type = contentType || file.type || getContentTypeFromFileName(resolvedName)
-        // Re-wrap only when we need to stamp a type the Blob doesn't already carry.
+        // `File` is not a global in Node 18, so guard the check before using it.
+        const name =
+            fileName ||
+            (typeof File !== 'undefined' && file instanceof File ? file.name : undefined) ||
+            'upload'
+        const type = contentType || file.type || getContentTypeFromFileName(name)
+        // Re-wrap only when stamping a type the Blob doesn't already carry.
         const blob = file.type === type ? file : new Blob([file], { type })
-        return { blob, fileName: resolvedName, contentType: type }
+        return { blob, fileName: name, contentType: type }
     }
 
-    if (typeof file === 'string') {
-        // File path: read bytes via Node's fs (dynamic import keeps this out of browser bundles).
-        const [{ readFile }, path] = await Promise.all([import('fs/promises'), import('path')])
-        const resolvedName = fileName || path.basename(file)
-        const type = contentType || getContentTypeFromFileName(resolvedName)
-        const bytes = await readFile(file)
-        return {
-            blob: new Blob([new Uint8Array(bytes)], { type }),
-            fileName: resolvedName,
-            contentType: type,
-        }
-    }
-
-    if (Buffer.isBuffer(file)) {
+    if (file instanceof Uint8Array) {
         if (!fileName) {
-            throw new Error('fileName is required when uploading from a Buffer')
+            throw new Error('fileName is required when uploading raw bytes')
         }
         const type = contentType || getContentTypeFromFileName(fileName)
-        return { blob: new Blob([new Uint8Array(file)], { type }), fileName, contentType: type }
+        // `Blob` accepts any `ArrayBufferView`; the cast satisfies the stricter lib
+        // `BlobPart` type (which pins the backing buffer to `ArrayBuffer`).
+        return { blob: new Blob([file as BlobPart], { type }), fileName, contentType: type }
     }
 
-    if (isReadableStream(file)) {
-        if (!fileName) {
-            throw new Error('fileName is required when uploading from a stream')
-        }
-        const { buffer } = await import('stream/consumers')
-        const bytes = await buffer(file)
-        const type = contentType || getContentTypeFromFileName(fileName)
-        return { blob: new Blob([new Uint8Array(bytes)], { type }), fileName, contentType: type }
-    }
-
-    throw new Error('Unsupported file type for upload')
+    throw new Error('Unsupported file type for upload: expected a Blob or Uint8Array')
 }
 
 /**
@@ -147,7 +125,7 @@ export async function uploadMultipartFile<T>(args: UploadMultipartFileArgs): Pro
         blob,
         fileName: resolvedFileName,
         contentType: resolvedType,
-    } = await toBlob(file, fileName, contentType)
+    } = toBlob(file, fileName, contentType)
 
     const fields: Record<string, string | number | boolean | undefined | null> = {
         file_name: resolvedFileName,

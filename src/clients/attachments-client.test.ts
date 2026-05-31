@@ -107,9 +107,27 @@ describe('AttachmentsClient', () => {
             expect(capturedForm?.get('underlying_type')).toBe('image/jpeg')
         })
 
-        it('throws when uploading a Buffer without a fileName', async () => {
+        it('uploads a Uint8Array', async () => {
+            let capturedForm: FormData | undefined
+
+            server.use(
+                http.post(UPLOAD_URL, async ({ request }) => {
+                    capturedForm = await request.formData()
+                    return HttpResponse.json(mockAttachmentResponse)
+                }),
+            )
+
+            await client.upload({ file: new Uint8Array([1, 2, 3]), fileName: 'bytes.bin' })
+
+            expect(capturedForm?.get('file')).toBeInstanceOf(Blob)
+            expect(capturedForm?.get('file_name')).toBe('bytes.bin')
+            expect(capturedForm?.get('file_size')).toBe('3')
+            expect(capturedForm?.get('underlying_type')).toBe('application/octet-stream')
+        })
+
+        it('throws when uploading raw bytes without a fileName', async () => {
             await expect(client.upload({ file: Buffer.from('x') })).rejects.toThrow(
-                'fileName is required when uploading from a Buffer',
+                'fileName is required when uploading raw bytes',
             )
         })
     })

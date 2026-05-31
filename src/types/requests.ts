@@ -434,13 +434,13 @@ export type GetUserLocalTimeArgs = {
 // Attachments
 export type UploadAttachmentArgs = {
     /**
-     * The file to upload. Accepts a `Blob`/`File` (browser), a `Buffer` or Node.js
-     * `ReadableStream`, or a path to a file on the local filesystem.
+     * The file to upload. Accepts a `Blob`/`File` (browser) or a `Uint8Array` of raw
+     * bytes. A Node `Buffer` is a `Uint8Array`, so `await readFile(path)` works directly.
      */
     file: UploadFile
     /**
-     * File name. Required when `file` is a `Buffer` or stream; inferred from the path
-     * (for string inputs) or the `File.name` otherwise.
+     * File name. Required when `file` is a `Uint8Array`; inferred from the `File.name`
+     * otherwise.
      */
     fileName?: string
     /** MIME type. Defaults to the `Blob`'s type or one inferred from the file extension. */
