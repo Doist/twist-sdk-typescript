@@ -40,6 +40,7 @@ export const CreateThreadArgsSchema = z.object({
     recipients: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
     tempId: z.number().nullable().optional(),
+    attachments: z.array(AttachmentSchema).nullable().optional(),
 })
 
 export type CreateThreadArgs = z.infer<typeof CreateThreadArgsSchema>

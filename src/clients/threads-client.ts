@@ -125,6 +125,7 @@ export class ThreadsClient extends BaseClient {
      * @param args.title - The thread title.
      * @param args.content - The thread content.
      * @param args.recipients - Optional array of user IDs to notify.
+     * @param args.attachments - Optional array of {@link Attachment}s (from `attachments.upload`).
      * @param args.sendAsIntegration - Optional flag to send as integration.
      * @param options - Optional configuration. Set `batch: true` to return a descriptor for batch requests.
      * @returns The created thread object.
