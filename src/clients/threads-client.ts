@@ -151,6 +151,15 @@ export class ThreadsClient extends BaseClient {
         const schema = this.threadSchema
 
         if (options?.batch) {
+            // The batch builder URL-encodes array params with `.join(',')`, which turns an
+            // array of attachment objects into `[object Object]`. Until batch serialization
+            // handles nested objects, reject attachments in batch mode rather than sending a
+            // silently broken payload. Upload + attach outside the batch instead.
+            if (args.attachments && args.attachments.length > 0) {
+                throw new Error(
+                    'createThread does not support `attachments` in batch mode; create the thread with attachments outside the batch.',
+                )
+            }
             return { method, url, params, schema }
         }
 

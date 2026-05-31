@@ -472,5 +472,27 @@ describe('ThreadsClient', () => {
                 ],
             })
         })
+
+        it('rejects attachments in batch mode (batch serialization cannot encode them)', () => {
+            expect(() =>
+                client.createThread(
+                    {
+                        channelId: 1,
+                        title: 'Release notes',
+                        content: 'See attached',
+                        attachments: [{ attachmentId: 'abc123', urlType: 'file' }],
+                    },
+                    { batch: true },
+                ),
+            ).toThrow(/attachments.*batch mode/)
+        })
+
+        it('still returns a batch descriptor when no attachments are present', () => {
+            const descriptor = client.createThread(
+                { channelId: 1, title: 'No files', content: 'Body' },
+                { batch: true },
+            )
+            expect(descriptor).toMatchObject({ method: 'POST', url: 'threads/add' })
+        })
     })
 })

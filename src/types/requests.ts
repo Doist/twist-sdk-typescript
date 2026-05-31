@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { UploadFile } from '../utils/multipart-upload'
-import { type Attachment, AttachmentSchema } from './entities'
+import { type Attachment, RequestAttachmentSchema } from './entities'
 import { NOTIFY_AUDIENCES } from './enums'
 
 export const CreateChannelArgsSchema = z.object({
@@ -40,7 +40,7 @@ export const CreateThreadArgsSchema = z.object({
     recipients: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
     tempId: z.number().nullable().optional(),
-    attachments: z.array(AttachmentSchema).nullable().optional(),
+    attachments: z.array(RequestAttachmentSchema).nullable().optional(),
 })
 
 export type CreateThreadArgs = z.infer<typeof CreateThreadArgsSchema>
@@ -57,7 +57,7 @@ export const CreateCommentArgsSchema = z.object({
     threadId: z.number(),
     content: z.string(),
     tempId: z.number().nullable().optional(),
-    attachments: z.array(AttachmentSchema).nullable().optional(),
+    attachments: z.array(RequestAttachmentSchema).nullable().optional(),
     actions: z.unknown().nullable().optional(),
     recipients: z.array(z.number()).nullable().optional(),
     groups: z.array(z.number()).nullable().optional(),
@@ -87,7 +87,7 @@ export const CreateMessageArgsSchema = z
         conversationId: z.number().nullable().optional(),
         threadId: z.number().nullable().optional(),
         content: z.string(),
-        attachments: z.array(AttachmentSchema).nullable().optional(),
+        attachments: z.array(RequestAttachmentSchema).nullable().optional(),
     })
     .refine(
         (data) => {
