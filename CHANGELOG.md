@@ -1,3 +1,9 @@
+## [2.9.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.0...v2.9.1) (2026-05-31)
+
+### Bug Fixes
+
+* **threads:** accept attachments when creating a thread ([#142](https://github.com/Doist/twist-sdk-typescript/issues/142)) ([3d88791](https://github.com/Doist/twist-sdk-typescript/commit/3d887918081e606c2e0c0da680087ee048b00971))
+
 ## [2.9.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.8.1...v2.9.0) (2026-05-31)
 
 ### Features
