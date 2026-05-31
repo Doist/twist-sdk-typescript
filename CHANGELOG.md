@@ -1,3 +1,9 @@
+## [2.9.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.8.1...v2.9.0) (2026-05-31)
+
+### Features
+
+* **attachments:** add client for uploading file attachments ([#141](https://github.com/Doist/twist-sdk-typescript/issues/141)) ([36c78c6](https://github.com/Doist/twist-sdk-typescript/commit/36c78c60cd0e609f084b6c6a38e2d34b99e2344d))
+
 ## [2.8.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.8.0...v2.8.1) (2026-05-22)
 
 ### Bug Fixes
