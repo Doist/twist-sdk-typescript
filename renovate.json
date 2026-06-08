@@ -4,5 +4,12 @@
         "config:recommended",
         "github>doist/renovate-config:integrations-base",
         "github>doist/renovate-config:integrations-automerge"
+    ],
+    "packageRules": [
+        {
+            "matchPackageNames": ["oxlint", "oxfmt"],
+            "groupName": "ox toolchain",
+            "description": "Group oxlint and oxfmt updates into a single PR"
+        }
     ]
 }
