@@ -1,3 +1,9 @@
+## [2.9.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.1...v2.9.2) (2026-06-08)
+
+### Bug Fixes
+
+* pin undici to 7.24.8 and group ox toolchain renovate updates ([#145](https://github.com/Doist/twist-sdk-typescript/issues/145)) ([a4e5569](https://github.com/Doist/twist-sdk-typescript/commit/a4e55696aa76d5ea7757d477d245623eeb218a53))
+
 ## [2.9.1](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.0...v2.9.1) (2026-05-31)
 
 ### Bug Fixes
