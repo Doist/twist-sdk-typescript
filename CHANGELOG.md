@@ -1,3 +1,9 @@
+## [2.9.3](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.2...v2.9.3) (2026-06-09)
+
+### Bug Fixes
+
+* build a working dispatcher on runtimes without undici's decompress interceptor (e.g. Bun) ([#147](https://github.com/Doist/twist-sdk-typescript/issues/147)) ([e734afc](https://github.com/Doist/twist-sdk-typescript/commit/e734afca9e86f4392c1f4ce55fa1b5202607f39c))
+
 ## [2.9.2](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.1...v2.9.2) (2026-06-08)
 
 ### Bug Fixes
