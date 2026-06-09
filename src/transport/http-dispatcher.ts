@@ -57,8 +57,9 @@ async function createDefaultDispatcher(): Promise<Dispatcher | undefined> {
     // absent and dispatchers have no `.compose`. Bun is the common case. There
     // the proxy agent alone is enough — Bun's `fetch` decompresses
     // gzip/deflate/br/zstd natively — so skip the interceptor instead of
-    // crashing on the missing API.
-    if (typeof interceptors.decompress !== 'function') {
+    // crashing on the missing API. Optional chaining also guards a runtime that
+    // omits the `interceptors` export entirely.
+    if (typeof interceptors?.decompress !== 'function') {
         return agent
     }
 
