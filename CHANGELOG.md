@@ -1,3 +1,9 @@
+## [2.9.4](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.3...v2.9.4) (2026-07-02)
+
+### Bug Fixes
+
+* use undici's own fetch to avoid version mismatch on Node 26 ([#160](https://github.com/Doist/twist-sdk-typescript/issues/160)) ([01b96f5](https://github.com/Doist/twist-sdk-typescript/commit/01b96f5f3d9dc3b95fa1bc30059fde616b067365))
+
 ## [2.9.3](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.2...v2.9.3) (2026-06-09)
 
 ### Bug Fixes
