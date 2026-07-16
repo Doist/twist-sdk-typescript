@@ -1,3 +1,13 @@
+## [3.0.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.4...v3.0.0) (2026-07-16)
+
+### ⚠ BREAKING CHANGES
+
+* require node >=24, test on 24 & 26, support npm >=11 (#163)
+
+### Features
+
+* require node >=24, test on 24 & 26, support npm >=11 ([#163](https://github.com/Doist/twist-sdk-typescript/issues/163)) ([ada92c9](https://github.com/Doist/twist-sdk-typescript/commit/ada92c93d3e81c74871cb1257955806f3b32d73c))
+
 ## [2.9.4](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.3...v2.9.4) (2026-07-02)
 
 ### Bug Fixes
