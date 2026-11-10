@@ -8,3 +8,5 @@ dist
 .claude/settings.local.json
 scratch.ts
 .vscode/launch.json
+.tmp/
+release-artifact/

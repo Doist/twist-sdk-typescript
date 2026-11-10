@@ -27,7 +27,7 @@ export type TwistApiOptions = {
  *
  * @example
  * ```typescript
- * import { TwistApi } from '@doist/twist-sdk'
+ * import { TwistApi } from '@todoist/twist-sdk'
  *
  * const api = new TwistApi('your-api-token')
  * const user = await api.users.getSessionUser()

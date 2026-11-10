@@ -1,0 +1,93 @@
+import { describe, expect, it } from 'vitest'
+import {
+    requireRecordedPlans,
+    requireUnallocatedVersion,
+    successfulArtifactAttempt,
+} from './pending-release.mjs'
+import { analyzeCommits } from './release-analysis.mjs'
+
+const context = (version: string, message: string, branch = 'main') => ({
+    lastRelease: { version },
+    branch: { name: branch },
+    commits: [{ hash: 'a'.repeat(40), message }],
+    cwd: process.cwd(),
+    logger: { log: () => {} },
+})
+
+describe('pending artifact attempts', () => {
+    const run = { id: 42, head_sha: 'a'.repeat(40), conclusion: 'failure' }
+    const artifact = { name: 'release-42-1' }
+    it('keeps the original successful attempt despite a failed later rerun', () => {
+        const calls: unknown[] = []
+        expect(
+            successfulArtifactAttempt(run, artifact, (id: number, attempt: string) => {
+                calls.push([id, attempt])
+                return { ...run, run_attempt: 1, status: 'completed', conclusion: 'success' }
+            }),
+        ).toBe(true)
+        expect(calls).toEqual([[42, '1']])
+    })
+    it.each(['failure', 'cancelled', 'timed_out'])('excludes %s original uploads', (conclusion) => {
+        expect(
+            successfulArtifactAttempt(run, artifact, () => ({
+                ...run,
+                run_attempt: 1,
+                status: 'completed',
+                conclusion,
+            })),
+        ).toBe(false)
+    })
+    it('waits for an unfinished original attempt', () => {
+        expect(() =>
+            successfulArtifactAttempt(run, artifact, () => ({
+                ...run,
+                run_attempt: 1,
+                status: 'in_progress',
+            })),
+        ).toThrow(/Wait for the original/)
+    })
+})
+
+describe('release lineage', () => {
+    it('selects the agreed first patch on the existing scope-independent baseline', async () => {
+        await expect(analyzeCommits({}, context('3.0.0', 'chore: migrate scope'))).resolves.toBe(
+            'patch',
+        )
+    })
+    it('continues normal conventional commit analysis after the first release', async () => {
+        await expect(analyzeCommits({}, context('3.0.1', 'fix: repair pagination'))).resolves.toBe(
+            'patch',
+        )
+        await expect(analyzeCommits({}, context('3.0.1', 'feat: add endpoint'))).resolves.toBe(
+            'minor',
+        )
+        await expect(analyzeCommits({}, context('3.0.1', 'chore: update docs'))).resolves.toBeNull()
+    })
+    it('stops rather than resetting history or squeezing a feature into the first patch', async () => {
+        await expect(analyzeCommits({}, context('', 'chore: migrate scope'))).rejects.toThrow()
+        await expect(analyzeCommits({}, context('3.0.0', 'feat: new endpoint'))).rejects.toThrow()
+        await expect(analyzeCommits({}, context('3.0.0', 'fix: repair', 'next'))).rejects.toThrow()
+    })
+    it('rejects an already-tagged prerelease even when its channel note is still missing', () => {
+        // Without the next channel note, semantic-release can propose this version again.
+        expect(() =>
+            requireUnallocatedVersion('3.1.0-next.1', (tag: string) => tag === 'v3.1.0-next.1'),
+        ).toThrow(/already tagged/)
+        expect(() =>
+            requireUnallocatedVersion('3.1.0-next.2', (tag: string) => tag === 'v3.1.0-next.1'),
+        ).not.toThrow()
+    })
+    it('holds later builds until a pending artifact is recorded', () => {
+        const plans = [{ version: '3.0.1', runId: '42' }]
+        expect(() => requireRecordedPlans(plans, () => false)).toThrow(
+            /Finish that exact artifact first/,
+        )
+        expect(() =>
+            requireRecordedPlans(
+                plans,
+                (plan: { version: string; runId: string }) =>
+                    plan.version === '3.0.1' && plan.runId === '42',
+            ),
+        ).not.toThrow()
+    })
+})
