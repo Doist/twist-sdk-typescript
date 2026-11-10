@@ -1,41 +1,16 @@
-# Website
+# Twist SDK documentation
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+The site is built with Docusaurus and TypeDoc from the SDK source.
 
-### Installation
-
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
+```sh
+npm ci --ignore-scripts
+npm run build
+npm --prefix website ci --ignore-scripts
+npm --prefix website run build
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+Run these from the repository root. The build produces static files in `website/build`; it does not publish them. During coordinated migration work, reserve the local heavy-build slot before the full website build. Hosted PR validation is independent.
 
-### Build
+`.github/workflows/validate-docs.yml` builds pull-request documentation without deployment. `.github/workflows/deploy-docusaurus.yml` publishes on `main` pushes or authorized manual dispatch through the existing `github-pages` environment. Merging this migration therefore redeploys documentation; keep that merge under the cutover operator's control.
 
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The intended site is <https://todoist.github.io/twist-sdk-typescript/> with base path `/twist-sdk-typescript/`. After rename, inspect [Pages settings](https://github.com/todoist/twist-sdk-typescript/settings/pages) (GitHub Actions, public, no custom domain) and existing environment branch restrictions. Verify the landing page, `/authorization/`, `/api/classes/TwistApi/`, images and canonical URLs. Local build success does not prove the destination is deployed. Do not rely on the old Pages hostname redirecting.

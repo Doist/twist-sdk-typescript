@@ -4,17 +4,17 @@ The following is a set of guidelines for contributing to the Twist SDK. Please r
 
 ## Open Development
 
-All work on Twist SDK happens directly on [GitHub](https://github.com/Doist/twist-sdk-typescript). Both core team members and external contributors send pull requests that go through the same review process.
+All work on Twist SDK happens directly on [GitHub](https://github.com/todoist/twist-sdk-typescript). Both core team members and external contributors send pull requests that go through the same review process.
 
 ## Semantic Versioning
 
 Twist SDK follows [semantic versioning](https://semver.org/). We release patch versions for bugfixes, minor versions for new features or non-essential changes, and major versions for any breaking changes.
 
-Every significant change is documented in the [CHANGELOG.md](CHANGELOG.md) file.
+New release notes are retained with each GitHub release. [CHANGELOG.md](CHANGELOG.md) preserves the historical changelog.
 
 ## Branch Organization
 
-Submit all changes to the [main](https://github.com/Doist/twist-sdk-typescript/tree/main) branch (via PR) by default. For pre-release work, target the `next` branch instead — see [Release Process](#release-process-core-team-only) for details.
+Submit all changes to the [main](https://github.com/todoist/twist-sdk-typescript/tree/main) branch (via PR) by default. For pre-release work, target the `next` branch instead — see [Release Process](#release-process-core-team-only) for details.
 
 We do our best to keep `main` in good shape, with all tests passing.
 
@@ -65,32 +65,14 @@ PR titles are validated against the Conventional Commits format by CI. When squa
 
 ## Release Process (core team only)
 
-The release process is fully automated with [semantic-release](https://github.com/semantic-release/semantic-release). Pushing to `main` (after CI passes) triggers a stable release automatically.
+Release analysis uses [semantic-release](https://github.com/semantic-release/semantic-release) and existing `v<version>` tags. A push to `main` or `next` validates, builds and retains an artifact. Publication is a separate controlled workflow; it writes that same artifact to both registries before recording the release. Automatic publication is disabled during the first new-scope bootstrap.
 
-### Pre-releases
+The first current-forward `@todoist/twist-sdk` release is 3.0.1. After that baseline is published, conventional commits determine normal future versions. Keep `next` synchronized with `main` through the normal reviewed process before prerelease work; merge prerelease history into `main` without squashing to preserve commit analysis. `next` releases use the `next` npm tag. Do not rebuild old releases or change historical tags.
 
-To test features before publishing a stable release:
-
-1. **Sync `next` with `main`** before starting new work, and after each stable release (required for semantic-release to correctly initiate the next pre-release versioning cycle):
-
-    ```sh
-    git checkout next
-    git merge main -m "chore: sync next with main [skip ci]"
-    git push origin next
-    ```
-
-2. **Develop on a feature branch** based off `next` and open a PR targeting `next`.
-
-3. **Automatic pre-release:** Each PR merge into `next` triggers CI and publishes a pre-release version (e.g., `1.1.0-next.1`) to the `next` dist-tag on npm.
-
-4. **Promote to stable:** When ready, open a PR to merge `next` into `main`. Use a regular merge commit (not squash), as this preserves the individual commit history and allows semantic-release to correctly generate a comprehensive changelog and determine the version bump automatically.
-
-> **Note:** The `CHANGELOG.md` is only updated for stable releases on `main`. Pre-releases still get GitHub release notes and npm publication.
-
-### Installing a pre-release
+See [docs/releasing.md](docs/releasing.md) for exact workflow/trust settings, operator commands, retained-artifact retries and interrupted draft recovery.
 
 ```sh
-npm install @doist/twist-sdk@next
+npm install @todoist/twist-sdk@next
 ```
 
 ## License

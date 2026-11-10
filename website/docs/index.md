@@ -11,13 +11,13 @@ The official TypeScript SDK for the Twist REST API.
 ## Installation
 
 ```bash
-npm install @doist/twist-sdk
+npm install @todoist/twist-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { TwistApi } from '@doist/twist-sdk'
+import { TwistApi } from '@todoist/twist-sdk'
 
 const api = new TwistApi('your-api-token')
 

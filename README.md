@@ -9,7 +9,7 @@ This is the official TypeScript SDK for the Twist REST API.
 ## Installation
 
 ```bash
-npm install @doist/twist-sdk
+npm install @todoist/twist-sdk
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ npm install @doist/twist-sdk
 An example of initializing the API client and fetching a user's information:
 
 ```typescript
-import { TwistApi } from '@doist/twist-sdk'
+import { TwistApi } from '@todoist/twist-sdk'
 
 const api = new TwistApi('YOUR_API_TOKEN')
 
@@ -32,7 +32,7 @@ api.users
 For applications that need to access user data, use OAuth 2.0:
 
 ```typescript
-import { getAuthorizationUrl, getAuthToken, TwistApi } from '@doist/twist-sdk'
+import { getAuthorizationUrl, getAuthToken, TwistApi } from '@todoist/twist-sdk'
 
 // Step 1: Generate authorization URL
 const authUrl = getAuthorizationUrl(
@@ -159,7 +159,7 @@ results.forEach((result, index) => {
 
 ## Documentation
 
-For detailed documentation, visit the [Twist SDK Documentation](https://doist.github.io/twist-sdk-typescript/).
+For detailed documentation, visit the [Twist SDK Documentation](https://todoist.github.io/twist-sdk-typescript/).
 
 For information about the Twist REST API, see the [Twist API Documentation](https://developer.twist.com/v3/).
 
@@ -199,21 +199,9 @@ api.workspaces
 
 ## Releases
 
-This package follows semantic versioning. Currently in alpha release (0.1.0-alpha.x).
+Releases follow semantic versioning. Changes on `main` and `next` produce a checked, retained artifact. Publication to npm and GitHub Packages uses the same artifact and can retry a missing mirror without rebuilding or recalculating the version.
 
-A new version is published to the NPM Registry whenever a new release on GitHub is created. The workflow automatically detects prerelease versions (alpha, beta, rc) and publishes them with the appropriate tag.
-
-To prepare a new release:
-
-```bash
-# For alpha releases
-npm version prerelease --preid=alpha --no-git-tag-version
-
-# For stable releases
-npm version <major|minor|patch> --no-git-tag-version
-```
-
-Once the version in `package.json` is updated, push the changes and create a GitHub release. The workflow will automatically publish to npm with the correct tag.
+See the [release operator guide](docs/releasing.md) for the first `@todoist/twist-sdk@3.0.1` publication, trusted publishing setup, prereleases and interruption recovery.
 
 ## Feedback
 

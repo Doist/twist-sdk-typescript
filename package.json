@@ -1,13 +1,13 @@
 {
-    "name": "@doist/twist-sdk",
+    "name": "@todoist/twist-sdk",
     "version": "3.0.0",
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
-    "homepage": "https://doist.github.io/twist-sdk-typescript/",
-    "repository": "https://github.com/Doist/twist-sdk-typescript",
+    "homepage": "https://todoist.github.io/twist-sdk-typescript/",
+    "repository": "https://github.com/todoist/twist-sdk-typescript",
     "publishConfig": {
         "access": "public",
-        "provenance": true
+        "provenance": false
     },
     "license": "MIT",
     "type": "module",
@@ -43,7 +43,7 @@
         "attw": "attw --pack --ignore-rules fallback-condition false-esm",
         "audit": "npm audit --audit-level=moderate",
         "integrity-checks": "npm-run-all clean check test build attw",
-        "prepublishOnly": "npm run integrity-checks",
+        "prepublishOnly": "node -e \"throw new Error('Use the retained workflow artifact and scripts/release.mjs; see docs/releasing.md')\"",
         "prepare": "npm run build"
     },
     "dependencies": {

@@ -9,12 +9,12 @@ const config: Config = {
     tagline: 'The TypeScript SDK for the Twist REST API.',
     favicon: 'img/favicon.ico',
 
-    url: 'https://doist.github.io/',
+    url: 'https://todoist.github.io/',
     // Set the /<baseUrl>/ pathname under which your site is served
     // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: '/twist-sdk-typescript/',
 
-    organizationName: 'Doist',
+    organizationName: 'todoist',
     projectName: 'twist-sdk-typescript',
 
     onBrokenLinks: 'throw',
@@ -56,7 +56,7 @@ const config: Config = {
                     to: '/',
                 },
                 {
-                    href: 'https://github.com/Doist/twist-sdk-typescript',
+                    href: 'https://github.com/todoist/twist-sdk-typescript',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -91,7 +91,7 @@ const config: Config = {
                         },
                         {
                             label: 'GitHub',
-                            href: 'https://github.com/Doist/twist-sdk-typescript',
+                            href: 'https://github.com/todoist/twist-sdk-typescript',
                         },
                     ],
                 },

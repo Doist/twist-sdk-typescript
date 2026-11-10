@@ -1,78 +1,54 @@
-name: Release
+name: Release artifact
 
 on:
     push:
-        branches:
-            - main
-            - next
+        branches: [main, next]
+    workflow_dispatch:
 
+# semantic-release dry-run checks push authorization. This workflow never pushes or publishes.
 permissions:
-    # Enable `semantic-release` to publish a GitHub release and push commits
     contents: write
-    # Enable `semantic-release` to post comments on issues
-    issues: write
-    # Enable `semantic-release` to post comments on pull requests
-    pull-requests: write
-    # Enable the use of OIDC for trusted publishing and npm provenance
-    id-token: write
+    actions: read
+    packages: read
 
-# Release involves crucial steps that shouldn't be cancelled mid-run,
-# so new workflow runs are queued until the previous one finishes.
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
+    group: twist-sdk-release-artifact
     cancel-in-progress: false
 
 jobs:
-    release:
-        name: Release
+    build:
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next'
         runs-on: ubuntu-latest
         timeout-minutes: 30
-
         steps:
-            - name: Generate bot token
-              id: generate_token
-              uses: actions/create-github-app-token@v3
+            - uses: actions/checkout@v6
               with:
-                  app-id: ${{ secrets.DOIST_RELEASE_BOT_ID }}
-                  private-key: ${{ secrets.DOIST_RELEASE_BOT_PRIVATE_KEY }}
-                  permission-contents: write
-                  permission-issues: write
-                  permission-pull-requests: write
-
-            - name: Get bot user ID
-              id: bot_user
-              run: |
-                  user_id=$(gh api "/users/${{ steps.generate_token.outputs.app-slug }}[bot]" --jq .id)
-                  if [ -z "$user_id" ]; then
-                      echo "Failed to get bot user ID" >&2
-                      exit 1
-                  fi
-                  echo "id=$user_id" >> "$GITHUB_OUTPUT"
-              env:
-                  GH_TOKEN: ${{ steps.generate_token.outputs.token }}
-
-            - name: Checkout repository
-              uses: actions/checkout@v6
-              with:
-                  token: ${{ steps.generate_token.outputs.token }}
+                  ref: ${{ github.sha }}
                   fetch-depth: 0
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
+            # Keep HEAD attached at the event SHA: semantic-release must not move a detached
+            # checkout to a newer branch tip during its history fetch.
+            - name: Attach reviewed event commit
+              env:
+                  RELEASE_BRANCH: ${{ github.ref_name }}
+                  RELEASE_SHA: ${{ github.sha }}
+              run: git checkout -B "$RELEASE_BRANCH" "$RELEASE_SHA"
+            - uses: actions/setup-node@v6
               with:
                   node-version-file: .nvmrc
                   cache: npm
-                  scope: '@doist'
-                  registry-url: 'https://registry.npmjs.org/'
-
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Release
-              run: npx semantic-release
+            - run: npm ci --ignore-scripts --no-audit --no-fund
+            - run: npm run integrity-checks
+            - name: Analyze and pack once
+              id: prepare
+              run: node scripts/prepare-release.mjs
               env:
-                  GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-                  GIT_AUTHOR_NAME: ${{ steps.generate_token.outputs.app-slug }}[bot]
-                  GIT_AUTHOR_EMAIL: ${{ steps.bot_user.outputs.id }}+${{ steps.generate_token.outputs.app-slug }}[bot]@users.noreply.github.com
-                  GIT_COMMITTER_NAME: ${{ steps.generate_token.outputs.app-slug }}[bot]
-                  GIT_COMMITTER_EMAIL: ${{ steps.bot_user.outputs.id }}+${{ steps.generate_token.outputs.app-slug }}[bot]@users.noreply.github.com
+                  GITHUB_TOKEN: ${{ github.token }}
+                  GH_TOKEN: ${{ github.token }}
+                  GH_PACKAGES_TOKEN: ${{ github.token }}
+            - uses: actions/upload-artifact@v4
+              if: steps.prepare.outputs.prepared == 'true'
+              with:
+                  name: release-${{ github.run_id }}-${{ github.run_attempt }}
+                  path: .tmp/release/
+                  if-no-files-found: error
+                  retention-days: 90
