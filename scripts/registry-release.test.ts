@@ -10,15 +10,16 @@ const environment = {
     NODE_AUTH_TOKEN: 'fixture-old',
     NPM_CONFIG_REGISTRY: 'https://wrong.invalid',
 }
-function fixture(copies: Record<string, unknown> = {}) {
+function fixture(copies: Record<string, unknown> = {}, mirror = 'public') {
     const events: { args: string[]; options: any }[] = []
     let ghReads = 0
     const io = {
         execFileSync(_bin: string, args: string[], options: any) {
             events.push({ args, options })
+            if (args[0] === 'api' && mirror === 'inaccessible') throw new Error('GitHub API 404')
             if (args[0] === 'api')
                 return JSON.stringify({
-                    visibility: 'public',
+                    visibility: mirror,
                     repository: { full_name: 'todoist/twist-sdk-typescript', id: 1069607965 },
                 })
             if (args[0] === 'config')
@@ -112,4 +113,21 @@ describe('same artifact dual registry publication', () => {
             expect(event.options.env.NPM_CONFIG_REGISTRY).toBeUndefined()
         }
     })
+})
+
+describe('existing public mirror visibility gate', () => {
+    it.each(['publish npmjs', 'publish github', 'bootstrap-npm npmjs'])(
+        'requires a readable public identity before %s',
+        (operation) => {
+            const [command, destination] = operation.split(' ')
+            for (const visibility of ['inaccessible', 'private', 'internal']) {
+                const f = fixture({}, visibility)
+                expect(() => f.execute(command, destination)).toThrow()
+                expect(f.events.some((event) => ['login', 'publish'].includes(event.args[0]))).toBe(
+                    false,
+                )
+                expect(f.events.some((event) => event.args[0] === 'view')).toBe(false)
+            }
+        },
+    )
 })
