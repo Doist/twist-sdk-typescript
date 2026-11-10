@@ -77,7 +77,7 @@ export function publishArtifact(
                 ),
             )
         const preflightBoth = () => {
-            assertGithubMirror(options.github.env, io, options.github.cwd)
+            const githubTags = assertGithubMirror(options.github.env, io, options.github.cwd)
             const copies = {}
             for (const name of Object.keys(registries)) {
                 copies[name] = view(name, spec, 'dist.integrity')
@@ -88,9 +88,10 @@ export function publishArtifact(
                         `Different same-version bytes on ${name}; no write permitted`,
                     )
             }
-            return copies
+            return { copies, githubTags }
         }
-        const tags = (name) => {
+        const tags = (name, state) => {
+            if (name === 'github') return state.githubTags
             const value = view(name, metadata.name, 'dist-tags') ?? {}
             assert.ok(
                 value && typeof value === 'object' && !Array.isArray(value),
@@ -98,9 +99,9 @@ export function publishArtifact(
             )
             return value
         }
-        let copies = preflightBoth()
-        if (copies[destination] !== undefined)
-            return { status: 'already-matches', tags: tags(destination) }
+        let state = preflightBoth()
+        if (state.copies[destination] !== undefined)
+            return { status: 'already-matches', tags: tags(destination, state) }
         assert.notEqual(command, 'check-registry', `Missing ${destination} mirror`)
         if (command === 'bootstrap-npm') {
             assert.notEqual(
@@ -113,12 +114,13 @@ export function publishArtifact(
                 stdio: 'inherit',
             })
         }
-        const previousTags = tags(destination)
-        validatePublicationTag(metadata.version, tag, previousTags)
-        // Repeat immediately before EVERY registry write, including after interactive login.
-        copies = preflightBoth()
-        if (copies[destination] !== undefined)
-            return { status: 'already-matches', tags: tags(destination) }
+        // Refresh package readability, both exact copies and channel knowledge after login.
+        state = preflightBoth()
+        if (state.copies[destination] !== undefined)
+            return { status: 'already-matches', tags: tags(destination, state) }
+        const previousTags = tags(destination, state)
+        for (const name of Object.keys(registries))
+            validatePublicationTag(metadata.version, tag, tags(name, state))
         const args = [
             'publish',
             tarball,
@@ -131,13 +133,13 @@ export function publishArtifact(
         // GitHub visibility is independently administered; never send --access there.
         // Both login and publish can prompt for browser auth/2FA.
         io.execFileSync('npm', args, { ...options[destination], stdio: 'inherit' })
-        copies = preflightBoth()
+        state = preflightBoth()
         assert.equal(
-            copies[destination],
+            state.copies[destination],
             metadata.integrity,
             'Publication may have succeeded; inspect before retrying',
         )
-        const currentTags = tags(destination)
+        const currentTags = tags(destination, state)
         assert.equal(currentTags[tag], metadata.version)
         for (const channel of ['latest', 'next']) {
             if (tag !== channel)

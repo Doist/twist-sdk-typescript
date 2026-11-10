@@ -10,7 +10,7 @@ All work on Twist SDK happens directly on [GitHub](https://github.com/todoist/tw
 
 Twist SDK follows [semantic versioning](https://semver.org/). We release patch versions for bugfixes, minor versions for new features or non-essential changes, and major versions for any breaking changes.
 
-New release notes are retained with each GitHub release. [CHANGELOG.md](CHANGELOG.md) preserves the historical changelog.
+Release notes are retained with each GitHub release. Stable releases also update [CHANGELOG.md](CHANGELOG.md) and the source package/lock versions after both registries have accepted the original artifact; prereleases leave those source records unchanged.
 
 ## Branch Organization
 

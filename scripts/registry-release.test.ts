@@ -10,9 +10,15 @@ const environment = {
     NODE_AUTH_TOKEN: 'fixture-old',
     NPM_CONFIG_REGISTRY: 'https://wrong.invalid',
 }
-function fixture(copies: Record<string, unknown> = {}, mirror = 'public') {
+function fixture(
+    copies: Record<string, unknown> = {},
+    mirror = 'public',
+    registry = 'readable',
+    channels: Record<string, string> = {},
+) {
     const events: { args: string[]; options: any }[] = []
     let ghReads = 0
+    let rootReads = 0
     const io = {
         execFileSync(_bin: string, args: string[], options: any) {
             events.push({ args, options })
@@ -37,11 +43,38 @@ function fixture(copies: Record<string, unknown> = {}, mirror = 'public') {
             const destination = args.some((x) => x.includes('npm.pkg.github.com'))
                 ? 'github'
                 : 'npmjs'
+            if (destination === 'github' && registry === '404')
+                return { status: 1, stdout: '{"error":{"code":"E404"}}' }
+            if (args[2] === '--json') {
+                rootReads++
+                if (registry === 'late-404' && rootReads > 1)
+                    return { status: 1, stdout: '{"error":{"code":"E404"}}' }
+                const document = {
+                    name: metadata.name,
+                    'dist-tags': {
+                        latest:
+                            channels.github ||
+                            (copies.github === metadata.integrity ? metadata.version : '2.2.0'),
+                        alpha: '0.1.0-alpha.5',
+                    },
+                }
+                const variants: Record<string, unknown> = {
+                    malformed: {},
+                    'missing-tags': { name: metadata.name },
+                    'empty-tags': { name: metadata.name, 'dist-tags': {} },
+                    'array-tags': { name: metadata.name, 'dist-tags': [] },
+                    'bad-version': { name: metadata.name, 'dist-tags': { latest: 42 } },
+                    'wrong-name': { ...document, name: '@other/twist-sdk' },
+                }
+                return { status: 0, stdout: JSON.stringify(variants[registry] || document) }
+            }
             if (args[2] === 'dist-tags')
                 return {
                     status: 0,
                     stdout: JSON.stringify({
-                        latest: copies[destination] === metadata.integrity ? '3.0.1' : '3.0.0',
+                        latest:
+                            channels[destination] ||
+                            (copies[destination] === metadata.integrity ? '3.0.1' : '3.0.0'),
                     }),
                 }
             if (destination === 'github') ghReads++
@@ -130,4 +163,60 @@ describe('existing public mirror visibility gate', () => {
             }
         },
     )
+})
+
+describe('registry readability is separate from public REST metadata and identity', () => {
+    it.each(['publish npmjs', 'publish github', 'bootstrap-npm npmjs'])(
+        'rejects all registry404s before any write during %s',
+        (operation) => {
+            const [command, destination] = operation.split(' ')
+            const f = fixture({}, 'public', '404')
+            expect(() => f.execute(command, destination)).toThrow()
+            expect(
+                f.events.filter((event) => ['login', 'publish'].includes(event.args[0])),
+            ).toEqual([])
+        },
+    )
+    it.each(['malformed', 'missing-tags', 'empty-tags', 'array-tags', 'bad-version', 'wrong-name'])(
+        'rejects %s metadata even when REST and whoami succeed',
+        (registry) => {
+            const f = fixture({}, 'public', registry)
+            expect(() => f.execute()).toThrow()
+            expect(f.events.some((event) => event.args[0] === 'publish')).toBe(false)
+        },
+    )
+    it('accepts an absent version only on a readable existing registry package', () => {
+        const f = fixture({ npmjs: metadata.integrity })
+        expect(f.execute('publish', 'github').status).toBe('published')
+        expect(f.events.filter((event) => event.args[0] === 'publish')).toHaveLength(1)
+    })
+    it.each(['9.0.0-.', '1.2.3-next..1', '1.2.3-next.01', '1.2.3+bad..build'])(
+        'rejects malformed SemVer %s before every publication path',
+        (version) => {
+            for (const operation of ['publish npmjs', 'publish github', 'bootstrap-npm npmjs']) {
+                const [command, destination] = operation.split(' ')
+                const f = fixture({}, 'public', 'readable', { github: version })
+                expect(() => f.execute(command, destination)).toThrow()
+                expect(
+                    f.events.filter((event) => ['login', 'publish'].includes(event.args[0])),
+                ).toEqual([])
+            }
+        },
+    )
+    it.each(['npmjs', 'github'])(
+        'does not advance %s when the opposite registry channel is newer',
+        (destination) => {
+            const opposite = destination === 'npmjs' ? 'github' : 'npmjs'
+            const f = fixture({}, 'public', 'readable', { [opposite]: '3.0.2' })
+            expect(() => f.execute('publish', destination)).toThrow(/downgrade/)
+            expect(f.events.some((event) => event.args[0] === 'publish')).toBe(false)
+        },
+    )
+})
+
+it('rechecks root registry readability after interactive login before publishing', () => {
+    const f = fixture({}, 'public', 'late-404')
+    expect(() => f.execute('bootstrap-npm')).toThrow(/registry package is unreadable/)
+    expect(f.events.some((event) => event.args[0] === 'login')).toBe(true)
+    expect(f.events.some((event) => event.args[0] === 'publish')).toBe(false)
 })

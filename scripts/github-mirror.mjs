@@ -33,4 +33,32 @@ export function assertGithubMirror(
         'GitHub registry read authentication failed; do not interpret 404 as absence',
     )
     assert.ok(auth.stdout.trim(), 'Empty GitHub registry identity')
+    // REST visibility and whoami do not prove this token can read the npm package.
+    // This is a known existing mirror, so root404 is never an absence exception.
+    const result = io.spawnSync(
+        'npm',
+        ['view', '@todoist/twist-sdk', '--json', '--registry=https://npm.pkg.github.com/'],
+        { env: environment, cwd, encoding: 'utf8' },
+    )
+    assert.equal(
+        result.status,
+        0,
+        'Existing GitHub registry package is unreadable; no registry write permitted',
+    )
+    const document = JSON.parse(result.stdout)
+    assert.equal(document?.name, '@todoist/twist-sdk', 'Invalid GitHub registry package document')
+    const tags = document['dist-tags']
+    assert.ok(
+        tags && typeof tags === 'object' && !Array.isArray(tags),
+        'Invalid GitHub registry dist-tags',
+    )
+    assert.ok(Object.hasOwn(tags, 'latest'), 'Existing GitHub package has no latest channel')
+    for (const version of Object.values(tags)) {
+        assert.equal(typeof version, 'string', 'Invalid GitHub registry tag version')
+        assert.match(
+            version,
+            /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/,
+        )
+    }
+    return tags
 }

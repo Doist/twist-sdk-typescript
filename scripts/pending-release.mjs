@@ -12,6 +12,7 @@ import {
 } from './github-release-record.mjs'
 import { publishArtifact } from './registry-release.mjs'
 import { REPOSITORY, VERSION } from './release-policy.mjs'
+import { assertStableSourceRecorded, sourceRecordApi } from './source-release-record.mjs'
 
 // Analysis and publication are separate jobs. Do not make two different tarballs for the same
 // next version when another push arrives before the earlier artifact's publication is recorded.
@@ -33,10 +34,22 @@ export function requireUnallocatedVersion(version, tagExists) {
     )
 }
 
+export function successfulArtifactAttempt(run, artifact, readAttempt) {
+    const match = artifact.name.match(new RegExp(`^release-${run.id}-([1-9]\\d*)$`))
+    assert.ok(match, 'Artifact has no original attempt identity')
+    const attempt = readAttempt(run.id, match[1])
+    assert.equal(attempt.id, run.id)
+    assert.equal(String(attempt.run_attempt), match[1])
+    assert.equal(attempt.head_sha, run.head_sha)
+    assert.equal(attempt.status, 'completed', 'Wait for the original artifact attempt to finish')
+    return attempt.conclusion === 'success'
+}
+
 export async function checkPendingReleases(baselineTag, proposedVersion) {
     const releases = githubReleaseApi()
     const baseline = await assertRecordedBaseline(releases, baselineTag)
     if (baseline) {
+        assertStableSourceRecorded(sourceRecordApi(), baseline)
         for (const destination of ['npmjs', 'github'])
             publishArtifact({ metadata: baseline, destination, command: 'check-registry' })
     }
@@ -78,6 +91,14 @@ export async function checkPendingReleases(baselineTag, proposedVersion) {
                 (item) => new RegExp(`^release-${run.id}-[1-9]\\d*$`).test(item.name),
             )
             for (const artifact of artifacts) {
+                // A retained upload from a cancelled/failed attempt can never be published.
+                // Consult the original attempt, not the latest rerun's conclusion.
+                if (
+                    !successfulArtifactAttempt(run, artifact, (id, attempt) =>
+                        api(`actions/runs/${id}/attempts/${attempt}`),
+                    )
+                )
+                    continue
                 assert.ok(
                     !artifact.expired,
                     `Run ${run.id} artifact expired; recover the original bytes and record before another build`,

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { requireRecordedPlans, requireUnallocatedVersion } from './pending-release.mjs'
+import {
+    requireRecordedPlans,
+    requireUnallocatedVersion,
+    successfulArtifactAttempt,
+} from './pending-release.mjs'
 import { analyzeCommits } from './release-analysis.mjs'
 
 const context = (version: string, message: string, branch = 'main') => ({
@@ -8,6 +12,40 @@ const context = (version: string, message: string, branch = 'main') => ({
     commits: [{ hash: 'a'.repeat(40), message }],
     cwd: process.cwd(),
     logger: { log: () => {} },
+})
+
+describe('pending artifact attempts', () => {
+    const run = { id: 42, head_sha: 'a'.repeat(40), conclusion: 'failure' }
+    const artifact = { name: 'release-42-1' }
+    it('keeps the original successful attempt despite a failed later rerun', () => {
+        const calls: unknown[] = []
+        expect(
+            successfulArtifactAttempt(run, artifact, (id: number, attempt: string) => {
+                calls.push([id, attempt])
+                return { ...run, run_attempt: 1, status: 'completed', conclusion: 'success' }
+            }),
+        ).toBe(true)
+        expect(calls).toEqual([[42, '1']])
+    })
+    it.each(['failure', 'cancelled', 'timed_out'])('excludes %s original uploads', (conclusion) => {
+        expect(
+            successfulArtifactAttempt(run, artifact, () => ({
+                ...run,
+                run_attempt: 1,
+                status: 'completed',
+                conclusion,
+            })),
+        ).toBe(false)
+    })
+    it('waits for an unfinished original attempt', () => {
+        expect(() =>
+            successfulArtifactAttempt(run, artifact, () => ({
+                ...run,
+                run_attempt: 1,
+                status: 'in_progress',
+            })),
+        ).toThrow(/Wait for the original/)
+    })
 })
 
 describe('release lineage', () => {

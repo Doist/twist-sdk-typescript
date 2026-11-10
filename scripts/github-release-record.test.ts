@@ -48,12 +48,12 @@ function fixture(initialAssets = 0) {
         list: () => [release],
         get: () => release,
         assets: () => assets,
-        tagSha: () => metadata.sourceSha,
+        tagSha: (): string | undefined => metadata.sourceSha,
         readAsset: (id: number) => files[id].bytes,
-        createTag: () => {
+        createTag: (_tag: string, _sha: string): void => {
             throw new Error('must not retag')
         },
-        createDraft: () => {
+        createDraft: (_metadata: typeof metadata): typeof release => {
             throw new Error('must not recreate')
         },
         upload: (_id: number, name: string) => {
@@ -71,6 +71,34 @@ function fixture(initialAssets = 0) {
 }
 
 describe('interrupted draft release recovery', () => {
+    it('creates the first tag and draft from the original build before uploading and publishing', () => {
+        const f = fixture()
+        let exists = false
+        let tag: string | undefined
+        f.api.list = () => (exists ? [f.release] : [])
+        f.api.tagSha = () => tag
+        f.api.createTag = (name: string, sha: string) => {
+            expect(name).toBe('v3.0.1')
+            expect(sha).toBe(metadata.sourceSha)
+            f.writes.push('tag')
+            tag = sha
+        }
+        f.api.createDraft = (original: typeof metadata) => {
+            expect(original).toEqual(metadata)
+            f.writes.push('draft')
+            exists = true
+            return f.release
+        }
+        expect(completeReleaseRecord(f.api, metadata, files)).toBe(true)
+        expect(f.writes).toEqual([
+            'tag',
+            'draft',
+            ...files.map((f) => `upload:${f.name}`),
+            'publish',
+        ])
+        expect(completeReleaseRecord(f.api, metadata, files)).toBe(false)
+        expect(f.writes).toHaveLength(5)
+    })
     it.each([0, 1, 2])('resumes an existing draft with %i uploaded assets', (count) => {
         const f = fixture(count)
         expect(completeReleaseRecord(f.api, metadata, files)).toBe(true)
