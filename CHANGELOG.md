@@ -1,3 +1,13 @@
+## [4.0.0](https://github.com/todoist/twist-sdk-typescript/compare/v3.0.1...v4.0.0) (2026-11-11)
+
+### ⚠ BREAKING CHANGES
+
+* publish as @todoist/twist-sdk (#185)
+
+### Features
+
+* publish as @todoist/twist-sdk ([#185](https://github.com/todoist/twist-sdk-typescript/issues/185)) ([5b0662b](https://github.com/todoist/twist-sdk-typescript/commit/5b0662beffea85e16f04d6796851b8582ec2986b))
+
 ## [3.0.1](https://github.com/todoist/twist-sdk-typescript/compare/v3.0.0...v3.0.1) (2026-11-11)
 
 ### Bug Fixes
