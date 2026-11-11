@@ -12,7 +12,7 @@ The Twist SDK provides helper functions to implement OAuth 2.0 authentication fo
 For quick testing and development, you can use an API token directly:
 
 ```typescript
-import { TwistApi } from '@doist/twist-sdk'
+import { TwistApi } from '@todoist/twist-sdk'
 
 const api = new TwistApi('your-api-token')
 const user = await api.users.getSessionUser()
@@ -29,7 +29,7 @@ The SDK provides three main functions to handle OAuth authentication:
 First, generate a secure random state parameter to prevent CSRF attacks:
 
 ```typescript
-import { getAuthStateParameter } from '@doist/twist-sdk'
+import { getAuthStateParameter } from '@todoist/twist-sdk'
 
 const state = getAuthStateParameter()
 // Returns a UUID v4 string like: "550e8400-e29b-41d4-a716-446655440000"
@@ -43,7 +43,7 @@ req.session.oauthState = state
 Create the URL to redirect users to for authorization:
 
 ```typescript
-import { getAuthorizationUrl, TwistScope } from '@doist/twist-sdk'
+import { getAuthorizationUrl, TwistScope } from '@todoist/twist-sdk'
 
 const scopes: TwistScope[] = ['user:read', 'workspaces:read', 'channels:read', 'threads:write']
 
@@ -75,7 +75,7 @@ getAuthorizationUrl(
 After the user authorizes your app, Twist redirects them back to your redirect URI with an authorization code. Exchange this code for an access token:
 
 ```typescript
-import { getAuthToken } from '@doist/twist-sdk'
+import { getAuthToken } from '@todoist/twist-sdk'
 
 // In your OAuth callback handler:
 app.get('/callback', async (req, res) => {
@@ -131,7 +131,7 @@ getAuthToken(
 When a user logs out or revokes access, you can revoke the token:
 
 ```typescript
-import { revokeAuthToken } from '@doist/twist-sdk'
+import { revokeAuthToken } from '@todoist/twist-sdk'
 
 const success = await revokeAuthToken({
     clientId: 'your-client-id',
@@ -236,7 +236,7 @@ import {
     getAuthToken,
     TwistApi,
     TwistScope,
-} from '@doist/twist-sdk'
+} from '@todoist/twist-sdk'
 
 const app = express()
 
@@ -314,7 +314,7 @@ import type {
     AuthTokenRequestArgs,
     AuthTokenResponse,
     RevokeAuthTokenRequestArgs,
-} from '@doist/twist-sdk'
+} from '@todoist/twist-sdk'
 ```
 
 ## Additional Resources

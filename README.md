@@ -9,15 +9,17 @@ This is the official TypeScript SDK for the Twist REST API.
 ## Installation
 
 ```bash
-npm install @doist/twist-sdk
+npm install @todoist/twist-sdk
 ```
+
+Previously published as `@doist/twist-sdk`.
 
 ## Usage
 
 An example of initializing the API client and fetching a user's information:
 
 ```typescript
-import { TwistApi } from '@doist/twist-sdk'
+import { TwistApi } from '@todoist/twist-sdk'
 
 const api = new TwistApi('YOUR_API_TOKEN')
 
@@ -32,7 +34,7 @@ api.users
 For applications that need to access user data, use OAuth 2.0:
 
 ```typescript
-import { getAuthorizationUrl, getAuthToken, TwistApi } from '@doist/twist-sdk'
+import { getAuthorizationUrl, getAuthToken, TwistApi } from '@todoist/twist-sdk'
 
 // Step 1: Generate authorization URL
 const authUrl = getAuthorizationUrl(
