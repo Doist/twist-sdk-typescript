@@ -4,7 +4,7 @@
     "description": "A TypeScript wrapper for the Twist REST API.",
     "author": "Doist developers",
     "homepage": "https://doist.github.io/twist-sdk-typescript/",
-    "repository": "https://github.com/Doist/twist-sdk-typescript",
+    "repository": "https://github.com/todoist/twist-sdk-typescript",
     "publishConfig": {
         "access": "public",
         "provenance": true
