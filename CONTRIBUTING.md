@@ -90,7 +90,7 @@ To test features before publishing a stable release:
 ### Installing a pre-release
 
 ```sh
-npm install @doist/twist-sdk@next
+npm install @todoist/twist-sdk@next
 ```
 
 ## License
