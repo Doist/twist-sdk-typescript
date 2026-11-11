@@ -217,7 +217,7 @@ Once the version in `package.json` is updated, push the changes and create a Git
 
 ## Feedback
 
-Any feedback, such as bugs, questions, comments, etc. can be reported as _Issues_ in this repository, and will be handled by the Doist team.
+Any feedback, such as bugs, questions, comments, etc. can be reported as _Issues_ in this repository, and will be handled by the Todoist team.
 
 ## Contributions
 
