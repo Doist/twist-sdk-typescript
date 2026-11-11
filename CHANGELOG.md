@@ -1,3 +1,9 @@
+## [3.0.1](https://github.com/todoist/twist-sdk-typescript/compare/v3.0.0...v3.0.1) (2026-11-11)
+
+### Bug Fixes
+
+* **ci:** use the todoist GitHub org after the rename ([#184](https://github.com/todoist/twist-sdk-typescript/issues/184)) ([2135c7a](https://github.com/todoist/twist-sdk-typescript/commit/2135c7acc63d957f0f632661eb713642015e7509))
+
 ## [3.0.0](https://github.com/Doist/twist-sdk-typescript/compare/v2.9.4...v3.0.0) (2026-07-16)
 
 ### ⚠ BREAKING CHANGES
